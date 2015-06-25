@@ -465,10 +465,10 @@ class App():
 					  "data calibration, data extraction and quality score\n"
 					  "calculations (a modification of the Nicolardi et al,\n"
 					  "2010 publication).\n\n"
-					  "This software is released under the MIT License,\n"
+					  "This software is released under the Apache 2.0 License,\n"
 					  "Full details regarding this license can be found at\n"
 					  "the following URL:\n\n"
-					  "http://www.opensource.org/licenses/mit-license.php")
+					  "http://www.apache.org/licenses/LICENSE-2.0")
 		self.about = Label(top, text = information,justify=LEFT)
 		self.about.pack()
 		top.lift()

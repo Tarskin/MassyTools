@@ -9,6 +9,7 @@ import glob
 import itertools
 import math
 import matplotlib.pyplot as plt
+import matplotlib
 import os
 import numpy
 import sys
@@ -402,7 +403,7 @@ class App():
 		self.noise = "MM"
 		self.noiseQC = False
 		self.batch = False
-		self.fig = plt.figure(figsize=(8,6))
+		self.fig = matplotlib.figure.Figure(figsize=(8,6))
 		# The MassyTools Logo (created by Rosina Plomp, 2014)
 		if os.path.isfile('./UI.png'):
 			image = plt.imread('./UI.png')

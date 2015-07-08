@@ -176,12 +176,12 @@ BLOCKS = {	#######################
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
-					'potassium':{'mass':38.9631581, 
+					'potassium':{'mass':38.9631581,
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
-						'sulfurs':0},		
+						'sulfurs':0},
 					'proton':{'mass':1.007276466812,
 						'carbons':0,
 						'hydrogens':0,
@@ -317,7 +317,7 @@ class NavToolBar(NavigationToolbar2TkAgg):
 		self.parent = parent
 		NavigationToolbar2TkAgg.__init__(self,canvas,root)
 
-#############################################		
+#############################################
 # Class definitions (used for storing data) #
 #############################################
 class Results():
@@ -337,13 +337,13 @@ class analyteResult():
 		self.background = background
 		self.ppm = ppm
 		self.isotopes = isotopes
-		
+
 class isotopeResult():
 	def __init__(self,area,SN,QC):
 		self.area = area
 		self.SN = SN
-		self.QC = QC		
-		
+		self.QC = QC
+
 class Analyte():
 	def __init__(self,composition,mass,window,isotopes,backgroundPoint,backgroundArea,noise):
 		self.composition = composition
@@ -364,7 +364,7 @@ class Isotope():
 		self.sn = sn
 		self.maxIntensity = maxIntensity
 		self.qc = qc
-		
+
 ###############################
 # Start of actual application #
 ###############################
@@ -399,7 +399,7 @@ class App():
 		self.log = True
 		# Nose can be determined in multiple ways
 		# Options are 'RMS' and 'MM'
-		self.noise = "MM" 
+		self.noise = "MM"
 		self.noiseQC = False
 		self.batch = False
 		self.fig = plt.figure(figsize=(8,6))
@@ -414,45 +414,45 @@ class App():
 		self.toolbar = NavigationToolbar2TkAgg(self.canvas, root)
 		self.canvas.get_tk_widget().pack(fill=BOTH,expand=YES)
 		self.canvas.draw()
-		
+
 		# FRAME
 		frame = Frame(master)
 		master.title("MassyTools 0.1.7.3")
 		if os.path.isfile('./Icon.ico'):
 			master.iconbitmap(default='./Icon.ico')
-		
+
 		# VARIABLE ENTRIES
-		
+
 		# BUTTONS
-		
+
 		# MENU
 		menu = Menu(root)
 		root.config(menu = menu)
-		
+
 		filemenu = Menu(menu,tearoff=0)
 		menu.add_cascade(label="File", menu=filemenu)
 		filemenu.add_command(label="Open Input File", command = self.openFile)
-		
+
 		calibmenu = Menu(menu,tearoff=0)
 		menu.add_cascade(label="Calibrate",menu=calibmenu)
 		calibmenu.add_command(label="Open Calibration File", command = self.openCalibrationFile)
 		calibmenu.add_command(label="Open Exclusion File", command = self.openExclusionFile)
-		calibmenu.add_command(label="Calibrate", command = self.calibrateData)	
-		
+		calibmenu.add_command(label="Calibrate", command = self.calibrateData)
+
 		extractionmenu = Menu(menu,tearoff=0)
 		menu.add_cascade(label="Extraction",menu=extractionmenu)
 		extractionmenu.add_command(label="Open Composition File", command = self.openCompositionFile)
 		extractionmenu.add_command(label="Extract", command = self.extractCompositions)
-		
+
 		qualitymenu = Menu(menu,tearoff=0)
 		menu.add_cascade(label="QC",menu=qualitymenu)
 		qualitymenu.add_command(label="Open Quality Control File", command = self.openQualityFile)
 		qualitymenu.add_command(label="Calculate QC", command = self.singularQualityControl)
-		
+
 		menu.add_command(label="Batch Process", command = lambda: self.batchPopup(self))
-		
+
 		menu.add_command(label="About MassyTools", command = lambda: self.infoPopup())
-	
+
 	def infoPopup(self):
 		top = self.top = Toplevel()
 		information = ("MassyTools Version 0.1.7.3\n\n"
@@ -472,15 +472,15 @@ class App():
 		self.about = Label(top, text = information,justify=LEFT)
 		self.about.pack()
 		top.lift()
-		
+
 	def batchPopup(self,master):
 		""" This function creates a pop up box in which all the parameters
 		for a batch process can be set and visualized. The window can
 		access and set the masters exclusionFile, calibrationFile,
-		compositionFile and batchFolder variables. The window can also 
+		compositionFile and batchFolder variables. The window can also
 		call the outputPopup function (to specify the contents of final
 		summary) and start the actual batchProcess function.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -496,7 +496,7 @@ class App():
 			self.calFile.set(master.calibrationFile)
 		def exclusionButton():
 			master.openExclusionFile()
-			self.exclFile.set(master.exclusionFile)	
+			self.exclFile.set(master.exclusionFile)
 		def compositionButton():
 			master.openCompositionFile()
 			self.compFile.set(master.compositionFile)
@@ -531,12 +531,12 @@ class App():
 		#top.lift()
 		# Couple the attributes to button presses
 		top.attributes("-topmost", True)
-			
+
 	def outputPopup(self,master):
 		""" This function creates a pop up box to specify what output
 		should be shown in the final summary. The default value for all
 		variables is off (0) and by ticking a box it is set to on (1).
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -617,13 +617,13 @@ class App():
 		self.button = Button(top,text='Ok',command = lambda: close(self))
 		self.button.grid(row = 16, column = 0, columnspan = 2)
 		top.lift()
-		
+
 	def openFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
 		to select a file. The chosen file is then read (by the readData
 		function) and the read data is used to plot the selected spectrum
 		on the screen (by the plotData function).
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -634,12 +634,12 @@ class App():
 			setattr(self,'inputFile',file_path)
 			data = self.readData(self.inputFile)
 			self.plotData(data)
-	
+
 	def openCalibrationFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
-		to select a file. The chosen file is then set to the 
+		to select a file. The chosen file is then set to the
 		self.calibrationFile variable.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -648,12 +648,12 @@ class App():
 			pass
 		else:
 			setattr(self,'calibrationFile',file_path)
-	
+
 	def openCompositionFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
-		to select a file. The chosen file is then set to the 
+		to select a file. The chosen file is then set to the
 		self.compositionFile variable.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -662,26 +662,26 @@ class App():
 			pass
 		else:
 			setattr(self,'compositionFile',file_path)
-	
+
 	def openExclusionFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
-		to select a file. The chosen file is then set to the 
+		to select a file. The chosen file is then set to the
 		self.exclusionFile variable.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
 		file_path = tkFileDialog.askopenfilename()
 		if not file_path:
 			pass
-		else:		
+		else:
 			setattr(self,'exclusionFile',file_path)
-			
+
 	def openQualityFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
-		to select a file. The chosen file is then set to the 
+		to select a file. The chosen file is then set to the
 		self.qualityFile variable.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -690,12 +690,12 @@ class App():
 			pass
 		else:
 			setattr(self,'qualityFile',file_path)
-		
+
 	def openBatchFolder(self):
 		""" This function opens a Tkinter filedialog, asking the user
 		to select a directory. The chosen directory is then set to the
 		self.batchFolder variable.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -704,16 +704,16 @@ class App():
 			pass
 		else:
 			setattr(self,'batchFolder',folder_path)
-		
+
 	def batchProcess(self,master):
-		""" This function controlls the batch analysis functionality. 
-		The function first checks if at least one meaningful file is 
+		""" This function controlls the batch analysis functionality.
+		The function first checks if at least one meaningful file is
 		selected and if not gives a 'File Error'. The function will then
 		perform first the calibration (if self.calibrationFile is set)
 		and then the extraction (if self.compositionFile is set). The
 		quality control is performed during the extraction (using the
 		self.compositionFile as the input analytes).
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -761,7 +761,7 @@ class App():
 			master.batchProcessing = 0
 			return
 		# Initialize the composition file (to only calculate isotopic patterns once
-		if self.compositionFile != "":			
+		if self.compositionFile != "":
 			self.initCompositionMasses(self.compositionFile)
 		for file in glob.glob(str(self.batchFolder)+"/*" + EXTENSION):
 			name = os.path.split(file)
@@ -822,21 +822,21 @@ class App():
 		# Destroy progress bar
 		barWindow.destroy()
 		tkMessageBox.showinfo("Status Message","Batch Process finished on "+str(datetime.now()))
-					
+
 	def checkMaximaSpacing(self,maxima,data):
 		""" This function ensures that the observed local maxima
 		(calibrants) are in accordance with the calibration rules (set
 		at the top of the program). The function examines three distinct
-		regions: 
-		
+		regions:
+
 		start - ( ( end <-> start ) / 3 ) + start
 		( ( end - start ) /3 ) + start <-> ( ( ( end-start)/3)*2 ) + start
 		( ( ( end-start)/3)*2 ) + start <-> end
-		
+
 		The number of maxima in each region is summed and compared to
-		NUM_LOW_RANGE, NUM_MID_RANGE and NUM_HIGH_RANGE. The sum of all 
+		NUM_LOW_RANGE, NUM_MID_RANGE and NUM_HIGH_RANGE. The sum of all
 		regions is compared with NUM_TOTAL.
-		
+
 		INPUT 1: A list containing floats (the m/z of local maxima)
 		INPUT 2: A list of (m/z, intensity) tuples
 		OUTPUT: A Boolean (True if the check passes, False if not)
@@ -865,7 +865,7 @@ class App():
 		takes the list of potentialCalibrants and subtracts/adds the
 		user defined CALIBRATION_WINDOW to the calibrant m/z and appends
 		both values as a tuple to a list.
-		
+
 		INPUT: A list containing floats (the calibrant m/z's)
 		OUTPUT: A list of float tuples (begin,end)
 		"""
@@ -873,16 +873,16 @@ class App():
 		for i in potentialCalibrants:
 			included.append((float(i)-CALIBRATION_WINDOW,float(i)+CALIBRATION_WINDOW))
 		return included
-	
+
 	def calcDistribution(self, element, number):
 		""" This function calculates the fraction of the total intensity
-		that is present in each isotope of the given element based on 
-		a binomial distribution. The function takes the name of the 
+		that is present in each isotope of the given element based on
+		a binomial distribution. The function takes the name of the
 		element and the number of atoms of said element as an input and
 		returns a list of (m/z,fraction) tuples. The number of isotopes
 		that is returned is dependant on the distribution, once fractions
 		fall below 0.01 the function stops.
-		
+
 		INPUT1: A string containing the code for the element (ie 33S)
 		INPUT2: An integer listing the number of atoms
 		OUTPUT: A list of float tuples (isotope m/z, isotope fraction).
@@ -898,21 +898,21 @@ class App():
 				if f <= MIN_CONTRIBUTION:
 					break
 		return fractions
-	
+
 	def parseAnalyte(self,Analyte):
 		""" This function splits the Analyte input string into a parts
 		and calculates the total number of each element of interest per
 		Analyte. The function will then attach further elements based on
 		the user specified mass modifiers before calling the isotopic
-		distribution function. The function finally returns a list 
+		distribution function. The function finally returns a list
 		containing the analyte mass and distribution lists for each
 		isotopic state.
-		
+
 		INPUT: A string containing the Analyte (ie 'H4N4')
 		OUTPUT: A list containing the Analyte m/z followed by several
 				other lists (1 for each isotopic state).
 		"""
-		results = []		
+		results = []
 		mass = 0
 		numCarbons = 0
 		numHydrogens = 0
@@ -950,12 +950,12 @@ class App():
 		sulfurs34 = self.calcDistribution(S34,numSulfurs)
 		sulfurs36 = self.calcDistribution(S36,numSulfurs)
 		return ((mass,carbons,hydrogens,nitrogens,oxygens17,oxygens18,sulfurs33,sulfurs34,sulfurs36))
-					
+
 	def getChanceNetwork(self,(mass,carbons,hydrogens,nitrogens,oxygens17,oxygens18,sulfurs33,sulfurs34,sulfurs36)):
 		""" This function calculates the total chance network based on
 		all the individual distributions. The function multiplies all
 		the chances to get a single chance for a single option.
-		
+
 		INPUT: A list containing the Analyte m/z followed by several
 			   other lists (1 for each isotopic state).
 		OUTPUT: A list of float tuples (isotopic m/z, isotopic chance)
@@ -970,7 +970,7 @@ class App():
 	def mergeChances(self,totals):
 		""" This function merges all the isotopic chances based on the
 		specified resolution of the machine.
-		
+
 		INPUT: A list of float tuples (isotopic m/z, isotopic chance)
 		OUTPUT: A sorted list of float tuples (isotopic m/z, isotopic
 		        chance).
@@ -989,18 +989,18 @@ class App():
 					newdata[(kk,vv)] = False
 			results.append((sum(keys)/sum(values),sum(values)))
 		return results
-	
+
 	def calibrateData(self):
 		""" This function controls the calibration process. The function
 		first checks if the self.calibrationFile variable was set (return
-		a 'File Error' if not). The function then reads the 
+		a 'File Error' if not). The function then reads the
 		self.calibrationFile to get a list of potentialCalibrants. The
 		function then creates an inclusionList (based on an exclusionFile
 		or the calibrants and a user defined window (CALIBRATION_WINDOW)).
 		The function then reads the input file into a list of (m/z,int)
 		tuples from which it attempts to find the local maxima (given
 		the inclusionList). The actual observed m/z of the calibrants
-		that passed the S/N Cutoff is then used to verify if enough 
+		that passed the S/N Cutoff is then used to verify if enough
 		calibrants were present (based on calibration rule at top of
 		program). A 2nd degree polynomial is fitted through the pairs
 		of expected m/z (actualCalibrants) and observed m/z (maximaMZ).
@@ -1008,7 +1008,7 @@ class App():
 		transformed m/z values, the transformed spectrum is also shown
 		on the main window (if the program is not running in batchProcess
 		mode).
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -1017,7 +1017,7 @@ class App():
 			return
 		maximaMZ = []
 		#window = self.calibrationMenu()
-		potentialCalibrants = self.readCalibrants()	
+		potentialCalibrants = self.readCalibrants()
 		if self.exclusionFile != "":
 			included = self.readInclusionRange()
 		else:
@@ -1030,7 +1030,7 @@ class App():
 				with open('MassyTools.log','a') as fw:
 					fw.write(str(datetime.now())+"\tNot enough datapoints for calibration\n")
 			self.writeUncalibratedFile()
-			return 
+			return
 		# Strip the m/z values from the maxima
 		for i in maxima:
 			if i[1] == 0:
@@ -1051,13 +1051,13 @@ class App():
 		# Ideally this would throw a pop up with calibration
 		# parameters and display the calibration 'curve'
 		self.transformFile(f)
-	
+
 	def writeCalibration(self,observed,expected):
 		""" This function takes the calibrant observed m/z and expected
 		m/z and calculates the PPM error after calibration from those
 		values. The expected, observed m/z and ppm error are then written
 		to a file (calibrated_{input_name}.error).
-		
+
 		INPUT 1: A list of m/z values (the observed m/z for calibrants)
 		INPUT 2: A list of m/z values (the expected m/z for calibrants)
 		OUTPUT: None
@@ -1077,7 +1077,7 @@ class App():
 				fw.write(str(expected[index])+"\t"+str(i)+"\t"+str(ppm)+"\n")
 		if self.batch == 0:
 			self.displayError(errors)
-			
+
 	def displayError(self,errors):
 		""" This function takes the residual mass error (in ppm) after
 		calibration and displays a graph visualize this difference. The
@@ -1117,12 +1117,12 @@ class App():
 			axes.annotate(i[1],(x_array[counter]+0.1,y_array[counter]+0.1))
 			axes.vlines(x_array[counter],0,y_array[counter],linestyles='dashed')
 		canvas2.draw()
-	
+
 	def writeUncalibratedFile(self):
-		""" This function reads the uncalibrated data file and writes it 
-		away as an uncalibrated data file, this is important to have 
+		""" This function reads the uncalibrated data file and writes it
+		away as an uncalibrated data file, this is important to have
 		these files listed in the final output (summary).
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -1139,26 +1139,26 @@ class App():
 	def gaussFunction(self, x, *p):
 		""" This function contains the guassian prototype used in
 		scipy curve fitting.
-		
+
 		INPUT 1: Data ?
 		INPUT 2: A set of starting variable values
 		OUTPUT: A representation of the guassian function ?
 		"""
 		A, mu, sigma = p
 		return A*numpy.exp(-(x-mu)**2/(2.*sigma**2))
-		
+
 	def getLocalMaxima(self,data,included):
 		""" This function parses the data per entry of the included list.
-		A set of binary searches is performed to find the elements of 
-		data belonging to the current calibrant (included list). A 
-		list of several windows in front of each calibrant region is 
+		A set of binary searches is performed to find the elements of
+		data belonging to the current calibrant (included list). A
+		list of several windows in front of each calibrant region is
 		examined to retrieve the background area, background intensity
-		and average noise levels (required to determine calibrant S/N 
+		and average noise levels (required to determine calibrant S/N
 		after background subtraction). A spline is fitted through the
 		datapoints in the calibrant region from which the local maximum
 		m/z coordinate is retrieved, the m/z value is appended to a list
 		(maxima) if it is above the user specified S/N cutoff.
-		
+
 		INPUT 1: A list of (m/z, intensity) tuples
 		INPUt 2: A list of (m/z, m/z) tuples
 		OUTPUT: A list of floats ((m/z,intensity), the observed local maxima)
@@ -1200,7 +1200,7 @@ class App():
 						noise = maxNoise - minNoise
 					else:
 						tkMessageBox.showinfo("Noise Error","No valid noise method selected")
-						return		
+						return
 			x_points = []
 			y_points = []
 			# Retrieve the x-coords and y-coords from the data structure for fitting
@@ -1243,7 +1243,7 @@ class App():
 					with open('MassyTools.log','a') as fw:
 						fw.write("Guassian Curve Fit failed for calibrant: "+str(i)+", reverting to non fitted local maximum\n")
 				for j in data[begin:end]:
-					if j[1] > maximum[1]: 
+					if j[1] > maximum[1]:
 						maximum = (j[0],j[1])
 			# Ensure that only peaks of S/N above the specified (CALIB_S_N_CUTOFF) are used for calibration
 			if maximum[1] > backgroundValue + CALIB_S_N_CUTOFF * noise:
@@ -1253,7 +1253,7 @@ class App():
 					with open('MassyTools.log','a') as fw:
 						fw.write(str(datetime.now())+"\t"+str(maximum)+" was not above cutoff: "+str(backgroundValue + CALIB_S_N_CUTOFF * noise)+"\n")
 		return maxima
-		
+
 	def getObservedCalibrants(self,maxima,potentialCalibrants):
 		""" This function compares the list of local maxima with the
 		expected calibrants. The function will perceive the observed
@@ -1262,13 +1262,13 @@ class App():
 		function then appends the theoretical m/z value of a calibrants
 		that were actually observed to a list (actualCalibrants) which
 		is returned at the end of the function.
-		
+
 		INPUT 1: A list of floats containg the observed local maxima (of
 		the spline fit within each inclusion range, assuming that they
 		were above user specified S/N cut off).
 		INPUT 2: A list of floats containing the theoretical m/z of all
 		calibrants.
-		OUTPUT: A list of floats containing the theoretical m/z of the 
+		OUTPUT: A list of floats containing the theoretical m/z of the
 		calibrants which were near an oberved local maxima.
 		"""
 		actualCalibrants = []
@@ -1281,7 +1281,7 @@ class App():
 					closest = float(j)
 			actualCalibrants.append(closest)
 		return actualCalibrants
-				
+
 	def readInclusionRange(self):
 		""" This function reads the exclusion file in a line by line
 		method. The new line character ('\n') is stripped from each line
@@ -1289,8 +1289,8 @@ class App():
 		2 elements read per line are then appended to a list (excluded).
 		The excluded list is read and and is transformed to a new list
 		(included) which contains the start and end point of a region
-		to be read (for the calibration) per list entry (tuple).  
-		
+		to be read (for the calibration) per list entry (tuple).
+
 		INPUT; None
 		OUTPUT: A list of (m/z,m/z) tuples containg the regions to be
 		screened for the calibrants.
@@ -1302,20 +1302,20 @@ class App():
 			for line in fr:
 				line = line.rstrip('\n')
 				values = line.split()
-				values = filter(None, values) 
+				values = filter(None, values)
 				excluded.append((values[0],values[1]))
 		# Transform the excluded regions into included regions
 		for index,i in enumerate(excluded):
 			if index+1 < len(excluded):
 				included.append((float(excluded[index][1]),float(excluded[index+1][0])))
 		return included
-				
+
 	def readCalibrants(self):
 		""" This file reads the calibrationFile, parses all lines that
 		do not contain 'm/z' on the second index after a split on tabs.
 		The second element of each line (the m/z) is appended to the list
 		potentialCalibrants which is returned at the end of the function.
-		
+
 		INPUT: None
 		OUTPUT: A list of floats (the m/z value of the calibrants)
 		"""
@@ -1327,15 +1327,15 @@ class App():
 				else:
 					line = line.rstrip('\n')
 					line = line.split('\t')
-					line = filter(None, line) 
+					line = filter(None, line)
 					if len(line) >= 2:
 						potentialCalibrants.append(float(line[1]))
 		return potentialCalibrants
-		
+
 	def transformFile(self, f):
 		""" This function gets a single function as input, reads the
 		raw data file and transforms the read m/z values in the raw data
-		file with the given function. The transformed m/z values are 
+		file with the given function. The transformed m/z values are
 		stored in a calibrated_<inputfile>.EXTENSION file (if program is running
 		in batchProcess mode) or asks the user for a filepath to save
 		the calibrated file (if program is running in single spectrum mode).
@@ -1351,7 +1351,7 @@ class App():
 				else:
 					tkMessageBox.showinfo("File Error","No output file selected")
 					return
-			else: 
+			else:
 				parts = os.path.split(str(self.inputFile))
 				output = "calibrated_"+str(parts[-1])
 				# Maybe replace batchFolder without outputFolder?
@@ -1380,15 +1380,15 @@ class App():
 				fw.write(joinedOutput)
 			if self.log == True:
 				with open('MassyTools.log','a') as fw:
-					fw.write(str(datetime.now())+"\tFinished writing output file: "+output+"\n")	
-	
+					fw.write(str(datetime.now())+"\tFinished writing output file: "+output+"\n")
+
 	def singularQualityControl(self):
 		""" This function creates a list of Analyte instances based on
 		a file with chemicals that are meant to be used for the QC. The
 		function extracts the data related to the mentioned chemicals and
-		calculates the QC value (based on Nicolardi S. et al, 2010). 
+		calculates the QC value (based on Nicolardi S. et al, 2010).
 		The method to display these values is currently not 'good' yet.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -1402,16 +1402,16 @@ class App():
 		peaks = self.extractData(self.inputFile,peaks)
 		peaks = self.qualityControl(peaks)
 		# TODO: How should we display this?
-	
+
 	def qualityControl(self,compositions):
 		""" This function takes a list of Analyte instances and iterates
 		through them. The function then calculates the fraction of the
-		total intensity that should be present in each isotope and 
+		total intensity that should be present in each isotope and
 		compares that to the fraction of the observed intensity that is
 		present in that isotope. The function than performs a QC check
 		on these values based on Nicolardi S. et al, 2010. The calculated
 		QC value is added to the Analyte instance.
-		
+
 		INPUT: A list of Analyte instances
 		OUTPUT: A list of Analyte instances
 		"""
@@ -1424,7 +1424,7 @@ class App():
 			if total == 0:
 				if self.log == True:
 					with open('MassyTools.log','a') as fw:
-						fw.write(str(datetime.now())+"\tSkipping QC calculation for "+str(i.composition)+" due to the total area being 0\n")	
+						fw.write(str(datetime.now())+"\tSkipping QC calculation for "+str(i.composition)+" due to the total area being 0\n")
 				break
 			for j in i.isotopes[1:]:
 				if self.noiseQC == True:
@@ -1435,7 +1435,7 @@ class App():
 				if self.batch == 0:
 					print "Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % f)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc)
 		return compositions
-	
+
 	def extractCompositions(self):
 		""" This function controls the data extraction that is performed
 		in the GUI (visual) aspect of the program. The function first
@@ -1446,7 +1446,7 @@ class App():
 		instances. The function finally hands the filled list of Analyte
 		instances to a function that will write the results to a result
 		file.
-		
+
 		INPUT: None
 		OUTPUT: None
 		"""
@@ -1460,16 +1460,16 @@ class App():
 		compositions = self.calcCompositionMasses(self.compositionFile)
 		compositions = self.extractData(self.inputFile,compositions)
 		self.writeResults(compositions)
-		
+
 	def initCompositionMasses(self, file):
-		""" This function reads the composition file. Calculates the 
-		masses for the compositions read from the composition file. 
+		""" This function reads the composition file. Calculates the
+		masses for the compositions read from the composition file.
 		The function then calculates the mass and fraction of total
 		ions that should be theoretically present in. The final output
 		is a modified reference list containing each analyte's structure
 		and window followed by a list of isotope m/z and isotopic
 		fraction.
-		
+
 		INPUT: A string containing the path of the composition file
 		OUTPUT: None
 		"""
@@ -1490,17 +1490,17 @@ class App():
 			for i in lines:
 				isotopes = []
 				i = i.split("\t")
-				i = filter(None, i) 
+				i = filter(None, i)
 				if len(i) == 2:
 					window = float(i[1])
 				else:
 					window = CALCULATION_WINDOW
 				values =  self.parseAnalyte(i[0])
 				totals = self.getChanceNetwork(values)
-				results = self.mergeChances(totals)			
+				results = self.mergeChances(totals)
 				results.sort(key=lambda x: x[0])
 				fw.write(str(i[0])+"\t"+str(window))
-				fTotal = 0 
+				fTotal = 0
 				for index,j in enumerate(results):
 					fTotal += j[1]
 					fw.write("\t"+str(j[0])+"\t"+str(j[1]))
@@ -1508,17 +1508,17 @@ class App():
 						fw.write("\n")
 						break
 		print "PRE-PROCESSING COMPLETE"
-		
+
 	def calcCompositionMasses(self, file):
-		""" This function reads the composition file. Reads the 
+		""" This function reads the composition file. Reads the
 		masses and other relevant information from the composition file.
 		The function calls the extractBackground function to get the
 		information regarding each analyte's background and appends it
-		to the list 'isotopes'. The function creates an instance of 
+		to the list 'isotopes'. The function creates an instance of
 		the Analyte class per composition and the isotopes list is attached
-		to the Analyte class which itself is appended to a list which is 
+		to the Analyte class which itself is appended to a list which is
 		returned at the end of the function.
-		
+
 		INPUT: A string containing the path of the composition file
 		OUTPUT: A list filled with Analyte instances
 		"""
@@ -1535,7 +1535,7 @@ class App():
 		for i in lines:
 			isotopes = []
 			i = i.split("\t")
-			i = filter(None, i) 
+			i = filter(None, i)
 			isoMasses = i[2::2]
 			isoFractions = i[3::2]
 			window = float(i[1])
@@ -1551,7 +1551,7 @@ class App():
 					break
 			compositions.append(Analyte(i[0],float(i[2]),window,isotopes,backgroundPoint,backgroundArea,noise))
 		return compositions
-	
+
 	###########################
 	### DEPRECATED FUNCTION ###
 	###########################
@@ -1578,7 +1578,7 @@ class App():
 						area = j
 						mass = masses[index]
 				analytes.append((analyte, mass, window, area))
-		# Get the accurate mass of highest isotope 
+		# Get the accurate mass of highest isotope
 		data = self.readData(self.inputFile)
 		inclusion = []
 		exactMasses = []
@@ -1599,17 +1599,17 @@ class App():
 			fw.write("Expected m/z\tObserved m\z\tPPM Error\n")
 			for index,i in enumerate(errors):
 				fw.write(str(i[0])+"\t"+str(i[1])+"\t"+str(i[2])+"\n")
-		
+
 	def extractData(self, file, compositions):
-		""" This function reads the raw datafile. Iterates over the 
+		""" This function reads the raw datafile. Iterates over the
 		list of Analyte instances, retrieves the data for each Analyte
 		instance from the raw data and stores it in the Analyte instance.
-		The function also calls a function that will find the background 
-		area, background value and noise value by examining a user 
-		defined range of windows in front of the m/z belonging to the 
+		The function also calls a function that will find the background
+		area, background value and noise value by examining a user
+		defined range of windows in front of the m/z belonging to the
 		currently examined Analyte instance.
-		
-		INPUT 1: A string containg the path of the raw data file 
+
+		INPUT 1: A string containg the path of the raw data file
 		INPUT 2: A list of Analyte instances
 		OUTPUT: A list of Analyte instances
 		"""
@@ -1643,7 +1643,7 @@ class App():
 								if k > maximum:
 									maximum = k
 									accurateMass = newX[index]
-							# Calculate ppm error and attach it to analyte		
+							# Calculate ppm error and attach it to analyte
 							i.ppm = ((accurateMass - j.mass) / j.mass) * 1000000
 			else:
 				i.ppm = "NA"
@@ -1674,13 +1674,13 @@ class App():
 				j.obsArea = total
 				j.maxIntensity = maxIntensity
 		return compositions
-		
+
 	def extractBackground(self,data,mass,window):
 		""" This function will parse a region of the given data structure
 		to identify the background and noise. This is done by examining
 		a series of consecutive windows and taking the set with the lowest
 		average as being a background region. This region is used to
-		calculate the background area (intensity * m/z width), background 
+		calculate the background area (intensity * m/z width), background
 		and noise (both as intensity only). The function returns these
 		values as a tuple.
 
@@ -1729,20 +1729,20 @@ class App():
 					noise = maxNoise - minNoise
 				else:
 					tkMessageBox.showinfo("Noise Error","No valid noise method selected")
-					return				
+					return
 		# Custom stuff to test a window of 1
 		"""backgroundArea = numpy.average(sum(totals[i][0]))
 		noise = numpy.std(totals[i][1])
 		backgroundPoint = numpy.average(totals[i][1])"""
 		return (backgroundPoint,backgroundArea,noise)
-		
+
 	def writeResults(self,results):
 		""" This function takes a list of Analyte instances, iterates
 		through the list and writes a line of results to an outputfile.
 		The output file's default name is the input's file name.raw.
-		The .raw files are what will be used in creating the summary 
+		The .raw files are what will be used in creating the summary
 		output file later on during program execution.
-		
+
 		INPUT: A list of Analyte instances
 		OUTPUT: A result file -> file_name.raw
 		"""
@@ -1781,21 +1781,21 @@ class App():
 				for j in i.isotopes:
 					fw.write(str(j.obsArea)+"\t"+str(j.sn)+"\t"+str(j.qc)+"\t")
 				fw.write("\n")
-		
+
 	def combineResults(self):
-		""" This function first parses all the .raw result files and 
+		""" This function first parses all the .raw result files and
 		creates a list filled with Results instances from the read
 		values. The function then iterates through the list of Results
 		instances and writes the user selected values (output blocks)
 		to the summary.txt file.
-		
+
 		INPUT: None
-		OUTOUT: A file -> summary.txt" 
+		OUTOUT: A file -> summary.txt"
 		"""
 		numIsotopes = 0
 		counter = 0
 		data = []
-		
+
 		# Construct the 'Mass' header
 		header = "[M"
 		if 'sodium' in CHARGE_CARRIER:
@@ -1808,13 +1808,13 @@ class App():
 			header = header + "]+"
 		if 'neg_proton' in CHARGE_CARRIER:
 			header = header + "-H]-"
-			
+
 		# Read the raw files and construct the data structure
 		# Maybe change batchFolder to outputFolder?
 		rawFiles = os.path.join(self.batchFolder,"*.raw")
 		for file in glob.glob(rawFiles):
 			calibrated = 1
-			with open(file,'r') as fr: 
+			with open(file,'r') as fr:
 				total = 0
 				totalBck = 0
 				values = []
@@ -1826,12 +1826,12 @@ class App():
 					pass
 				else:
 					# Ensure that files that contained _ to begin with aren't broken
-					name = name.split("calibrated_")[1] 
-					#name = name.split("calibrated_")[1:] 
-					#name = ''.join(name)	
+					name = name.split("calibrated_")[1]
+					#name = name.split("calibrated_")[1:]
+					#name = ''.join(name)
 				name = name.split(".")[0]
 				for line in fr:
-					parts = line.split("\t")			
+					parts = line.split("\t")
 					values.append(parts)
 				# Custom addition for albert
 				inputfile = name.split(".")[0]
@@ -1852,7 +1852,7 @@ class App():
 							float(j[0])
 							isotopeResults.append(isotopeResult(float(j[0]),float(j[1]),float(j[2])))
 							if float(j[0]) > float(i[7]):
-								totalBck += float(j[0]) - float(i[7]) 
+								totalBck += float(j[0]) - float(i[7])
 						except ValueError:
 							pass
 					analyteResults.append(analyteResult(str(i[0]),float(i[1]),float(i[3]),float(i[7]),str(i[6]),isotopeResults))
@@ -1874,7 +1874,7 @@ class App():
 				name = name.split("uncalibrated_")[1]
 				name = name.split(".")[0]
 				data.append(Results(name,calibrated,total,total,total,values))
-		
+
 
 		################################################################
 		# Sort the data list on the filename (alphabetical)		       #
@@ -1885,13 +1885,13 @@ class App():
 		# Block (containing the metadata)                              #
 		################################################################
 		new = sorted(data, key = lambda Results: Results.name)
-	
+
 		# Write the data structure to the output file
 		# Maybe change batchFolder with outputFolder?
 		utc_datetime = datetime.utcnow()
 		s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
 		filename = s +"_"+OUTPUT_FILE
-		summaryFile = os.path.join(self.batchFolder,filename)		
+		summaryFile = os.path.join(self.batchFolder,filename)
 		with open(os.path.join(self.batchFolder,summaryFile),'w') as fw:
 			# Write the parameters used during the processing
 			fw.write("Processing Parameters\n")
@@ -1912,9 +1912,9 @@ class App():
 				fw.write("Minimum signal-to-noise ratio used in percentage based QC\t"+str(S_N_CUTOFF)+"\n")
 				fw.write("Minimum fraction of total isotopic distribution used for extraction\t"+str(MIN_TOTAL_CONTRIBUTION)+"\n")
 			fw.write("\n")
-			
+
 			# Absolute Intensity block (non background subtracted)
-			if self.absoluteIntensity.get() == 1:		
+			if self.absoluteIntensity.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Area\tCalibrated")
@@ -1939,9 +1939,9 @@ class App():
 						fw.write("\t"+str(total))
 					fw.write("\n")
 				fw.write("\n")
-			
+
 			# Absolute Intensity block (background subtracted)
-			if self.absoluteIntensityBackground.get() == 1:		
+			if self.absoluteIntensityBackground.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Area - Background Area\tCalibrated")
@@ -1967,9 +1967,9 @@ class App():
 						fw.write("\t"+str(total))
 					fw.write("\n")
 				fw.write("\n")
-				
+
 			# Analyte Background block
-			if self.analyteBackground.get() == 1:		
+			if self.analyteBackground.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Background Area\tCalibrated")
@@ -1990,14 +1990,14 @@ class App():
 					for j in i.analytes:
 						fw.write("\t"+str(j.background))
 					fw.write("\n")
-				fw.write("\n")				
-	
+				fw.write("\n")
+
 			# Relative Intensity block
 			if self.relativeIntensity.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Relative Area\tCalibrated")
-					for j in i.analytes:					
+					for j in i.analytes:
 						fw.write("\t"+str(j.composition))
 					fw.write("\tTotal Intensity\n")
 					break
@@ -2021,7 +2021,7 @@ class App():
 					else:
 						fw.write("\n")
 				fw.write("\n")
-			
+
 			# Relative Intensity block (background subtracted)
 			if self.relativeIntensityBackground.get() == 1:
 				# Compositions
@@ -2052,7 +2052,7 @@ class App():
 					else:
 						fw.write("\n")
 				fw.write("\n")
-			
+
 			# Corrected (for distribution) Relative Intensity block (background subtracted)
 			if self.correctedRelativeIntensityBackground.get() == 1:
 				# Compositions
@@ -2103,7 +2103,7 @@ class App():
 						fw.write("\n")
 				fw.write("\n")
 
-					
+
 			# Percentage of spectrum in analytes
 			if self.percentageSpectrum.get() == 1:
 				# Compositions
@@ -2136,9 +2136,9 @@ class App():
 						fraction = 0
 					fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(fraction)+"\n")
 				fw.write("\n")
-					
+
 			# Percentage of signals above S_N_CUTOFF block (non background subtracted)
-			if self.percentage.get() == 1:		
+			if self.percentage.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte Area above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
 				# Absolute Intensity values
@@ -2160,9 +2160,9 @@ class App():
 						percentage = float(intensity) / float(i.total)
 					fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(percentage)+"\n")
 				fw.write("\n")
-			
+
 			# Percentage of signals above S_N_CUTOFF block (background subtracted)
-			if self.percentageBackground.get() == 1:		
+			if self.percentageBackground.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte Area - Background Area above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
 				# Absolute Intensity values
@@ -2184,7 +2184,7 @@ class App():
 						percentage = float(intensity) / float(i.totalBck)
 					fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(percentage)+"\n")
 				fw.write("\n")
-				
+
 			# Maximum Signal to nose block
 			if self.maxSignalNoise.get() == 1:
 				# Compositions
@@ -2212,7 +2212,7 @@ class App():
 						fw.write("\t"+str(SN))
 					fw.write("\n")
 				fw.write("\n")
-			
+
 			# Quality Score block
 			if self.qcScore.get() == 1:
 				# Compositions
@@ -2229,7 +2229,7 @@ class App():
 						fw.write("\t"+str(j.mass))
 					fw.write("\n")
 					break
-				# Summed QC (per Analyte) values 
+				# Summed QC (per Analyte) values
 				for i in new:
 					fw.write(str(i.name)+"\t"+str(i.calibrated))
 					for j in i.analytes:
@@ -2239,7 +2239,7 @@ class App():
 						fw.write("\t"+str(qc))
 					fw.write("\n")
 				fw.write("\n")
-			
+
 			# PPM Error block
 			if self.ppmQC.get() == 1:
 				# Compositions
@@ -2263,7 +2263,7 @@ class App():
 						fw.write("\t"+str(j.ppm))
 					fw.write("\n")
 				fw.write("\n")
-			
+
 			# Isotopic Signal to noise block
 			if self.isoSignalNoise.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
@@ -2292,7 +2292,7 @@ class App():
 								fw.write("\t")
 						fw.write("\n")
 					fw.write("\n")
-		
+
 			# Isotopic absolute intensity block (background subtracted)
 			if self.isoAbsoluteIntensity.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
@@ -2323,22 +2323,22 @@ class App():
 							except IndexError:
 								fw.write("\t")
 						fw.write("\n")
-					fw.write("\n")			
-								
+					fw.write("\n")
+
 	def search_left(self, array, target, high):
-		""" This function takes a sorted array and searches for the 
-		index in that array where all elements beyond the index are 
-		smaller than the target and that all elements before the index 
-		are greater or equal to  the target. The function then returns 
+		""" This function takes a sorted array and searches for the
+		index in that array where all elements beyond the index are
+		smaller than the target and that all elements before the index
+		are greater or equal to  the target. The function then returns
 		the index.
 
-		The return value a is such that all elements in array[:a] have 
+		The return value a is such that all elements in array[:a] have
 		element < target, and all e in array[a:] have element >= target.
-		
+
 		INPUT 1: A list of (m/z, intensity) tuples, sorted on m/z
 		INPUT 2: A float containing the search target
 		INPUT 3: An integer listing the farthest in the array that this
-		function has to search (essential for arrays that contain 0's 
+		function has to search (essential for arrays that contain 0's
 		beyond the final datapoint, ie Numpy arrays).
 		OUTPUT: An integer listing the array index
 		"""
@@ -2354,19 +2354,19 @@ class App():
 			return a
 
 	def search_right(self, array, target, high):
-		""" This function takes a sorted array and searches for the 
-		index in that array where all elements beyond the index are 
-		greater or equal to the target and that all elements before the 
+		""" This function takes a sorted array and searches for the
+		index in that array where all elements beyond the index are
+		greater or equal to the target and that all elements before the
 		index are smaller than the target. The function then returns the
 		index.
 
-		The return value a is such that all elements in array[:a] have 
+		The return value a is such that all elements in array[:a] have
 		element <= target, and all e in array[a:] have element > target.
-		
+
 		INPUT 1: A list of (m/z, intensity) tuples, sorted on m/z
 		INPUT 2: A float containing the search target
 		INPUT 3: An integer listing the farthest in the array that this
-		function has to search (essential for arrays that contain 0's 
+		function has to search (essential for arrays that contain 0's
 		beyond the final datapoint, ie Numpy arrays).
 		OUTPUT: An integer listing the array index
 		"""
@@ -2381,16 +2381,16 @@ class App():
 				else:
 					a = mid+1
 			return a
-		
+
 	def readData(self, file):
 		""" This function opens the specified file and parses it line
 		by line. The new line ('\n') character is stripped from each line
 		prior to the line being split (on any whitespace character).
-		The first part of a line is appended to a list (x_array), the 
+		The first part of a line is appended to a list (x_array), the
 		second part of a line is appended to a list (y_array). The
 		function returns a list of tuples ( (x1,y1), (x2,y2) ) by using
 		the zip functionality.
-		
+
 		INPUT: A string containing the filepath
 		OUTPUT: A list of (m/z,int) tuples
 		"""
@@ -2407,26 +2407,26 @@ class App():
 					#if float(values[1]) < 0.0:
 						#print "ERROR: Negative intensity value: "+str(values[1])+" encountered in file: "+str(file)+"\n"
 						#raw_input("Press enter to exit")
-						#sys.exit() 
+						#sys.exit()
 					x_array.append(float(values[0]))
 					y_array.append(float(values[1]))
 		if min(y_array) < 0.0:
 			if self.log == True:
 				with open('MassyTools.log','a') as fw:
 					fw.write(str(file)+" contained negative intensities, entire spectrum uplifted with "+str(min(y_array))+" intensity")
-			offset = abs(math.ceil(min(y_array)))		
+			offset = abs(math.ceil(min(y_array)))
 			newList = [x + offset for x in y_array]
-			y_array = newList	
+			y_array = newList
 		return zip(x_array,y_array)
-	
+
 	def plotChange(self,data,f):
 		""" This function takes an array of data. The function also
 		takes the given function (f) and determines new x-coordinates
 		by transforming the given x-coordinates with the given function.
-		The function then prepares for plotting both data sets by 
-		clearing the main screen and creating a line (per dataset) on a 
+		The function then prepares for plotting both data sets by
+		clearing the main screen and creating a line (per dataset) on a
 		new subplot.  which is finally shown on the	screen.
-		
+
 		INPUT 1: A list of (m/z, intensity) tuples
 		INPUT 2: A calibration function
 		OUTPUT: None
@@ -2443,13 +2443,13 @@ class App():
 		self.line, = self.axes.plot(x_array,y_array)
 		self.line, = self.axes.plot(x_new,y_array)
 		self.canvas.draw()
-		
+
 	def plotData(self,data):
-		""" This function takes an array of data. The function then 
+		""" This function takes an array of data. The function then
 		prepares for plotting the data by clearing the main screen and
 		creating a line on a new subplot which is finally shown on the
 		screen.
-		
+
 		INPUT: A list of (m/z, intensity) tuples
 		OUTPUT: None
 		"""
@@ -2462,7 +2462,7 @@ class App():
 		self.axes = self.fig.add_subplot(111)
 		self.line, = self.axes.plot(x_array,y_array)
 		self.canvas.draw()
-		
+
 	#####################
 	# CONSTRUCTION AREA #
 	#####################
@@ -2474,7 +2474,7 @@ class App():
 	def openFiles(self,number):
 		""" This function assigns the input string to the variable that
 		is indicated by the input integer.
-		
+
 		INPUT 1: A string containing a filepath
 		INPUT 2: A integer indicating the desired variable
 		OUTPUT: None
@@ -2486,15 +2486,15 @@ class App():
 			3: 'mzML'
 		}
 		setattr(self,ops[number],name)
-	
+
 	def getTotalArea(self, file):
 		""" This function reads a spectrum by calling the readData
 		function. The function then attempts to calculate the total area
 		for a spectrum by adding the intensity (element i) * m/z
-		difference (between element i+1 and i). The function will use 
-		element -1 and element -2 once element i+1 does not exist (due 
+		difference (between element i+1 and i). The function will use
+		element -1 and element -2 once element i+1 does not exist (due
 		to length of the array).
-		
+
 		INPUT: None
 		OUTPUT: A float containing the total area for a spectrum.
 		"""
@@ -2509,8 +2509,8 @@ class App():
 	#####################
 	# CONSTRUCTION AREA #
 	#####################
-	
-# Call the main app	
+
+# Call the main app
 root = Tk()
 app = App(root)
 root.mainloop()

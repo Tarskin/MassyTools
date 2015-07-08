@@ -24,34 +24,34 @@ OUTPUT_FILE = "Summary.txt"								# Default name for the second half of the out
 # Extraction Parameters
 MASS_MODIFIERS = ['free']								# Mass modifiers applied to all analytes (Default is addition of H2O)
 CHARGE_CARRIER = ['sodium']								# The Charge carrier of an analyte(Default is addition of a proton)
-CALCULATION_WINDOW = 0.49		                		# Default range to sum around the calculated m/z
-OUTER_BCK_BORDER = 20			                		# Maximum range to search for background signal
-S_N_CUTOFF = 9						        			# Minimum signal to noise value of an analyte to be included in the percentage QC
+CALCULATION_WINDOW = 0.49								# Default range to sum around the calculated m/z
+OUTER_BCK_BORDER = 20									# Maximum range to search for background signal
+S_N_CUTOFF = 9											# Minimum signal to noise value of an analyte to be included in the percentage QC
 MIN_TOTAL_CONTRIBUTION = 0.95							# Minimum total contribution of isotopes (of the total distribution) to be extracted
 
 # Advanced Extraction Parameters (DO NOT CHANGE THESE UNLESS YOU KNOW WHAT YOU ARE DOING!!)
 MIN_CONTRIBUTION = 0.0001								# Minimum contribution of an isotope to the total distribution to be included in the extraction
 
 # Calibration Parameters
-CALIBRATION_WINDOW = 0.4		                		# Default window for calibration (if no exclusion list is used)
-CALIB_S_N_CUTOFF = 9			                		# Minimum signal to noise value for a calibrant to be included in the calibration
-NUM_LOW_RANGE = 3				        				# Minimum number of calibrants in the first 1/3 of spectrum above specified S/N
-NUM_MID_RANGE = 2				        				# Minimum number of calibrants in the second 1/3 of spectrum above specified S/N
-NUM_HIGH_RANGE = 0				        				# Minimum number of calibrants in the third 1/3 of spectrum above specified S/N
-NUM_TOTAL = 5					        				# Minimum number of calibrants in the whole spectrum above specified S/N
+CALIBRATION_WINDOW = 0.4								# Default window for calibration (if no exclusion list is used)
+CALIB_S_N_CUTOFF = 9									# Minimum signal to noise value for a calibrant to be included in the calibration
+NUM_LOW_RANGE = 3										# Minimum number of calibrants in the first 1/3 of spectrum above specified S/N
+NUM_MID_RANGE = 2										# Minimum number of calibrants in the second 1/3 of spectrum above specified S/N
+NUM_HIGH_RANGE = 0										# Minimum number of calibrants in the third 1/3 of spectrum above specified S/N
+NUM_TOTAL = 5											# Minimum number of calibrants in the whole spectrum above specified S/N
 
 # The maximum distance between distinct isotopic masses to be 'pooled'
 EPSILON = 0.5
 
 # Isotopic Mass Differences
-C = [('13C',0.0107,1.00335)]
-H = [('2H',0.00012,1.00628)]
-N = [('15N',0.00364,0.99703)]
-O18 = [('18O',0.00205,2.00425)]
-O17 = [('17O',0.00038,1.00422)]
-S33 = [('33S',0.0076,0.99939)]
-S34 = [('34S',0.0429,1.9958)]
-S36 = [('36S',0.0002,3.99501)]
+C = [('13C', 0.0107, 1.00335)]
+H = [('2H', 0.00012, 1.00628)]
+N = [('15N', 0.00364, 0.99703)]
+O18 = [('18O', 0.00205, 2.00425)]
+O17 = [('17O', 0.00038, 1.00422)]
+S33 = [('33S', 0.0076, 0.99939)]
+S34 = [('34S', 0.0429, 1.9958)]
+S36 = [('36S', 0.0002, 3.99501)]
 
 # Building block properties
 BLOCKS = {	#######################
@@ -308,21 +308,25 @@ BLOCKS = {	#######################
 						'sulfurs':2}}
 UNITS = BLOCKS.keys()
 
+
 ################################################
 # Custom navigation toolbar class (unfinished) #
 ################################################
 class NavToolBar(NavigationToolbar2TkAgg):
-	def __init__(self,canvas,root,parent):
+
+	def __init__(self, canvas, root, parent):
 		self.canvas = canvas
 		self.root = root
 		self.parent = parent
-		NavigationToolbar2TkAgg.__init__(self,canvas,root)
+		NavigationToolbar2TkAgg.__init__(self, canvas, root)
+
 
 #############################################
 # Class definitions (used for storing data) #
 #############################################
 class Results():
-	def __init__(self,name,calibrated,total,totalBck,totalInt,analytes):
+
+	def __init__(self, name, calibrated, total, totalBck, totalInt, analytes):
 		self.name = name
 		self.calibrated = calibrated
 		self.total = total
@@ -330,8 +334,10 @@ class Results():
 		self.totalInt = totalInt
 		self.analytes = analytes
 
+
 class analyteResult():
-	def __init__(self,composition,mass,distribution,background,ppm,isotopes):
+
+	def __init__(self, composition, mass, distribution, background, ppm, isotopes):
 		self.composition = composition
 		self.mass = mass
 		self.distribution = distribution
@@ -339,14 +345,18 @@ class analyteResult():
 		self.ppm = ppm
 		self.isotopes = isotopes
 
+
 class isotopeResult():
-	def __init__(self,area,SN,QC):
+
+	def __init__(self, area, SN, QC):
 		self.area = area
 		self.SN = SN
 		self.QC = QC
 
+
 class Analyte():
-	def __init__(self,composition,mass,window,isotopes,backgroundPoint,backgroundArea,noise):
+
+	def __init__(self, composition, mass, window, isotopes, backgroundPoint, backgroundArea, noise):
 		self.composition = composition
 		self.mass = mass
 		self.window = window
@@ -356,8 +366,10 @@ class Analyte():
 		self.noise = noise
 		self.ppm = None
 
+
 class Isotope():
-	def __init__(self,isotope,mass,obsArea,expArea,sn,maxIntensity,qc):
+
+	def __init__(self, isotope, mass, obsArea, expArea, sn, maxIntensity, qc):
 		self.isotope = isotope
 		self.mass = mass
 		self.obsArea = obsArea
@@ -366,11 +378,13 @@ class Isotope():
 		self.maxIntensity = maxIntensity
 		self.qc = qc
 
+
 ###############################
 # Start of actual application #
 ###############################
 class App():
-	def __init__(self,master):
+
+	def __init__(self, master):
 		# VARIABLES
 		self.master = master
 		self.absoluteIntensity = IntVar()
@@ -403,7 +417,7 @@ class App():
 		self.noise = "MM"
 		self.noiseQC = False
 		self.batch = False
-		self.fig = matplotlib.figure.Figure(figsize=(8,6))
+		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
 		# The MassyTools Logo (created by Rosina Plomp, 2014)
 		if os.path.isfile('./UI.png'):
 			image = plt.imread('./UI.png')
@@ -411,9 +425,9 @@ class App():
 			plt.tight_layout()
 			im = plt.imshow(image)
 		# The Canvas
-		self.canvas = FigureCanvasTkAgg(self.fig, master = master)
+		self.canvas = FigureCanvasTkAgg(self.fig, master=master)
 		self.toolbar = NavigationToolbar2TkAgg(self.canvas, root)
-		self.canvas.get_tk_widget().pack(fill=BOTH,expand=YES)
+		self.canvas.get_tk_widget().pack(fill=BOTH, expand=YES)
 		self.canvas.draw()
 
 		# FRAME
@@ -428,53 +442,53 @@ class App():
 
 		# MENU
 		menu = Menu(root)
-		root.config(menu = menu)
+		root.config(menu=menu)
 
-		filemenu = Menu(menu,tearoff=0)
+		filemenu = Menu(menu, tearoff=0)
 		menu.add_cascade(label="File", menu=filemenu)
-		filemenu.add_command(label="Open Input File", command = self.openFile)
+		filemenu.add_command(label="Open Input File", command=self.openFile)
 
-		calibmenu = Menu(menu,tearoff=0)
-		menu.add_cascade(label="Calibrate",menu=calibmenu)
-		calibmenu.add_command(label="Open Calibration File", command = self.openCalibrationFile)
-		calibmenu.add_command(label="Open Exclusion File", command = self.openExclusionFile)
-		calibmenu.add_command(label="Calibrate", command = self.calibrateData)
+		calibmenu = Menu(menu, tearoff=0)
+		menu.add_cascade(label="Calibrate", menu=calibmenu)
+		calibmenu.add_command(label="Open Calibration File", command=self.openCalibrationFile)
+		calibmenu.add_command(label="Open Exclusion File", command=self.openExclusionFile)
+		calibmenu.add_command(label="Calibrate", command=self.calibrateData)
 
-		extractionmenu = Menu(menu,tearoff=0)
-		menu.add_cascade(label="Extraction",menu=extractionmenu)
-		extractionmenu.add_command(label="Open Composition File", command = self.openCompositionFile)
-		extractionmenu.add_command(label="Extract", command = self.extractCompositions)
+		extractionmenu = Menu(menu, tearoff=0)
+		menu.add_cascade(label="Extraction", menu=extractionmenu)
+		extractionmenu.add_command(label="Open Composition File", command=self.openCompositionFile)
+		extractionmenu.add_command(label="Extract", command=self.extractCompositions)
 
-		qualitymenu = Menu(menu,tearoff=0)
-		menu.add_cascade(label="QC",menu=qualitymenu)
-		qualitymenu.add_command(label="Open Quality Control File", command = self.openQualityFile)
-		qualitymenu.add_command(label="Calculate QC", command = self.singularQualityControl)
+		qualitymenu = Menu(menu, tearoff=0)
+		menu.add_cascade(label="QC", menu=qualitymenu)
+		qualitymenu.add_command(label="Open Quality Control File", command=self.openQualityFile)
+		qualitymenu.add_command(label="Calculate QC", command=self.singularQualityControl)
 
-		menu.add_command(label="Batch Process", command = lambda: self.batchPopup(self))
+		menu.add_command(label="Batch Process", command=lambda: self.batchPopup(self))
 
-		menu.add_command(label="About MassyTools", command = lambda: self.infoPopup())
+		menu.add_command(label="About MassyTools", command=lambda: self.infoPopup())
 
 	def infoPopup(self):
 		top = self.top = Toplevel()
 		information = ("MassyTools Version 0.1.7.3\n\n"
-					  "Written by Bas Jansen, bas.c.jansen@gmail.com\n"
-					  "Art by Rosina Plomp, h.r.plomp@lumc.nl\n\n"
-					  "MassyTools is designed to be a complete toolkit for\n"
-					  "all 2 dimensional mass spectrometry experiments.\n"
-					  "The software can both be ran in single spectrum\n"
-					  "and batch processing modes. The software can perform\n"
-					  "data calibration, data extraction and quality score\n"
-					  "calculations (a modification of the Nicolardi et al,\n"
-					  "2010 publication).\n\n"
-					  "This software is released under the Apache 2.0 License,\n"
-					  "Full details regarding this license can be found at\n"
-					  "the following URL:\n\n"
-					  "http://www.apache.org/licenses/LICENSE-2.0")
-		self.about = Label(top, text = information,justify=LEFT)
+					   "Written by Bas Jansen, bas.c.jansen@gmail.com\n"
+					   "Art by Rosina Plomp, h.r.plomp@lumc.nl\n\n"
+					   "MassyTools is designed to be a complete toolkit for\n"
+					   "all 2 dimensional mass spectrometry experiments.\n"
+					   "The software can both be ran in single spectrum\n"
+					   "and batch processing modes. The software can perform\n"
+					   "data calibration, data extraction and quality score\n"
+					   "calculations (a modification of the Nicolardi et al,\n"
+					   "2010 publication).\n\n"
+					   "This software is released under the Apache 2.0 License,\n"
+					   "Full details regarding this license can be found at\n"
+					   "the following URL:\n\n"
+					   "http://www.apache.org/licenses/LICENSE-2.0")
+		self.about = Label(top, text=information, justify=LEFT)
 		self.about.pack()
 		top.lift()
 
-	def batchPopup(self,master):
+	def batchPopup(self, master):
 		""" This function creates a pop up box in which all the parameters
 		for a batch process can be set and visualized. The window can
 		access and set the masters exclusionFile, calibrationFile,
@@ -492,48 +506,54 @@ class App():
 		self.exclFile = StringVar()
 		self.compFile = StringVar()
 		self.folder = StringVar()
+
 		def calibrationButton():
 			master.openCalibrationFile()
 			self.calFile.set(master.calibrationFile)
+
 		def exclusionButton():
 			master.openExclusionFile()
 			self.exclFile.set(master.exclusionFile)
+
 		def compositionButton():
 			master.openCompositionFile()
 			self.compFile.set(master.compositionFile)
+
 		def batchButton():
 			master.openBatchFolder()
 			self.folder.set(master.batchFolder)
+
 		def close(self):
 			master.batchWindow = 0
 			top.destroy()
+
 		top = self.top = Toplevel()
-		top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
-		self.calib = Button(top, text = "Calibration File", width = 25, command = lambda: calibrationButton())
-		self.calib.grid(row = 0, column = 0, sticky = W)
-		self.cal = Label(top, textvariable = self.calFile, width = 25)
-		self.cal.grid(row = 0, column = 1, padx = 25)
-		self.exclus = Button(top, text = "Exclusion File", width = 25, command = lambda: exclusionButton())
-		self.exclus.grid(row = 1, column = 0, sticky = W)
-		self.exc = Label(top, textvariable = self.exclFile, width = 25)
-		self.exc.grid(row = 1, column = 1)
-		self.compos = Button(top, text = "Composition File", width = 25, command = lambda: compositionButton())
-		self.compos.grid(row = 2, column = 0, sticky = W)
-		self.com = Label(top, textvariable = self.compFile, width = 25)
-		self.com.grid(row = 2, column = 1)
-		self.batchDir = Button(top, text = "Batch Directory", width = 25, command = lambda: batchButton())
-		self.batchDir.grid(row = 3, column = 0, sticky = W)
-		self.batch = Label(top, textvariable = self.folder, width = 25)
-		self.batch.grid(row = 3, column = 1)
-		self.output = Button(top, text = "Output Format", width = 25, command = lambda: master.outputPopup(master))
-		self.output.grid(row = 4, column = 0,columnspan = 2)
-		self.run = Button(top, text = "Run Batch Process", width = 25, command = lambda: master.batchProcess(master))
-		self.run.grid(row = 5, column = 0, columnspan = 2)
-		#top.lift()
+		top.protocol("WM_DELETE_WINDOW", lambda: close(self))
+		self.calib = Button(top, text="Calibration File", width=25, command=lambda: calibrationButton())
+		self.calib.grid(row=0, column=0, sticky=W)
+		self.cal = Label(top, textvariable=self.calFile, width=25)
+		self.cal.grid(row=0, column=1, padx=25)
+		self.exclus = Button(top, text="Exclusion File", width=25, command=lambda: exclusionButton())
+		self.exclus.grid(row=1, column=0, sticky=W)
+		self.exc = Label(top, textvariable=self.exclFile, width=25)
+		self.exc.grid(row=1, column=1)
+		self.compos = Button(top, text="Composition File", width=25, command=lambda: compositionButton())
+		self.compos.grid(row=2, column=0, sticky=W)
+		self.com = Label(top, textvariable=self.compFile, width=25)
+		self.com.grid(row=2, column=1)
+		self.batchDir = Button(top, text="Batch Directory", width=25, command=lambda: batchButton())
+		self.batchDir.grid(row=3, column=0, sticky=W)
+		self.batch = Label(top, textvariable=self.folder, width=25)
+		self.batch.grid(row=3, column=1)
+		self.output = Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
+		self.output.grid(row=4, column=0, columnspan=2)
+		self.run = Button(top, text="Run Batch Process", width=25, command=lambda: master.batchProcess(master))
+		self.run.grid(row=5, column=0, columnspan=2)
+		# top.lift()
 		# Couple the attributes to button presses
 		top.attributes("-topmost", True)
 
-	def outputPopup(self,master):
+	def outputPopup(self, master):
 		""" This function creates a pop up box to specify what output
 		should be shown in the final summary. The default value for all
 		variables is off (0) and by ticking a box it is set to on (1).
@@ -544,6 +564,7 @@ class App():
 		if master.outputWindow == 1:
 			return
 		master.outputWindow = 1
+
 		def select_all(self):
 			master.absoluteIntensity.set(1)
 			master.absoluteIntensityBackground.set(1)
@@ -560,6 +581,7 @@ class App():
 			master.ppmQC.set(1)
 			master.isoSignalNoise.set(1)
 			master.isoAbsoluteIntensity.set(1)
+
 		def select_none(self):
 			master.absoluteIntensity.set(0)
 			master.absoluteIntensityBackground.set(0)
@@ -576,47 +598,49 @@ class App():
 			master.ppmQC.set(0)
 			master.isoSignalNoise.set(0)
 			master.isoAbsoluteIntensity.set(0)
+
 		def close(self):
 			master.outputWindow = 0
 			top.destroy()
+
 		top = self.top = Toplevel()
-		top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
-		self.all = Button(top, text = "Select All", command = lambda: select_all(self))
-		self.all.grid(row = 0, column = 0, sticky = W)
-		self.none = Button(top, text = "Select None", command = lambda: select_none(self))
-		self.none.grid(row = 0, column = 1, sticky = E)
-		self.ai = Checkbutton(top, text = "Analyte Area", variable = master.absoluteIntensity, onvalue = 1, offvalue = 0)
-		self.ai.grid(row = 1, column = 0, sticky = W)
-		self.aiBck = Checkbutton(top, text = "Analyte Area - Background Area", variable = master.absoluteIntensityBackground, onvalue = 1, offvalue = 0)
-		self.aiBck.grid(row = 2, column = 0, sticky = W)
-		self.Bck = Checkbutton(top, text = "Analyte Background Area", variable = master.analyteBackground, onvalue = 1, offvalue = 0)
-		self.Bck.grid(row = 3, column = 0, sticky = W)
-		self.ri = Checkbutton(top, text = "Relative Area", variable = master.relativeIntensity, onvalue = 1, offvalue = 0)
-		self.ri.grid(row = 4, column = 0, sticky = W)
-		self.riBck = Checkbutton(top, text = "Relative Area - Background Area", variable = master.relativeIntensityBackground, onvalue = 1, offvalue = 0)
-		self.riBck.grid(row = 5, column = 0, sticky = W)
-		self.corRiBck = Checkbutton(top, text = "Corrected Relative Area - Background Area", variable = master.correctedRelativeIntensityBackground, onvalue = 1, offvalue = 0)
-		self.corRiBck.grid(row = 6, column = 0, sticky = W)
-		self.percSpec = Checkbutton(top, text = "Fraction of spectrum explained by analytes", variable = master.percentageSpectrum, onvalue = 1, offvalue = 0)
-		self.percSpec.grid(row = 7, column = 0, sticky = W)
-		self.percAnal = Checkbutton(top, text = "Fraction of analytes above S/N Cutoff", variable = master.percentageAnalytes, onvalue = 1, offvalue = 0)
-		self.percAnal.grid(row = 8, column = 0, sticky = W)
-		self.perc = Checkbutton(top, text = "Fraction of Analytes Area above S/N Cutoff", variable = master.percentage, onvalue = 1, offvalue = 0)
-		self.perc.grid(row = 9, column = 0, sticky = W)
-		self.percBck = Checkbutton(top, text = "Fraction of Analytes Area - Background Area above S/N Cutoff", variable = master.percentageBackground, onvalue = 1, offvalue = 0)
-		self.percBck.grid(row = 10, column = 0, sticky = W)
-		self.sn = Checkbutton(top, text = "Maximum S/N", variable = master.maxSignalNoise, onvalue = 1, offvalue = 0)
-		self.sn.grid(row = 11, column = 0, sticky = W)
-		self.qc = Checkbutton(top, text = "Quality Score", variable = master.qcScore, onvalue = 1, offvalue = 0)
-		self.qc.grid(row = 12, column = 0, sticky = W)
-		self.ppm = Checkbutton(top, text = "PPM Error", variable = master.ppmQC, onvalue = 1, offvalue = 0)
-		self.ppm.grid(row = 13, column = 0, sticky = W)
-		self.isosn = Checkbutton(top, text = "Isotope S/N", variable = master.isoSignalNoise, onvalue = 1, offvalue = 0)
-		self.isosn.grid(row = 14, column = 0, sticky = W)
-		self.isoai = Checkbutton(top, text = "Isotope Area - Background Area", variable = master.isoAbsoluteIntensity, onvalue = 1, offvalue = 0)
-		self.isoai.grid(row = 15, column = 0, sticky = W)
-		self.button = Button(top,text='Ok',command = lambda: close(self))
-		self.button.grid(row = 16, column = 0, columnspan = 2)
+		top.protocol("WM_DELETE_WINDOW", lambda: close(self))
+		self.all = Button(top, text="Select All", command=lambda: select_all(self))
+		self.all.grid(row=0, column=0, sticky=W)
+		self.none = Button(top, text="Select None", command=lambda: select_none(self))
+		self.none.grid(row=0, column=1, sticky=E)
+		self.ai = Checkbutton(top, text="Analyte Area", variable=master.absoluteIntensity, onvalue=1, offvalue=0)
+		self.ai.grid(row=1, column=0, sticky=W)
+		self.aiBck = Checkbutton(top, text="Analyte Area - Background Area", variable=master.absoluteIntensityBackground, onvalue=1, offvalue=0)
+		self.aiBck.grid(row=2, column=0, sticky=W)
+		self.Bck = Checkbutton(top, text="Analyte Background Area", variable=master.analyteBackground, onvalue=1, offvalue=0)
+		self.Bck.grid(row=3, column=0, sticky=W)
+		self.ri = Checkbutton(top, text="Relative Area", variable=master.relativeIntensity, onvalue=1, offvalue=0)
+		self.ri.grid(row=4, column=0, sticky=W)
+		self.riBck = Checkbutton(top, text="Relative Area - Background Area", variable=master.relativeIntensityBackground, onvalue=1, offvalue=0)
+		self.riBck.grid(row=5, column=0, sticky=W)
+		self.corRiBck = Checkbutton(top, text="Corrected Relative Area - Background Area", variable=master.correctedRelativeIntensityBackground, onvalue=1, offvalue=0)
+		self.corRiBck.grid(row=6, column=0, sticky=W)
+		self.percSpec = Checkbutton(top, text="Fraction of spectrum explained by analytes", variable=master.percentageSpectrum, onvalue=1, offvalue=0)
+		self.percSpec.grid(row=7, column=0, sticky=W)
+		self.percAnal = Checkbutton(top, text="Fraction of analytes above S/N Cutoff", variable=master.percentageAnalytes, onvalue=1, offvalue=0)
+		self.percAnal.grid(row=8, column=0, sticky=W)
+		self.perc = Checkbutton(top, text="Fraction of Analytes Area above S/N Cutoff", variable=master.percentage, onvalue=1, offvalue=0)
+		self.perc.grid(row=9, column=0, sticky=W)
+		self.percBck = Checkbutton(top, text="Fraction of Analytes Area - Background Area above S/N Cutoff", variable=master.percentageBackground, onvalue=1, offvalue=0)
+		self.percBck.grid(row=10, column=0, sticky=W)
+		self.sn = Checkbutton(top, text="Maximum S/N", variable=master.maxSignalNoise, onvalue=1, offvalue=0)
+		self.sn.grid(row=11, column=0, sticky=W)
+		self.qc = Checkbutton(top, text="Quality Score", variable=master.qcScore, onvalue=1, offvalue=0)
+		self.qc.grid(row=12, column=0, sticky=W)
+		self.ppm = Checkbutton(top, text="PPM Error", variable=master.ppmQC, onvalue=1, offvalue=0)
+		self.ppm.grid(row=13, column=0, sticky=W)
+		self.isosn = Checkbutton(top, text="Isotope S/N", variable=master.isoSignalNoise, onvalue=1, offvalue=0)
+		self.isosn.grid(row=14, column=0, sticky=W)
+		self.isoai = Checkbutton(top, text="Isotope Area - Background Area", variable=master.isoAbsoluteIntensity, onvalue=1, offvalue=0)
+		self.isoai.grid(row=15, column=0, sticky=W)
+		self.button = Button(top, text='Ok', command=lambda: close(self))
+		self.button.grid(row=16, column=0, columnspan=2)
 		top.lift()
 
 	def openFile(self):
@@ -632,7 +656,7 @@ class App():
 		if not file_path:
 			pass
 		else:
-			setattr(self,'inputFile',file_path)
+			setattr(self, 'inputFile', file_path)
 			data = self.readData(self.inputFile)
 			self.plotData(data)
 
@@ -648,7 +672,7 @@ class App():
 		if not file_path:
 			pass
 		else:
-			setattr(self,'calibrationFile',file_path)
+			setattr(self, 'calibrationFile', file_path)
 
 	def openCompositionFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
@@ -662,7 +686,7 @@ class App():
 		if not file_path:
 			pass
 		else:
-			setattr(self,'compositionFile',file_path)
+			setattr(self, 'compositionFile', file_path)
 
 	def openExclusionFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
@@ -676,7 +700,7 @@ class App():
 		if not file_path:
 			pass
 		else:
-			setattr(self,'exclusionFile',file_path)
+			setattr(self, 'exclusionFile', file_path)
 
 	def openQualityFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
@@ -690,7 +714,7 @@ class App():
 		if not file_path:
 			pass
 		else:
-			setattr(self,'qualityFile',file_path)
+			setattr(self, 'qualityFile', file_path)
 
 	def openBatchFolder(self):
 		""" This function opens a Tkinter filedialog, asking the user
@@ -704,9 +728,9 @@ class App():
 		if not folder_path:
 			pass
 		else:
-			setattr(self,'batchFolder',folder_path)
+			setattr(self, 'batchFolder', folder_path)
 
-	def batchProcess(self,master):
+	def batchProcess(self, master):
 		""" This function controlls the batch analysis functionality.
 		The function first checks if at least one meaningful file is
 		selected and if not gives a 'File Error'. The function will then
@@ -722,7 +746,7 @@ class App():
 		if master.batchProcessing == 1:
 			# Destroy progress bar
 			barWindow.destroy()
-			tkMessageBox.showinfo("Error Message","Batch Process already running")
+			tkMessageBox.showinfo("Error Message", "Batch Process already running")
 			return
 		master.batchProcessing = 1
 		#####################
@@ -732,32 +756,32 @@ class App():
 		self.extPerc = StringVar()
 		self.calPerc.set("0%")
 		self.extPerc.set("0%")
-		#barWindow = Tk()
+		# barWindow = Tk()
 		barWindow = self.top = Toplevel()
 		barWindow.title("Progress Bar")
-		cal = Label(barWindow, text = "Calibration",padx = 25)
-		cal.grid(row = 0, column = 0, sticky = "W")
+		cal = Label(barWindow, text="Calibration", padx=25)
+		cal.grid(row=0, column=0, sticky="W")
 		ft = ttk.Frame(barWindow)
-		ft.grid(row = 1, columnspan = 2, sticky = "")
-		perc1 = Label(barWindow, textvariable = self.calPerc)
-		perc1.grid(row = 0, column = 1, padx = 25)
-		progressbar = ttk.Progressbar(ft, length = 100, mode = 'determinate')
-		progressbar.grid(row = 1, columnspan = 2, sticky = "")
-		ext = Label(barWindow, text = "Extraction", padx = 25)
-		ext.grid(row = 2, column = 0, sticky = "W")
+		ft.grid(row=1, columnspan=2, sticky="")
+		perc1 = Label(barWindow, textvariable=self.calPerc)
+		perc1.grid(row=0, column=1, padx=25)
+		progressbar = ttk.Progressbar(ft, length=100, mode='determinate')
+		progressbar.grid(row=1, columnspan=2, sticky="")
+		ext = Label(barWindow, text="Extraction", padx=25)
+		ext.grid(row=2, column=0, sticky="W")
 		ft2 = ttk.Frame(barWindow)
-		ft2.grid(row = 3, columnspan = 2, sticky = "")
-		perc2 = Label(barWindow, textvariable = self.extPerc)
-		perc2.grid(row = 2, column = 1, padx = 25)
-		progressbar2 = ttk.Progressbar(ft2, length= 100, mode = 'determinate')
-		progressbar2.grid(row = 3, columnspan = 2, sticky = "")
+		ft2.grid(row=3, columnspan=2, sticky="")
+		perc2 = Label(barWindow, textvariable=self.extPerc)
+		perc2.grid(row=2, column=1, padx=25)
+		progressbar2 = ttk.Progressbar(ft2, length=100, mode='determinate')
+		progressbar2.grid(row=3, columnspan=2, sticky="")
 		###################
 		# END OF BAR CODE #
 		###################
-		results,filesGrabbed = ([] for i in range(2))
+		results, filesGrabbed = ([] for i in range(2))
 		self.batch = True
 		if self.calibrationFile == "" and self.compositionFile == "":
-			tkMessageBox.showinfo("File Error","No calibration or composition file selected")
+			tkMessageBox.showinfo("File Error", "No calibration or composition file selected")
 			# Clear the batchProcess lock
 			master.batchProcessing = 0
 			return
@@ -766,21 +790,21 @@ class App():
 			self.initCompositionMasses(self.compositionFile)
 		for file in glob.glob(str(self.batchFolder)+"/*" + EXTENSION):
 			name = os.path.split(file)
-			omittedFiles = ('calibrated','uncalibrated')
+			omittedFiles = ('calibrated', 'uncalibrated')
 			if any(x in name[-1] for x in omittedFiles):
 				pass
 			else:
 				filesGrabbed.append(file)
 		for index, file in enumerate(filesGrabbed):
 			self.inputFile = file
-			if self.calibrationFile != "": # and self.exclusionFile != "":
+			if self.calibrationFile != "":  # and self.exclusionFile != "":
 				# Update the calibration progress bar
 				self.calPerc.set(str(int( (float(index) / float(len(filesGrabbed) ) ) *100))+"%")
-				#print "CalPerc is now set to: "+str(self.calPerc.get())
+				# print "CalPerc is now set to: "+str(self.calPerc.get())
 				progressbar["value"] = int( (float(index) / float(len(filesGrabbed) ) ) *100)
 				progressbar.update()
-				if self.log == True:
-					with open('MassyTools.log','a') as fw:
+				if self.log is True:
+					with open('MassyTools.log', 'a') as fw:
 						fw.write(str(datetime.now())+"\tAttempting to calibrate "+str(self.inputFile)+"\n")
 				self.calibrateData()
 		# Ensure that calibration progress bar is filled at the end
@@ -788,29 +812,29 @@ class App():
 		progressbar["value"] = 100
 		del filesGrabbed[:]
 		for file in glob.glob(str(self.batchFolder)+"/calibrated_*" + EXTENSION):
-			omittedFiles = ('_calibrated','_uncalibrated')
+			omittedFiles = ('_calibrated', '_uncalibrated')
 			if any(x in name[-1] for x in omittedFiles):
 				pass
 			else:
 				filesGrabbed.append(file)
-		for index,file in enumerate(filesGrabbed):
+		for index, file in enumerate(filesGrabbed):
 			self.inputFile = file
 			if self.compositionFile != "":
 				# Update the extraction progress bar
 				self.extPerc.set(str(int( (float(index) / float(len(filesGrabbed) ) ) *100))+"%")
 				progressbar2["value"] = int( (float(index) / float(len(filesGrabbed) ) ) *100)
 				progressbar2.update()
-				if self.log == True:
-					with open('MassyTools.log','a') as fw:
+				if self.log is True:
+					with open('MassyTools.log', 'a') as fw:
 						fw.write(str(datetime.now())+"\tExtracting values from "+str(self.inputFile)+"\n")
 				compositions = self.calcCompositionMasses(self.compositionFile)
-				compositions = self.extractData(self.inputFile,compositions)
+				compositions = self.extractData(self.inputFile, compositions)
 				# Disabled to prevent spam, useful for in-depth analysis
-				#self.calcErrorAll(file,compositions)
+				# self.calcErrorAll(file,compositions)
 				if self.qcScore.get() == 1:
 					self.qualityFile = self.compositionFile
-					if self.log == True:
-						with open('MassyTools.log','a') as fw:
+					if self.log is True:
+						with open('MassyTools.log', 'a') as fw:
 							fw.write(str(datetime.now())+"\tAttempting to calculate QC values for "+str(self.inputFile)+"\n")
 					compositions = self.qualityControl(compositions)
 				self.writeResults(compositions)
@@ -822,7 +846,7 @@ class App():
 		master.batchProcess = 0
 		# Destroy progress bar
 		barWindow.destroy()
-		tkMessageBox.showinfo("Status Message","Batch Process finished on "+str(datetime.now()))
+		tkMessageBox.showinfo("Status Message", "Batch Process finished on "+str(datetime.now()))
 
 	def checkMaximaSpacing(self,maxima,data):
 		""" This function ensures that the observed local maxima
@@ -974,7 +998,7 @@ class App():
 
 		INPUT: A list of float tuples (isotopic m/z, isotopic chance)
 		OUTPUT: A sorted list of float tuples (isotopic m/z, isotopic
-		        chance).
+				chance).
 		"""
 		results = []
 		newdata = {d: True for d in totals}
@@ -1104,7 +1128,7 @@ class App():
 		axes.scatter(x_array,y_array)
 		##################################################################
 		# The following chunk is relevant if you wish to have labels and #
-		# ticks on the y-axis                                            #
+		# ticks on the y-axis											 #
 		##################################################################
 		"""print x_array[1],x_array[-1]
 		self.axes.set_xticks((x_array[1],x_array[-1]),1)
@@ -1878,12 +1902,12 @@ class App():
 
 
 		################################################################
-		# Sort the data list on the filename (alphabetical)		       #
+		# Sort the data list on the filename (alphabetical)			   #
 		################################################################
-		# The sorted list is used to write the actual data             #
+		# The sorted list is used to write the actual data			   #
 		################################################################
 		# The unsorted list is used to write the first lines of each   #
-		# Block (containing the metadata)                              #
+		# Block (containing the metadata)							   #
 		################################################################
 		new = sorted(data, key = lambda Results: Results.name)
 
@@ -2426,7 +2450,7 @@ class App():
 		by transforming the given x-coordinates with the given function.
 		The function then prepares for plotting both data sets by
 		clearing the main screen and creating a line (per dataset) on a
-		new subplot.  which is finally shown on the	screen.
+		new subplot.  which is finally shown on the screen.
 
 		INPUT 1: A list of (m/z, intensity) tuples
 		INPUT 2: A calibration function

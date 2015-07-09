@@ -848,7 +848,7 @@ class App():
 		barWindow.destroy()
 		tkMessageBox.showinfo("Status Message", "Batch Process finished on "+str(datetime.now()))
 
-	def checkMaximaSpacing(self,maxima,data):
+	def checkMaximaSpacing(self, maxima, data):
 		""" This function ensures that the observed local maxima
 		(calibrants) are in accordance with the calibration rules (set
 		at the top of the program). The function examines three distinct
@@ -883,7 +883,7 @@ class App():
 		else:
 			return False
 
-	def createInclusionList(self,potentialCalibrants):
+	def createInclusionList(self, potentialCalibrants):
 		""" This function creates a simple inclusion list based on the
 		potential calibrants that were supplied. This function is only
 		called if the user did not supply an exclusion list. The function
@@ -896,7 +896,7 @@ class App():
 		"""
 		included = []
 		for i in potentialCalibrants:
-			included.append((float(i)-CALIBRATION_WINDOW,float(i)+CALIBRATION_WINDOW))
+			included.append((float(i)-CALIBRATION_WINDOW, float(i)+CALIBRATION_WINDOW))
 		return included
 
 	def calcDistribution(self, element, number):
@@ -918,13 +918,13 @@ class App():
 			while j <= number:
 				nCk = math.factorial(number) / (math.factorial(j) * math.factorial(number - j))
 				f = nCk * i[1]**j * (1 - i[1])**(number-j)
-				fractions.append((i[2]*j,f))
-				j+= 1
+				fractions.append((i[2]*j, f))
+				j += 1
 				if f <= MIN_CONTRIBUTION:
 					break
 		return fractions
 
-	def parseAnalyte(self,Analyte):
+	def parseAnalyte(self, Analyte):
 		""" This function splits the Analyte input string into a parts
 		and calculates the total number of each element of interest per
 		Analyte. The function will then attach further elements based on
@@ -945,9 +945,9 @@ class App():
 		numOxygens = 0
 		numSulfurs = 0
 		totalElements = 0
-		units = ["".join(x) for _,x in itertools.groupby(Analyte,key=str.isdigit)]
+		units = ["".join(x) for _, x in itertools.groupby(Analyte, key=str.isdigit)]
 		# Calculate the bass composition values
-		for index,j in enumerate(units):
+		for index, j in enumerate(units):
 			for k in UNITS:
 					if j == k:
 						mass += float(BLOCKS[k]['mass']) * float(units[index+1])
@@ -966,17 +966,17 @@ class App():
 			numOxygens += int(BLOCKS[j]['oxygens'])
 			numSulfurs += int(BLOCKS[j]['sulfurs'])
 		# Calculate the distribution for the given value
-		carbons = self.calcDistribution(C,numCarbons)
-		hydrogens = self.calcDistribution(H,numHydrogens)
-		nitrogens = self.calcDistribution(N,numNitrogens)
-		oxygens17 = self.calcDistribution(O17,numOxygens)
-		oxygens18 = self.calcDistribution(O18,numOxygens)
-		sulfurs33 = self.calcDistribution(S33,numSulfurs)
-		sulfurs34 = self.calcDistribution(S34,numSulfurs)
-		sulfurs36 = self.calcDistribution(S36,numSulfurs)
-		return ((mass,carbons,hydrogens,nitrogens,oxygens17,oxygens18,sulfurs33,sulfurs34,sulfurs36))
+		carbons = self.calcDistribution(C, numCarbons)
+		hydrogens = self.calcDistribution(H, numHydrogens)
+		nitrogens = self.calcDistribution(N, numNitrogens)
+		oxygens17 = self.calcDistribution(O17, numOxygens)
+		oxygens18 = self.calcDistribution(O18, numOxygens)
+		sulfurs33 = self.calcDistribution(S33, numSulfurs)
+		sulfurs34 = self.calcDistribution(S34, numSulfurs)
+		sulfurs36 = self.calcDistribution(S36, numSulfurs)
+		return ((mass, carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36))
 
-	def getChanceNetwork(self,(mass,carbons,hydrogens,nitrogens,oxygens17,oxygens18,sulfurs33,sulfurs34,sulfurs36)):
+	def getChanceNetwork(self, (mass, carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36)):
 		""" This function calculates the total chance network based on
 		all the individual distributions. The function multiplies all
 		the chances to get a single chance for a single option.
@@ -986,13 +986,13 @@ class App():
 		OUTPUT: A list of float tuples (isotopic m/z, isotopic chance)
 		"""
 		totals = []
-		for x in itertools.product(carbons,hydrogens,nitrogens,oxygens17,oxygens18,sulfurs33,sulfurs34,sulfurs36):
+		for x in itertools.product(carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36):
 			i, j, k, l, m, n, o, p = x
 			totals.append((mass+i[0]+j[0]+k[0]+l[0]+m[0]+n[0]+o[0]+p[0],
 						   i[1]*j[1]*k[1]*l[1]*m[1]*n[1]*o[1]*p[1]))
 		return totals
 
-	def mergeChances(self,totals):
+	def mergeChances(self, totals):
 		""" This function merges all the isotopic chances based on the
 		specified resolution of the machine.
 
@@ -1003,16 +1003,16 @@ class App():
 		results = []
 		newdata = {d: True for d in totals}
 		for k, v in totals:
-			if not newdata[(k,v)]: continue
-			newdata[(k,v)] = False
+			if not newdata[(k, v)]: continue
+			newdata[(k, v)] = False
 			# use each piece of data only once
-			keys,values = [k*v],[v]
+			keys, values = [k*v], [v]
 			for kk, vv in [d for d in totals if newdata[d]]:
 				if abs(k-kk) < EPSILON:
 					keys.append(kk*vv)
 					values.append(vv)
-					newdata[(kk,vv)] = False
-			results.append((sum(keys)/sum(values),sum(values)))
+					newdata[(kk, vv)] = False
+			results.append((sum(keys)/sum(values), sum(values)))
 		return results
 
 	def calibrateData(self):
@@ -1038,7 +1038,7 @@ class App():
 		OUTPUT: None
 		"""
 		if self.calibrationFile == "":
-			tkMessageBox.showinfo("File Error","No calibration file selected")
+			tkMessageBox.showinfo("File Error", "No calibration file selected")
 			return
 		maximaMZ = []
 		#window = self.calibrationMenu()
@@ -1048,36 +1048,36 @@ class App():
 		else:
 			included = self.createInclusionList(potentialCalibrants)
 		data = self.readData(self.inputFile)
-		maxima = self.getLocalMaxima(data,included)
-		actualCalibrants = self.getObservedCalibrants(maxima,potentialCalibrants)
-		if self.checkMaximaSpacing(actualCalibrants,data) == False:
-			if self.log == True:
-				with open('MassyTools.log','a') as fw:
+		maxima = self.getLocalMaxima(data, included)
+		actualCalibrants = self.getObservedCalibrants(maxima, potentialCalibrants)
+		if self.checkMaximaSpacing(actualCalibrants, data) is False:
+			if self.log is True:
+				with open('MassyTools.log', 'a') as fw:
 					fw.write(str(datetime.now())+"\tNot enough datapoints for calibration\n")
 			self.writeUncalibratedFile()
 			return
 		# Strip the m/z values from the maxima
 		for i in maxima:
 			if i[1] == 0:
-				if self.log == True:
-					with open('MassyTools.log','a') as fw:
+				if self.log is True:
+					with open('MassyTools.log', 'a') as fw:
 						fw.write(str(datetime.now())+"\tUnexpected error!\n")
 			else:
 				maximaMZ.append(i[0])
 		# Perform 2d degree polynomial fit
-		z = numpy.polyfit(maximaMZ,actualCalibrants,2)
+		z = numpy.polyfit(maximaMZ, actualCalibrants, 2)
 		f = numpy.poly1d(z)
 		y = f(maximaMZ)
 		# Display the calibrated plot on the main screen
-		if self.batch == False:
-			self.plotChange(data,f)
-		self.writeCalibration(y,actualCalibrants)
+		if self.batch is False:
+			self.plotChange(data, f)
+		self.writeCalibration(y, actualCalibrants)
 		# Call function to write away calibrated file
 		# Ideally this would throw a pop up with calibration
 		# parameters and display the calibration 'curve'
 		self.transformFile(f)
 
-	def writeCalibration(self,observed,expected):
+	def writeCalibration(self, observed, expected):
 		""" This function takes the calibrant observed m/z and expected
 		m/z and calculates the PPM error after calibration from those
 		values. The expected, observed m/z and ppm error are then written
@@ -1092,18 +1092,18 @@ class App():
 		name = name.split(".")[0]
 		name = "calibrated_"+name+str(".error")
 		# Maybe replace batchFolder with outputFolder?
-		name = os.path.join(self.batchFolder,name)
-		with open(name,'w') as fw:
+		name = os.path.join(self.batchFolder, name)
+		with open(name, 'w') as fw:
 			fw.write("Expected\tObserved\tPPM Error\n")
 		for index, i in enumerate(observed):
 			ppm = ((i-expected[index])/expected[index])*1000000
-			errors.append((expected,i,ppm))
-			with open(name,'a') as fw:
+			errors.append((expected, i, ppm))
+			with open(name, 'a') as fw:
 				fw.write(str(expected[index])+"\t"+str(i)+"\t"+str(ppm)+"\n")
 		if self.batch == 0:
 			self.displayError(errors)
 
-	def displayError(self,errors):
+	def displayError(self, errors):
 		""" This function takes the residual mass error (in ppm) after
 		calibration and displays a graph visualize this difference. The
 		graph is opened in a new window with it's own navigation bar.
@@ -1113,19 +1113,19 @@ class App():
 		"""
 		root2 = Toplevel()
 		fig2 = plt.Figure()
-		canvas2 = FigureCanvasTkAgg(fig2, master = root2)
+		canvas2 = FigureCanvasTkAgg(fig2, master=root2)
 		toolbar2 = NavigationToolbar2TkAgg(canvas2, root2)
 		canvas2.show()
-		canvas2.get_tk_widget().pack(fill=BOTH,expand=YES)
+		canvas2.get_tk_widget().pack(fill=BOTH, expand=YES)
 		x_array = []
 		y_array = []
 		labels = []
-		for counter,i in enumerate(errors):
+		for counter, i in enumerate(errors):
 			x_array.append(counter)
 			labels.append(i[0])
 			y_array.append(i[2])
 		axes = fig2.add_subplot(111)
-		axes.scatter(x_array,y_array)
+		axes.scatter(x_array, y_array)
 		##################################################################
 		# The following chunk is relevant if you wish to have labels and #
 		# ticks on the y-axis											 #
@@ -1134,13 +1134,13 @@ class App():
 		self.axes.set_xticks((x_array[1],x_array[-1]),1)
 		self.axes.set_xticklabels(labels,rotation=90)
 		self.axes.set_xlabel('Analyte number (to be changed)')"""
-		axes.tick_params(axis='x',which='both',bottom='off',top='off',labelbottom='off')
+		axes.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
 		axes.set_ylabel('Mass error (ppm)')
-		axes.hlines(0,x_array[0]-0.5,x_array[-1]+0.5)
-		axes.set_xlim(x_array[0]-0.5,x_array[-1]+0.5)
-		for counter,i in enumerate(errors):
-			axes.annotate(i[1],(x_array[counter]+0.1,y_array[counter]+0.1))
-			axes.vlines(x_array[counter],0,y_array[counter],linestyles='dashed')
+		axes.hlines(0, x_array[0]-0.5, x_array[-1]+0.5)
+		axes.set_xlim(x_array[0]-0.5, x_array[-1]+0.5)
+		for counter, i in enumerate(errors):
+			axes.annotate(i[1], (x_array[counter]+0.1, y_array[counter]+0.1))
+			axes.vlines(x_array[counter], 0, y_array[counter], linestyles='dashed')
 		canvas2.draw()
 
 	def writeUncalibratedFile(self):
@@ -1151,12 +1151,12 @@ class App():
 		INPUT: None
 		OUTPUT: None
 		"""
-		with open(self.inputFile,'r') as fr:
+		with open(self.inputFile, 'r') as fr:
 			parts = os.path.split(str(self.inputFile))
 			output = "uncalibrated_"+str(parts[-1])
 			# Maybe change batchFolder into outputFolder
-			output = os.path.join(self.batchFolder,output)
-			with open(output,'w') as fw:
+			output = os.path.join(self.batchFolder, output)
+			with open(output, 'w') as fw:
 				for line in fr:
 					line = line.rstrip('\n')
 					fw.write(line+"\n")
@@ -1172,7 +1172,7 @@ class App():
 		A, mu, sigma = p
 		return A*numpy.exp(-(x-mu)**2/(2.*sigma**2))
 
-	def getLocalMaxima(self,data,included):
+	def getLocalMaxima(self, data, included):
 		""" This function parses the data per entry of the included list.
 		A set of binary searches is performed to find the elements of
 		data belonging to the current calibrant (included list). A
@@ -1192,20 +1192,20 @@ class App():
 		for i in included:
 			backgroundValue = 1000000000
 			noise = 0
-			maximum = (0,0)
+			maximum = (0, 0)
 			totals = []
-			begin = self.search_right(data,i[0],len(data))
-			end = self.search_left(data,i[1],len(data))
+			begin = self.search_right(data, i[0], len(data))
+			end = self.search_left(data, i[1], len(data))
 			# Create data subsets for each window
-			for j in range(-OUTER_BCK_BORDER,OUTER_BCK_BORDER):
+			for j in range(-OUTER_BCK_BORDER, OUTER_BCK_BORDER):
 				windowIntensities = []
-				begin2 = self.search_right(data,i[0]-j*C[0][2],len(data))
-				end2 = self.search_left(data,i[1]-j*C[0][2],len(data))
+				begin2 = self.search_right(data, i[0]-j*C[0][2], len(data))
+				end2 = self.search_left(data, i[1]-j*C[0][2], len(data))
 				for k in data[begin2:end2]:
 					windowIntensities.append(k[1])
 				totals.append(windowIntensities)
 			# Find the set of 5 consecutive windows with lowest average intensity
-			for j in range(0,(2*OUTER_BCK_BORDER)-4):
+			for j in range(0, (2*OUTER_BCK_BORDER)-4):
 				mix = totals[j]+totals[j+1]+totals[j+2]+totals[j+3]+totals[j+4]
 				dev = numpy.std(mix)
 				avg = numpy.average(mix)
@@ -1224,7 +1224,7 @@ class App():
 								minNoise = k
 						noise = maxNoise - minNoise
 					else:
-						tkMessageBox.showinfo("Noise Error","No valid noise method selected")
+						tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
 						return
 			x_points = []
 			y_points = []
@@ -1245,8 +1245,8 @@ class App():
 				# We multiply the number of bins with the actual window (to not    #
 				# have major changes in returned maxima with different windows)    #
 				####################################################################
-				newX = numpy.linspace(x_points[0],x_points[-1],2500*(x_points[-1]-x_points[0]))
-				f = interp1d(x_points,y_points, kind='cubic')
+				newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
+				f = interp1d(x_points, y_points,  kind='cubic')
 				ySPLINE = f(newX)
 				###############################################
 				# Plot Chunk (internal testing purposes ONLY) #
@@ -1261,25 +1261,25 @@ class App():
 				plt.show()"""
 				for index, j in enumerate(ySPLINE):
 					if j > maximum[1]:
-						maximum = (newX[index],j)
+						maximum = (newX[index], j)
 			# Use the highest intensity point, in case the gaussian fit failed
 			except RuntimeError:
-				if self.log == True:
-					with open('MassyTools.log','a') as fw:
+				if self.log is True:
+					with open('MassyTools.log', 'a') as fw:
 						fw.write("Guassian Curve Fit failed for calibrant: "+str(i)+", reverting to non fitted local maximum\n")
 				for j in data[begin:end]:
 					if j[1] > maximum[1]:
-						maximum = (j[0],j[1])
+						maximum = (j[0], j[1])
 			# Ensure that only peaks of S/N above the specified (CALIB_S_N_CUTOFF) are used for calibration
 			if maximum[1] > backgroundValue + CALIB_S_N_CUTOFF * noise:
 				maxima.append(maximum)
 			else:
-				if self.log == True:
-					with open('MassyTools.log','a') as fw:
+				if self.log is True:
+					with open('MassyTools.log', 'a') as fw:
 						fw.write(str(datetime.now())+"\t"+str(maximum)+" was not above cutoff: "+str(backgroundValue + CALIB_S_N_CUTOFF * noise)+"\n")
 		return maxima
 
-	def getObservedCalibrants(self,maxima,potentialCalibrants):
+	def getObservedCalibrants(self, maxima, potentialCalibrants):
 		""" This function compares the list of local maxima with the
 		expected calibrants. The function will perceive the observed
 		local maxima that is closest to a desired calibrant as being the
@@ -1323,16 +1323,16 @@ class App():
 		excluded = []
 		included = []
 		# Read the excluded regions
-		with open(self.exclusionFile,'r') as fr:
+		with open(self.exclusionFile, 'r') as fr:
 			for line in fr:
 				line = line.rstrip('\n')
 				values = line.split()
-				values = filter(None, values)
-				excluded.append((values[0],values[1]))
+				values = filter(None,  values)
+				excluded.append((values[0], values[1]))
 		# Transform the excluded regions into included regions
-		for index,i in enumerate(excluded):
+		for index, i in enumerate(excluded):
 			if index+1 < len(excluded):
-				included.append((float(excluded[index][1]),float(excluded[index+1][0])))
+				included.append((float(excluded[index][1]), float(excluded[index+1][0])))
 		return included
 
 	def readCalibrants(self):
@@ -1345,7 +1345,7 @@ class App():
 		OUTPUT: A list of floats (the m/z value of the calibrants)
 		"""
 		potentialCalibrants = []
-		with open(self.calibrationFile,'r') as fr:
+		with open(self.calibrationFile, 'r') as fr:
 			for line in fr:
 				if line[0] == '#':
 					pass
@@ -1368,21 +1368,21 @@ class App():
 		INPUT: a numpy polynomial (poly1d) function
 		OUTPUT: a calibrated data file
 		"""
-		with open (self.inputFile,'r') as fr:
-			if self.batch == False:
+		with open(self.inputFile, 'r') as fr:
+			if self.batch is False:
 				output = tkFileDialog.asksaveasfilename()
 				if output:
 					pass
 				else:
-					tkMessageBox.showinfo("File Error","No output file selected")
+					tkMessageBox.showinfo("File Error", "No output file selected")
 					return
 			else:
 				parts = os.path.split(str(self.inputFile))
 				output = "calibrated_"+str(parts[-1])
 				# Maybe replace batchFolder without outputFolder?
-				output = os.path.join(self.batchFolder,output)
-			if self.log == True:
-				with open('MassyTools.log','a') as fw:
+				output = os.path.join(self.batchFolder, output)
+			if self.log is True:
+				with open('MassyTools.log', 'a') as fw:
 					fw.write(str(datetime.now())+"\tWriting output file: "+output+"\n")
 			# Prepare variables required for transformation
 			outputBatch = []
@@ -1401,10 +1401,10 @@ class App():
 				outputBatch.append(str(i)+" "+str(intList[index])+"\n")
 			# Join the output list elements
 			joinedOutput = ''.join(outputBatch)
-			with open(output,'w') as fw:
+			with open(output, 'w') as fw:
 				fw.write(joinedOutput)
-			if self.log == True:
-				with open('MassyTools.log','a') as fw:
+			if self.log is True:
+				with open('MassyTools.log', 'a') as fw:
 					fw.write(str(datetime.now())+"\tFinished writing output file: "+output+"\n")
 
 	def singularQualityControl(self):
@@ -1418,17 +1418,17 @@ class App():
 		OUTPUT: None
 		"""
 		if self.qualityFile == "":
-			tkMessageBox.showinfo("File Error","No QC file selected")
+			tkMessageBox.showinfo("File Error", "No QC file selected")
 			return
 		if self.inputFile == "":
-			tkMessageBox.showinfo("File Error","No data file selected")
+			tkMessageBox.showinfo("File Error", "No data file selected")
 			return
 		peaks = self.calcCompositionMasses(self.qualityFile)
-		peaks = self.extractData(self.inputFile,peaks)
+		peaks = self.extractData(self.inputFile, peaks)
 		peaks = self.qualityControl(peaks)
 		# TODO: How should we display this?
 
-	def qualityControl(self,compositions):
+	def qualityControl(self, compositions):
 		""" This function takes a list of Analyte instances and iterates
 		through them. The function then calculates the fraction of the
 		total intensity that should be present in each isotope and
@@ -1447,12 +1447,12 @@ class App():
 			for j in i.isotopes[1:]:
 				total += j.maxIntensity
 			if total == 0:
-				if self.log == True:
-					with open('MassyTools.log','a') as fw:
+				if self.log is True:
+					with open('MassyTools.log', 'a') as fw:
 						fw.write(str(datetime.now())+"\tSkipping QC calculation for "+str(i.composition)+" due to the total area being 0\n")
 				break
 			for j in i.isotopes[1:]:
-				if self.noiseQC == True:
+				if self.noiseQC is True:
 					j.qc = float(((((j.maxIntensity - i.backgroundPoint)/total) - j.expArea)**2)/i.noise**2)
 				else:
 					j.qc = float((((j.maxIntensity - i.backgroundPoint)/total) - j.expArea)**2)
@@ -1476,14 +1476,14 @@ class App():
 		OUTPUT: None
 		"""
 		if self.compositionFile == "":
-			tkMessageBox.showinfo("File Error","No composition file selected")
+			tkMessageBox.showinfo("File Error", "No composition file selected")
 			return
 		if self.inputFile == "":
-			tkMessageBox.showinfo("File Error","No data file selected")
+			tkMessageBox.showinfo("File Error", "No data file selected")
 			return
 		self.initCompositionMasses(self.compositionFile)
 		compositions = self.calcCompositionMasses(self.compositionFile)
-		compositions = self.extractData(self.inputFile,compositions)
+		compositions = self.extractData(self.inputFile, compositions)
 		self.writeResults(compositions)
 
 	def initCompositionMasses(self, file):
@@ -1500,18 +1500,18 @@ class App():
 		"""
 		lines = []
 		compositions = []
-		with open(file,'r') as fr:
+		with open(file, 'r') as fr:
 			for line in fr:
 				line = line.rstrip()
 				lines.append(line)
 		# Chop composition into sub units and get exact mass & carbon count
-		analyteFile = os.path.join(self.batchFolder,"analytes.ref")
-		if os.path.exists(analyteFile) == True:
+		analyteFile = os.path.join(self.batchFolder, "analytes.ref")
+		if os.path.exists(analyteFile) is True:
 			print "USING EXISTING REFERENCE FILE"
 			return
 		print "PRE-PROCESSING REFERENCE FILE"
 		print "THIS MAY TAKE A WHILE"
-		with open(analyteFile,'w') as fw:
+		with open(analyteFile, 'w') as fw:
 			for i in lines:
 				isotopes = []
 				i = i.split("\t")
@@ -1520,13 +1520,13 @@ class App():
 					window = float(i[1])
 				else:
 					window = CALCULATION_WINDOW
-				values =  self.parseAnalyte(i[0])
+				values = self.parseAnalyte(i[0])
 				totals = self.getChanceNetwork(values)
 				results = self.mergeChances(totals)
 				results.sort(key=lambda x: x[0])
 				fw.write(str(i[0])+"\t"+str(window))
 				fTotal = 0
-				for index,j in enumerate(results):
+				for index, j in enumerate(results):
 					fTotal += j[1]
 					fw.write("\t"+str(j[0])+"\t"+str(j[1]))
 					if fTotal >= MIN_TOTAL_CONTRIBUTION:
@@ -1551,8 +1551,8 @@ class App():
 		compositions = []
 		data = self.readData(self.inputFile)
 		#with open(file,'r') as fr:
-		analyteFile = os.path.join(self.batchFolder,"analytes.ref")
-		with open(analyteFile,'r') as fr:
+		analyteFile = os.path.join(self.batchFolder, "analytes.ref")
+		with open(analyteFile, 'r') as fr:
 			for line in fr:
 				line = line.rstrip()
 				lines.append(line)
@@ -1565,16 +1565,16 @@ class App():
 			isoFractions = i[3::2]
 			window = float(i[1])
 			# Get background values
-			backgroundPoint,backgroundArea,noise = self.extractBackground(data,float(i[2]),window)
-			isotopes.append(Isotope(-1,'background',backgroundArea,0,backgroundArea/backgroundArea,0,0))
+			backgroundPoint, backgroundArea, noise = self.extractBackground(data, float(i[2]), window)
+			isotopes.append(Isotope(-1, 'background', backgroundArea, 0, backgroundArea/backgroundArea, 0, 0))
 			# Include isotopes until the contribution of an isotope falls below 1%
-			fTotal = 0 # Beta
-			for index,j in enumerate(isoMasses):
-				isotopes.append(Isotope(index,float(j),0,float(isoFractions[index]),0,0,0))
+			fTotal = 0  # Beta
+			for index, j in enumerate(isoMasses):
+				isotopes.append(Isotope(index, float(j), 0, float(isoFractions[index]), 0, 0, 0))
 				fTotal += float(isoFractions[index])
 				if fTotal >= MIN_TOTAL_CONTRIBUTION:
 					break
-			compositions.append(Analyte(i[0],float(i[2]),window,isotopes,backgroundPoint,backgroundArea,noise))
+			compositions.append(Analyte(i[0], float(i[2]), window, isotopes, backgroundPoint, backgroundArea, noise))
 		return compositions
 
 	###########################
@@ -1586,8 +1586,8 @@ class App():
 		the calibrated data and calculates the PPM error for all analytes.
 		"""
 		# Get the exact mass of highest isotope
-		analyteFile = os.path.join(self.batchFolder,"analytes.ref")
-		with open(analyteFile,'r') as fr:
+		analyteFile = os.path.join(self.batchFolder, "analytes.ref")
+		with open(analyteFile, 'r') as fr:
 			analytes = []
 			for line in fr:
 				mass = 0
@@ -1598,7 +1598,7 @@ class App():
 				window = line[1]
 				areas = line[3::2]
 				masses = line[2::2]
-				for index,j in enumerate(areas):
+				for index, j in enumerate(areas):
 					if j > area:
 						area = j
 						mass = masses[index]
@@ -1608,24 +1608,24 @@ class App():
 		inclusion = []
 		exactMasses = []
 		for i in analytes:
-			inclusion.append((float(i[1])-float(i[2]),float(i[1])+float(i[2])))
+			inclusion.append((float(i[1])-float(i[2]), float(i[1])+float(i[2])))
 			exactMasses.append(float(i[1]))
-		maxima = self.getLocalMaxima(data,inclusion)
+		maxima = self.getLocalMaxima(data, inclusion)
 		# Create pairs and calculate the ppm error
-		actualPeaks = self.getObservedCalibrants(maxima,exactMasses)
+		actualPeaks = self.getObservedCalibrants(maxima, exactMasses)
 		errors = []
 		for index, i in enumerate(maxima):
 			ppm = ((i[0]-actualPeaks[index])/actualPeaks[index])*1000000
-			errors.append((actualPeaks[index],i[0],ppm))
+			errors.append((actualPeaks[index], i[0], ppm))
 		outFile = os.path.split(str(self.inputFile))[-1]
 		outFile = outFile.split(".")[0]
 		outFile = outFile+".errorAll"
-		with open(outFile,'w') as fw:
+		with open(outFile, 'w') as fw:
 			fw.write("Expected m/z\tObserved m\z\tPPM Error\n")
-			for index,i in enumerate(errors):
+			for index, i in enumerate(errors):
 				fw.write(str(i[0])+"\t"+str(i[1])+"\t"+str(i[2])+"\n")
 
-	def extractData(self, file, compositions):
+	def extractData(self,  file,  compositions):
 		""" This function reads the raw datafile. Iterates over the
 		list of Analyte instances, retrieves the data for each Analyte
 		instance from the raw data and stores it in the Analyte instance.
@@ -1650,9 +1650,9 @@ class App():
 						contribution = j.expArea
 						lowerEdge = j.mass - i.window
 						upperEdge = j.mass + i.window
-						begin = self.search_right(data,lowerEdge,len(data))
-						end = self.search_left(data,upperEdge,len(data))
-						if begin == None or end == None:
+						begin = self.search_right(data, lowerEdge, len(data))
+						end = self.search_left(data, upperEdge, len(data))
+						if begin is None or end is None:
 							pass
 						else:
 							x_points = []
@@ -1660,8 +1660,8 @@ class App():
 							for k in data[begin:end]:
 								x_points.append(k[0])
 								y_points.append(k[1])
-							newX = numpy.linspace(x_points[0],x_points[-1],1000)
-							f = interp1d(x_points,y_points, kind='cubic')
+							newX = numpy.linspace(x_points[0], x_points[-1], 1000)
+							f = interp1d(x_points, y_points, kind='cubic')
 							ySpline = f(newX)
 							maximum = 0
 							for index, k in enumerate(ySpline):
@@ -1679,10 +1679,10 @@ class App():
 				currentMass = j.mass
 				lowerEdge = currentMass - i.window
 				upperEdge = currentMass + i.window
-				begin = self.search_right(data,lowerEdge,len(data))
-				end = self.search_left(data,upperEdge,len(data))
+				begin = self.search_right(data, lowerEdge, len(data))
+				end = self.search_left(data, upperEdge, len(data))
 				# Check if the spectrum contained the target
-				if begin == None or end == None:
+				if begin is None or end is None:
 					pass
 				else:
 					for k in data[begin:end]:
@@ -1700,7 +1700,7 @@ class App():
 				j.maxIntensity = maxIntensity
 		return compositions
 
-	def extractBackground(self,data,mass,window):
+	def extractBackground(self, data, mass, window):
 		""" This function will parse a region of the given data structure
 		to identify the background and noise. This is done by examining
 		a series of consecutive windows and taking the set with the lowest
@@ -1717,13 +1717,13 @@ class App():
 		totals = []
 		lowEdge = mass - window
 		highEdge = mass + window
-		for i in range(-OUTER_BCK_BORDER,OUTER_BCK_BORDER):
+		for i in range(-OUTER_BCK_BORDER, OUTER_BCK_BORDER):
 			windowAreas = []
 			windowIntensities = []
-			begin = self.search_right(data,lowEdge-i*C[0][2],len(data))
-			end = self.search_left(data,highEdge-i*C[0][2],len(data))
-			if begin == None or end == None:
-				print "Specified m/z value of " +str(lowEdge) + " or " + str(highEdge)+ " outside of spectra range"
+			begin = self.search_right(data, lowEdge-i*C[0][2], len(data))
+			end = self.search_left(data, highEdge-i*C[0][2], len(data))
+			if begin is None or end is None:
+				print "Specified m/z value of " + str(lowEdge) + " or " + str(highEdge) + " outside of spectra range"
 				raw_input("Press enter to exit")
 				sys.exit()
 			for j in data[begin:end]:
@@ -1731,11 +1731,11 @@ class App():
 				windowAreas.append(j[1] * ((data[end][0] - data[begin][0]) / (end - begin)))
 				# Pure intensities are required to get the pure noise and background (non area)
 				windowIntensities.append(j[1])
-			totals.append((windowAreas,windowIntensities))
+			totals.append((windowAreas, windowIntensities))
 		# Find the set of 5 consecutive windows with lowest average intensity
-		for i in range(0,(2*OUTER_BCK_BORDER)-4):
+		for i in range(0, (2*OUTER_BCK_BORDER)-4):
 			mix = totals[i][1]+totals[i+1][1]+totals[i+2][1]+totals[i+3][1]+totals[i+4][1]
-			avgBackground = numpy.average([sum(totals[i][0]),sum(totals[i+1][0]),sum(totals[i+2][0]),sum(totals[i+3][0]),sum(totals[i+4][0])])
+			avgBackground = numpy.average([sum(totals[i][0]), sum(totals[i+1][0]), sum(totals[i+2][0]), sum(totals[i+3][0]), sum(totals[i+4][0])])
 			dev = numpy.std(mix)
 			avg = numpy.average(mix)
 			if avg < backgroundPoint:
@@ -1753,15 +1753,15 @@ class App():
 							minNoise = k
 					noise = maxNoise - minNoise
 				else:
-					tkMessageBox.showinfo("Noise Error","No valid noise method selected")
+					tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
 					return
 		# Custom stuff to test a window of 1
 		"""backgroundArea = numpy.average(sum(totals[i][0]))
 		noise = numpy.std(totals[i][1])
 		backgroundPoint = numpy.average(totals[i][1])"""
-		return (backgroundPoint,backgroundArea,noise)
+		return (backgroundPoint, backgroundArea, noise)
 
-	def writeResults(self,results):
+	def writeResults(self, results):
 		""" This function takes a list of Analyte instances, iterates
 		through the list and writes a line of results to an outputfile.
 		The output file's default name is the input's file name.raw.
@@ -1777,22 +1777,22 @@ class App():
 			if outFile:
 				pass
 			else:
-				tkMessageBox.showinfo("File Error","No output file selected")
+				tkMessageBox.showinfo("File Error", "No output file selected")
 				return
 		else:
 			outFile = os.path.split(str(self.inputFile))[-1]
 			outFile = outFile.split(".")[0]
 			outFile = outFile+".raw"
 			# Maybe change batchFolder into outputFolder?
-			outFile = os.path.join(self.batchFolder,outFile)
+			outFile = os.path.join(self.batchFolder, outFile)
 		for i in results:
 			if len(i.isotopes) > maxIsotope:
 				maxIsotope = len(i.isotopes)
-		with open(outFile,'w') as fw:
+		with open(outFile, 'w') as fw:
 			name = str(self.inputFile).split("/")[-1]
 			fw.write(name+"\n")
 			fw.write("Composition\tMass\tWindow\tPercentage of Distribution\tTotal\tMaximum SN\tPPM Error of Main Isotope\t")
-			for i in range(-1,maxIsotope):
+			for i in range(-1, maxIsotope):
 				fw.write("Iso_"+str(i)+"\tS/N Ratio\tQC Value\t")
 			fw.write("\n")
 			for i in results:
@@ -1836,10 +1836,10 @@ class App():
 
 		# Read the raw files and construct the data structure
 		# Maybe change batchFolder to outputFolder?
-		rawFiles = os.path.join(self.batchFolder,"*.raw")
+		rawFiles = os.path.join(self.batchFolder, "*.raw")
 		for file in glob.glob(rawFiles):
 			calibrated = 1
-			with open(file,'r') as fr:
+			with open(file, 'r') as fr:
 				total = 0
 				totalBck = 0
 				values = []
@@ -1871,23 +1871,23 @@ class App():
 					# Sum all isotope - background values
 					# Get all values for isotope 0 and up
 					isotopes = i[10::3]
-					sections = [i[x:x+3] for x in xrange(10, len(i),3)]
+					sections = [i[x:x+3] for x in xrange(10, len(i), 3)]
 					for j in sections:
 						try:
 							float(j[0])
-							isotopeResults.append(isotopeResult(float(j[0]),float(j[1]),float(j[2])))
+							isotopeResults.append(isotopeResult(float(j[0]), float(j[1]), float(j[2])))
 							if float(j[0]) > float(i[7]):
 								totalBck += float(j[0]) - float(i[7])
 						except ValueError:
 							pass
-					analyteResults.append(analyteResult(str(i[0]),float(i[1]),float(i[3]),float(i[7]),str(i[6]),isotopeResults))
+					analyteResults.append(analyteResult(str(i[0]), float(i[1]), float(i[3]), float(i[7]), str(i[6]), isotopeResults))
 					# Get the value for the maximum number of isotopes to be listed in the output
 					if len(isotopes) > numIsotopes:
 						numIsotopes = len(isotopes)
-			data.append(Results(name,calibrated,total,totalBck,totalInt,analyteResults))
+			data.append(Results(name, calibrated, total, totalBck, totalInt, analyteResults))
 
 		# Todo maybe rename the values in the below chunk for naming convention?
-		rawFiles = os.path.join(self.batchFolder,"*.xy")
+		rawFiles = os.path.join(self.batchFolder, "*.xy")
 		for file in glob.glob(rawFiles):
 			total = 0
 			values = []
@@ -1898,7 +1898,7 @@ class App():
 			if 'uncalibrated' in name:
 				name = name.split("uncalibrated_")[1]
 				name = name.split(".")[0]
-				data.append(Results(name,calibrated,total,total,total,values))
+				data.append(Results(name, calibrated, total, total, total, values))
 
 
 		################################################################
@@ -1909,15 +1909,15 @@ class App():
 		# The unsorted list is used to write the first lines of each   #
 		# Block (containing the metadata)							   #
 		################################################################
-		new = sorted(data, key = lambda Results: Results.name)
+		new = sorted(data, key=lambda Results: Results.name)
 
 		# Write the data structure to the output file
 		# Maybe change batchFolder with outputFolder?
 		utc_datetime = datetime.utcnow()
 		s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
-		filename = s +"_"+OUTPUT_FILE
-		summaryFile = os.path.join(self.batchFolder,filename)
-		with open(os.path.join(self.batchFolder,summaryFile),'w') as fw:
+		filename = s + "_" + OUTPUT_FILE
+		summaryFile = os.path.join(self.batchFolder, filename)
+		with open(os.path.join(self.batchFolder, summaryFile), 'w') as fw:
 			# Write the parameters used during the processing
 			fw.write("Processing Parameters\n")
 			if self.calibrationFile != "":
@@ -2292,7 +2292,7 @@ class App():
 			# Isotopic Signal to noise block
 			if self.isoSignalNoise.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
-				for i in range(0,numIsotopes):
+				for i in range(0, numIsotopes):
 					# Compositions
 					for j in data:
 						fw.write("SN Isotope "+str(int(i)+1)+"\tCalibrated")
@@ -2321,7 +2321,7 @@ class App():
 			# Isotopic absolute intensity block (background subtracted)
 			if self.isoAbsoluteIntensity.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
-				for i in range(0,numIsotopes):
+				for i in range(0, numIsotopes):
 					# Compositions
 					for j in data:
 						fw.write("Area Isotope "+str(int(i)+1)+" - Background Area\tCalibrated")
@@ -2371,11 +2371,11 @@ class App():
 			a = 0
 			b = high-1
 			while a < b:
-				mid=(a+b)//2
+				mid = (a+b)//2
 				if array[mid][0] < target:
-					a=mid+1
+					a = mid + 1
 				else:
-					b=mid
+					b = mid
 			return a
 
 	def search_right(self, array, target, high):
@@ -2396,7 +2396,7 @@ class App():
 		OUTPUT: An integer listing the array index
 		"""
 
-		if target >= array[0][0] and target <=array[high-1][0]:
+		if target >= array[0][0] and target <= array[high-1][0]:
 			a = 0
 			b = high-1
 			while a < b:
@@ -2421,7 +2421,7 @@ class App():
 		"""
 		x_array = []
 		y_array = []
-		with open(file,'r') as fr:
+		with open(file, 'r') as fr:
 			for line in fr:
 				if line[0] == '#':
 					pass
@@ -2436,15 +2436,15 @@ class App():
 					x_array.append(float(values[0]))
 					y_array.append(float(values[1]))
 		if min(y_array) < 0.0:
-			if self.log == True:
-				with open('MassyTools.log','a') as fw:
+			if self.log is True:
+				with open('MassyTools.log', 'a') as fw:
 					fw.write(str(file)+" contained negative intensities, entire spectrum uplifted with "+str(min(y_array))+" intensity")
 			offset = abs(math.ceil(min(y_array)))
 			newList = [x + offset for x in y_array]
 			y_array = newList
-		return zip(x_array,y_array)
+		return zip(x_array, y_array)
 
-	def plotChange(self,data,f):
+	def plotChange(self, data, f):
 		""" This function takes an array of data. The function also
 		takes the given function (f) and determines new x-coordinates
 		by transforming the given x-coordinates with the given function.
@@ -2465,11 +2465,11 @@ class App():
 		x_new = abs(f(x_array))
 		self.fig.clear()
 		self.axes = self.fig.add_subplot(111)
-		self.line, = self.axes.plot(x_array,y_array)
-		self.line, = self.axes.plot(x_new,y_array)
+		self.line, = self.axes.plot(x_array, y_array)
+		self.line, = self.axes.plot(x_new, y_array)
 		self.canvas.draw()
 
-	def plotData(self,data):
+	def plotData(self, data):
 		""" This function takes an array of data. The function then
 		prepares for plotting the data by clearing the main screen and
 		creating a line on a new subplot which is finally shown on the
@@ -2485,7 +2485,7 @@ class App():
 			y_array.append(i[1])
 		self.fig.clear()
 		self.axes = self.fig.add_subplot(111)
-		self.line, = self.axes.plot(x_array,y_array)
+		self.line, = self.axes.plot(x_array, y_array)
 		self.canvas.draw()
 
 	#####################
@@ -2496,7 +2496,7 @@ class App():
 	to be used in the stable version of this program.
 	"""
 
-	def openFiles(self,number):
+	def openFiles(self, number):
 		""" This function assigns the input string to the variable that
 		is indicated by the input integer.
 
@@ -2510,7 +2510,7 @@ class App():
 			2: 'peptideFile',
 			3: 'mzML'
 		}
-		setattr(self,ops[number],name)
+		setattr(self, ops[number], name)
 
 	def getTotalArea(self, file):
 		""" This function reads a spectrum by calling the readData
@@ -2525,7 +2525,7 @@ class App():
 		"""
 		intensity = 0
 		data = self.readData(file)
-		for i in range(0,len(data)):
+		for i in range(0, len(data)):
 			try:
 				intensity += float(data[i][1]) * (float(data[i+1][0]) - float(data[i][0]))
 			except IndexError:

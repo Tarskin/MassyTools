@@ -20,6 +20,7 @@ import ttk
 # File
 EXTENSION = ".xy"										# Extension of datafiles to be used during batch process
 OUTPUT_FILE = "Summary.txt"								# Default name for the second half of the output file
+SETTINGS_FILE = "Settings.txt"							# Default name for the measurement settings file
 
 # Extraction Parameters
 MASS_MODIFIERS = ['free']								# Mass modifiers applied to all analytes (Default is addition of H2O)
@@ -61,42 +62,63 @@ BLOCKS = {	#######################
 				# Monosaccharides #
 				###################
 					'F':{'mass':146.05790879894,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Fucose',
 						'carbons':6,
 						'hydrogens':10,
 						'nitrogens':0,
 						'oxygens':4,
 						'sulfurs':0},
 					'H':{'mass':162.0528234185,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Hexose',					
 						'carbons':6,
 						'hydrogens':10,
 						'nitrogens':0,
 						'oxygens':5,
 						'sulfurs':0},
 					'N':{'mass':203.07937251951,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'N-Acetyl Hexosamine',					
 						'carbons':8,
 						'hydrogens':13,
 						'nitrogens':1,
 						'oxygens':5,
 						'sulfurs':0},
 					'S':{'mass':291.09541650647,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'N-Acetyl Neuraminic Acid',					
 						'carbons':11,
 						'hydrogens':17,
 						'nitrogens':1,
 						'oxygens':8,
 						'sulfurs':0},
 					'L':{'mass':273.08485182277,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Lactonized N-Acetyl Neuraminic Acid',
 						'carbons':11,
 						'hydrogens':15,
 						'nitrogens':1,
 						'oxygens':7,
 						'sulfurs':0},
 					'M':{'mass':305.11106657061,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Methylated N-Acetyl Neuraminic Acid',					
 						'carbons':12,
 						'hydrogens':19,
 						'nitrogens':1,
 						'oxygens':8,
 						'sulfurs':0},
 					'E':{'mass':319.12671663475,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Ethylated N-Acetyl Neuraminic Acid',						
 						'carbons':13,
 						'hydrogens':21,
 						'nitrogens':1,
@@ -106,18 +128,27 @@ BLOCKS = {	#######################
 				# Mouse Monosaccharides #
 				#########################
 					'G':{'mass':307.0903311261,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Mouse Thingy',						
 						'carbons':11,
 						'hydrogens':17,
 						'nitrogens':1,
 						'oxygens':9,
 						'sulfurs':0},
 					'Gl':{'mass':289.0797664424,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Lactonized Mouse Thingy',						
 						'carbons':11,
 						'hydrogens':15,
 						'nitrogens':1,
 						'oxygens':8,
 						'sulfurs':0},
 					'Ge':{'mass':335.1216312544,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Ethylated Mouse Thingy',						
 						'carbons':13,
 						'hydrogens':21,
 						'nitrogens':1,
@@ -127,18 +158,27 @@ BLOCKS = {	#######################
 				# Sugar Modifications #
 				#######################
 					'P':{'mass':79.96633088875,
+						'available_for_mass_modifiers':1,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Phosphate',						
 						'carbons':0,
 						'hydrogens':1,
 						'nitrogens':0,
 						'oxygens':3,
 						'sulfurs':0},
 					'Su':{'mass':79.95681485868,
+						'available_for_mass_modifiers':1,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Sulfate',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':3,
 						'sulfurs':1},
 					'Ac':{'mass':42.0105646837,
+						'available_for_mass_modifiers':1,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Acetyl',						
 						'carbons':2,
 						'hydrogens':2,
 						'nitrogens':0,
@@ -148,18 +188,27 @@ BLOCKS = {	#######################
 				# Reducing End Modifications #
 				##############################
 					'aa':{'mass':139.06332853255,
+						'available_for_mass_modifiers':1,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'2-aminobenzoic acid label',						
 						'carbons':7,
 						'hydrogens':9,
 						'nitrogens':1,
 						'oxygens':2,
 						'sulfurs':0},
 					'ab':{'mass':138.07931294986,
+						'available_for_mass_modifiers':1,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'2-aminobenzamide label',	
 						'carbons':7,
 						'hydrogens':10,
 						'nitrogens':2,
 						'oxygens':1,
 						'sulfurs':0},
 					'free':{'mass':18.0105646837,
+						'available_for_mass_modifiers':1,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Water',								
 						'carbons':0,
 						'hydrogens':2,
 						'nitrogens':0,
@@ -172,18 +221,27 @@ BLOCKS = {	#######################
 					# Positive Mode #
 					#################
 					'sodium':{'mass':22.98922070,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Sodium',	
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'potassium':{'mass':38.9631581,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Potassium',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'proton':{'mass':1.007276466812,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Proton',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
@@ -193,30 +251,45 @@ BLOCKS = {	#######################
 					# Negative Mode #
 					#################
 					'protonLoss':{'mass':-1.007276466812,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Proton Loss',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'chloride':{'mass':34.969402,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Chloride',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'acetate':{'mass':59.013851,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Acetate',						
 						'carbons':2,
 						'hydrogens':3,
 						'nitrogens':0,
 						'oxygens':2,
 						'sulfurs':0},
 					'formate':{'mass':44.998201,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Formate',						
 						'carbons':1,
 						'hydrogens':1,
 						'nitrogens':0,
 						'oxygens':2,
 						'sulfurs':0},
 					'electron':{'mass':0.00054857990946,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':1,
+						'human_readable_name':'Electron',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
@@ -226,54 +299,81 @@ BLOCKS = {	#######################
 			# Elements #
 			############
 					'_H':{'mass':1.007825,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Hydrogen',	
 						'carbons':0,
 						'hydrogens':1,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'_C':{'mass':12.000000,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Carbon',						
 						'carbons':1,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'_N':{'mass':14.003074,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Nitrogen',	
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':1,
 						'oxygens':0,
 						'sulfurs':0},
 					'_O':{'mass':15.994915,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Oxygen',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':1,
 						'sulfurs':0},
 					'_S':{'mass':31.972071,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Sulfur',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':1},
 					'_P':{'mass':30.973761,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Potassium',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'_F':{'mass':18.998403,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Fluor',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'_Na':{'mass':22.989770,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Sodium',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
 						'oxygens':0,
 						'sulfurs':0},
 					'_K':{'mass':38.963708,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Kalium',						
 						'carbons':0,
 						'hydrogens':0,
 						'nitrogens':0,
@@ -283,24 +383,36 @@ BLOCKS = {	#######################
 			# Custom Blocks #
 			#################
 					'Q':{'mass':4135.882086,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Custom',						
 						'carbons':177,
 						'hydrogens':270,
 						'nitrogens':50,
 						'oxygens':59,
 						'sulfurs':3},
 					'R':{'mass':2962.590442,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Custom',						
 						'carbons':128,
 						'hydrogens':219,
 						'nitrogens':37,
 						'oxygens':41,
 						'sulfurs':1},
 					'T':{'mass':2346.1348023,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Custom',						
 						'carbons':101,
 						'hydrogens':163,
 						'nitrogens':27,
 						'oxygens':33,
 						'sulfurs':2},
 					'U':{'mass':2183.0709257,
+						'available_for_mass_modifiers':0,
+						'available_for_charge_carrier':0,
+						'human_readable_name':'Custom',						
 						'carbons':92,
 						'hydrogens':154,
 						'nitrogens':26,
@@ -404,6 +516,7 @@ class App():
 		self.isoSignalNoise = IntVar()
 		self.batchProcessing = 0
 		self.batchWindow = 0
+		self.measurementWindow = 0
 		self.outputWindow = 0
 		self.inputFile = ""
 		self.calibrationFile = ""
@@ -412,13 +525,28 @@ class App():
 		self.batchFolder = ""
 		self.qualityFile = ""
 		self.log = True
+		# Attempt to retrieve previously saved settings from settingsfile
+		if os.path.isfile('./'+str(SETTINGS_FILE)):
+			with open(SETTINGS_FILE,'r') as fr:
+				for line in fr:
+					line = line.rstrip('\n')
+					chunks = line.split()
+					if chunks[0] == "MASS_MODIFIERS":
+						global MASS_MODIFIERS
+						MASS_MODIFIERS = []
+						for i in chunks[1:]:
+							MASS_MODIFIERS.append(i)
+					if chunks[0] == "CHARGE_CARRIER":
+						global CHARGE_CARRIER
+						CHARGE_CARRIER = []
+						CHARGE_CARRIER.append(chunks[1])
 		# Nose can be determined in multiple ways
 		# Options are 'RMS' and 'MM'
 		self.noise = "MM"
 		self.noiseQC = False
 		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
-		# The MassyTools Logo (created by Rosina Plomp, 2014)
+		# The MassyTools Logo (created by Rosina Plomp, 2015)
 		if os.path.isfile('./UI.png'):
 			image = plt.imread('./UI.png')
 			plt.axis('off')
@@ -545,14 +673,122 @@ class App():
 		self.batchDir.grid(row=3, column=0, sticky=W)
 		self.batch = Label(top, textvariable=self.folder, width=25)
 		self.batch.grid(row=3, column=1)
+		self.measurement = Button(top, text="Measurement Setup", width=25, command=lambda: master.measurementPopup(master))
+		self.measurement.grid(row=4, column=0,columnspan=2)
 		self.output = Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
-		self.output.grid(row=4, column=0, columnspan=2)
+		self.output.grid(row=5, column=0, columnspan=2)
 		self.run = Button(top, text="Run Batch Process", width=25, command=lambda: master.batchProcess(master))
-		self.run.grid(row=5, column=0, columnspan=2)
+		self.run.grid(row=6, column=0, columnspan=2)
 		# top.lift()
 		# Couple the attributes to button presses
 		top.attributes("-topmost", True)
-
+		
+	def measurementPopup(self,master):
+		""" This function creates a pop up box to specify how the analytes
+		were measured, referring to the charge carrier and mass modifiers.
+		<STILL IN DEVELOPMENT>
+		
+		INPUT: None
+		OUTPUT: None
+		"""
+		options = []
+		self.chargeCarrierVar = StringVar()
+		self.chargeCarrierVar.set(CHARGE_CARRIER[0])
+		
+		def onselect1(evt):
+			w = evt.widget
+			index = int(w.curselection()[0])
+			value = w.get(index)
+			master.selected.insert(END,value)
+			master.avail.delete(index)
+			
+		def onselect2(evt):
+			w = evt.widget
+			index = int(w.curselection()[0])
+			value = w.get(index)
+			master.selected.delete(index)
+			master.avail.insert(END,value)
+			
+		def close(self):
+			global MASS_MODIFIERS			# Evil... I know
+			global CHARGE_CARRIER			# Ditto
+			MASS_MODIFIERS = []
+			values = master.selected.get(0, END)
+			for i in values:
+				for j in UNITS:
+					if str(i) == BLOCKS[j]['human_readable_name']:
+						MASS_MODIFIERS.append(j)
+			CHARGE_CARRIER = []
+			for i in UNITS:
+				if str(i) == master.chargeCarrierVar.get():
+					CHARGE_CARRIER.append(i)
+			master.measurementWindow = 0
+			top.destroy()
+		
+		def save(self):			
+			global MASS_MODIFIERS			# Evil... I know
+			global CHARGE_CARRIER			# Ditto
+			MASS_MODIFIERS = []
+			values = master.selected.get(0, END)
+			for i in values:
+				for j in UNITS:
+					if str(i) == BLOCKS[j]['human_readable_name']:
+						MASS_MODIFIERS.append(j)
+			CHARGE_CARRIER = []
+			for i in UNITS:
+				if str(i) == master.chargeCarrierVar.get():
+					CHARGE_CARRIER.append(i)
+			with open(SETTINGS_FILE,'w') as fw:
+				fw.write("MASS_MODIFIERS")
+				for i in MASS_MODIFIERS:
+					fw.write("\t"+str(i))
+				fw.write("\nCHARGE_CARRIER\t"+str(CHARGE_CARRIER[0])+"\n")
+							
+		if master.measurementWindow == 1:
+			return
+			
+		master.measurementWindow = 1
+		top = self.top = Toplevel()
+		top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
+		self.charge = Label(top, text = "Charge", width = 10)
+		self.charge.grid(row = 0, column = 0, sticky = W)
+		self.min = Label(top, text = "Min", width = 5)
+		self.min.grid(row=0, column = 1, sticky = W)
+		self.minCharge = Spinbox(top, from_= 1, to = 3, width = 5)
+		self.minCharge.grid(row = 0, column = 2, sticky = W)
+		self.max = Label(top, text = "Max", width = 5)
+		self.max.grid(row = 0, column = 3, sticky = W)					
+		self.maxCharge = Spinbox(top, from_ = 1, to=3, width=5)
+		self.maxCharge.grid(row = 0, column = 4, sticky = W)
+		# Construct charge carrier option menu	
+		for i in UNITS:
+			if BLOCKS[i]['available_for_charge_carrier'] == 1:
+				options.append(i)
+		self.chargeCarrier = OptionMenu(top, self.chargeCarrierVar, *options)
+		self.chargeCarrier.grid(row = 0, column = 5, sticky = W)
+		self.availMass = Label(top, text = "Available")
+		self.availMass.grid(row = 1, column = 1, sticky = W)
+		self.selectMass = Label(top, text = "Selected")
+		self.selectMass.grid(row = 1, column = 3, sticky = W)
+		self.massMod = Label(top, text = "Mass Mods")
+		self.massMod.grid(row = 2, column = 0, sticky = W)
+		self.avail = Listbox(top)
+		self.avail.grid(row = 2, column = 1, columnspan = 2, sticky = W)
+		self.avail.bind('<<ListboxSelect>>',onselect1)
+		self.selected = Listbox(top)
+		self.selected.grid(row = 2, column = 3, columnspan = 2, sticky = W)
+		self.selected.bind('<<ListboxSelect>>',onselect2)
+		# Construct mass modifier list box							
+		for i in UNITS:
+			if i in MASS_MODIFIERS:
+				self.selected.insert(END,BLOCKS[i]['human_readable_name'])
+			elif BLOCKS[i]['available_for_mass_modifiers'] == 1:
+				self.avail.insert(END,BLOCKS[i]['human_readable_name'])
+		self.ok = Button(top,text = 'Ok', command = lambda: close(self))
+		self.ok.grid(row = 3, column = 0, sticky = W)
+		self.save = Button(top, text = 'Save', command = lambda: save(self))
+		self.save.grid(row = 3, column = 5, sticky = E)
+	
 	def outputPopup(self, master):
 		""" This function creates a pop up box to specify what output
 		should be shown in the final summary. The default value for all

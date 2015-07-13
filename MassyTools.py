@@ -24,7 +24,7 @@ SETTINGS_FILE = "Settings.txt"							# Default name for the measurement settings
 
 # Extraction Parameters
 MASS_MODIFIERS = ['free']								# Mass modifiers applied to all analytes (Default is addition of H2O)
-CHARGE_CARRIER = ['sodium']								# The Charge carrier of an analyte(Default is addition of a proton)
+CHARGE_CARRIER = ['sodium']								# The Charge carrier of an analyte (Default is addition of a proton)
 CALCULATION_WINDOW = 0.49								# Default range to sum around the calculated m/z
 OUTER_BCK_BORDER = 20									# Maximum range to search for background signal
 S_N_CUTOFF = 9											# Minimum signal to noise value of an analyte to be included in the percentage QC
@@ -130,7 +130,7 @@ BLOCKS = {	#######################
 					'G':{'mass':307.0903311261,
 						'available_for_mass_modifiers':0,
 						'available_for_charge_carrier':0,
-						'human_readable_name':'Mouse Thingy',						
+						'human_readable_name':'N-glycolyl Neuraminic Acid',						
 						'carbons':11,
 						'hydrogens':17,
 						'nitrogens':1,
@@ -139,7 +139,7 @@ BLOCKS = {	#######################
 					'Gl':{'mass':289.0797664424,
 						'available_for_mass_modifiers':0,
 						'available_for_charge_carrier':0,
-						'human_readable_name':'Lactonized Mouse Thingy',						
+						'human_readable_name':'Lactonized N-glycolyl Neuraminic Acid',						
 						'carbons':11,
 						'hydrogens':15,
 						'nitrogens':1,
@@ -148,7 +148,7 @@ BLOCKS = {	#######################
 					'Ge':{'mass':335.1216312544,
 						'available_for_mass_modifiers':0,
 						'available_for_charge_carrier':0,
-						'human_readable_name':'Ethylated Mouse Thingy',						
+						'human_readable_name':'Ethylated N-glycolyl Neuraminic Acid',						
 						'carbons':13,
 						'hydrogens':21,
 						'nitrogens':1,
@@ -221,7 +221,7 @@ BLOCKS = {	#######################
 					# Positive Mode #
 					#################
 					'sodium':{'mass':22.98922070,
-						'available_for_mass_modifiers':0,
+						'available_for_mass_modifiers':1,
 						'available_for_charge_carrier':1,
 						'human_readable_name':'Sodium',	
 						'carbons':0,
@@ -230,7 +230,7 @@ BLOCKS = {	#######################
 						'oxygens':0,
 						'sulfurs':0},
 					'potassium':{'mass':38.9631581,
-						'available_for_mass_modifiers':0,
+						'available_for_mass_modifiers':1,
 						'available_for_charge_carrier':1,
 						'human_readable_name':'Potassium',						
 						'carbons':0,
@@ -732,11 +732,11 @@ class App():
 			values = master.selected.get(0, END)
 			for i in values:
 				for j in UNITS:
-					if str(i) == BLOCKS[j]['human_readable_name']:
+					if str(i) == BLOCKS[j]['human_readable_name'] and BLOCKS[j]['available_for_mass_modifiers']:
 						MASS_MODIFIERS.append(j)
 			CHARGE_CARRIER = []
 			for i in UNITS:
-				if str(i) == master.chargeCarrierVar.get():
+				if str(i) == master.chargeCarrierVar.get() and BLOCKS[i]['available_for_charge_carrier'] == 1:
 					CHARGE_CARRIER.append(i)
 			with open(SETTINGS_FILE,'w') as fw:
 				fw.write("MASS_MODIFIERS")
@@ -1192,6 +1192,11 @@ class App():
 						numNitrogens += int(BLOCKS[k]['nitrogens']) * int(units[index+1])
 						numOxygens += int(BLOCKS[k]['oxygens']) * int(units[index+1])
 						numSulfurs += int(BLOCKS[k]['sulfurs']) * int(units[index+1])
+		"""# Get rid of a proton if a sodium or potassium was used as a mass modifier
+		if 'sodium' in MASS_MODIFIERS:
+			MASS_MODIFIERS.append('protonLoss')
+		if 'potassium' in MASS_MODIFIERS:
+			MASS_MODIFIERS.append('protonLoss')"""	
 		# Attach the mass modifier values
 		totalMassModifers = MASS_MODIFIERS + CHARGE_CARRIER
 		for j in totalMassModifers:

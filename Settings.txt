@@ -1,2 +1,0 @@
-MASS_MODIFIERS	ab	free	Su	aa
-CHARGE_CARRIER	sodium

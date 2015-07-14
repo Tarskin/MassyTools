@@ -2,3 +2,4 @@ Task List
 
 1. Finish the GUI for the mass modifiers and charge carrier (Bas Jansen)
 2. Allow the user to 'save' his default values (Bas Jansen)
+3. Change the version numbering inside the source code to dynamically reflect the github commit (Unassigned)

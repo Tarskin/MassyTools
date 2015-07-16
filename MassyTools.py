@@ -449,11 +449,12 @@ class Results():
 
 class analyteResult():
 
-	def __init__(self, composition, mass, distribution, background, ppm, isotopes):
+	def __init__(self, composition, mass, distribution, background, noise, ppm, isotopes):
 		self.composition = composition
 		self.mass = mass
 		self.distribution = distribution
 		self.background = background
+		self.noise = noise
 		self.ppm = ppm
 		self.isotopes = isotopes
 
@@ -502,6 +503,7 @@ class App():
 		self.absoluteIntensity = IntVar()
 		self.absoluteIntensityBackground = IntVar()
 		self.analyteBackground = IntVar()
+		self.analNoise = IntVar()
 		self.relativeIntensity = IntVar()
 		self.relativeIntensityBackground = IntVar()
 		self.correctedRelativeIntensityBackground = IntVar()
@@ -805,6 +807,7 @@ class App():
 			master.absoluteIntensity.set(1)
 			master.absoluteIntensityBackground.set(1)
 			master.analyteBackground.set(1)
+			master.analNoise.set(1)
 			master.relativeIntensity.set(1)
 			master.relativeIntensityBackground.set(1)
 			master.correctedRelativeIntensityBackground.set(1)
@@ -822,6 +825,7 @@ class App():
 			master.absoluteIntensity.set(0)
 			master.absoluteIntensityBackground.set(0)
 			master.analyteBackground.set(0)
+			master.analNoise.set(0)
 			master.relativeIntensity.set(0)
 			master.relativeIntensityBackground.set(0)
 			master.correctedRelativeIntensityBackground.set(0)
@@ -851,32 +855,34 @@ class App():
 		self.aiBck.grid(row=2, column=0, sticky=W)
 		self.Bck = Checkbutton(top, text="Analyte Background Area", variable=master.analyteBackground, onvalue=1, offvalue=0)
 		self.Bck.grid(row=3, column=0, sticky=W)
+		self.anNoise = Checkbutton(top, text="Analyte Noise", variable=master.analNoise, onvalue=1, offvalue=0)
+		self.anNoise.grid(row=4, column=0, sticky=W)
 		self.ri = Checkbutton(top, text="Relative Area", variable=master.relativeIntensity, onvalue=1, offvalue=0)
-		self.ri.grid(row=4, column=0, sticky=W)
+		self.ri.grid(row=5, column=0, sticky=W)
 		self.riBck = Checkbutton(top, text="Relative Area - Background Area", variable=master.relativeIntensityBackground, onvalue=1, offvalue=0)
-		self.riBck.grid(row=5, column=0, sticky=W)
+		self.riBck.grid(row=6, column=0, sticky=W)
 		self.corRiBck = Checkbutton(top, text="Corrected Relative Area - Background Area", variable=master.correctedRelativeIntensityBackground, onvalue=1, offvalue=0)
-		self.corRiBck.grid(row=6, column=0, sticky=W)
+		self.corRiBck.grid(row=7, column=0, sticky=W)
 		self.percSpec = Checkbutton(top, text="Fraction of spectrum explained by analytes", variable=master.percentageSpectrum, onvalue=1, offvalue=0)
-		self.percSpec.grid(row=7, column=0, sticky=W)
+		self.percSpec.grid(row=8, column=0, sticky=W)
 		self.percAnal = Checkbutton(top, text="Fraction of analytes above S/N Cutoff", variable=master.percentageAnalytes, onvalue=1, offvalue=0)
-		self.percAnal.grid(row=8, column=0, sticky=W)
+		self.percAnal.grid(row=9, column=0, sticky=W)
 		self.perc = Checkbutton(top, text="Fraction of Analytes Area above S/N Cutoff", variable=master.percentage, onvalue=1, offvalue=0)
-		self.perc.grid(row=9, column=0, sticky=W)
+		self.perc.grid(row=10, column=0, sticky=W)
 		self.percBck = Checkbutton(top, text="Fraction of Analytes Area - Background Area above S/N Cutoff", variable=master.percentageBackground, onvalue=1, offvalue=0)
-		self.percBck.grid(row=10, column=0, sticky=W)
+		self.percBck.grid(row=11, column=0, sticky=W)
 		self.sn = Checkbutton(top, text="Maximum S/N", variable=master.maxSignalNoise, onvalue=1, offvalue=0)
-		self.sn.grid(row=11, column=0, sticky=W)
+		self.sn.grid(row=12, column=0, sticky=W)
 		self.qc = Checkbutton(top, text="Quality Score", variable=master.qcScore, onvalue=1, offvalue=0)
-		self.qc.grid(row=12, column=0, sticky=W)
+		self.qc.grid(row=13, column=0, sticky=W)
 		self.ppm = Checkbutton(top, text="PPM Error", variable=master.ppmQC, onvalue=1, offvalue=0)
-		self.ppm.grid(row=13, column=0, sticky=W)
+		self.ppm.grid(row=14, column=0, sticky=W)
 		self.isosn = Checkbutton(top, text="Isotope S/N", variable=master.isoSignalNoise, onvalue=1, offvalue=0)
-		self.isosn.grid(row=14, column=0, sticky=W)
+		self.isosn.grid(row=15, column=0, sticky=W)
 		self.isoai = Checkbutton(top, text="Isotope Area - Background Area", variable=master.isoAbsoluteIntensity, onvalue=1, offvalue=0)
-		self.isoai.grid(row=15, column=0, sticky=W)
+		self.isoai.grid(row=16, column=0, sticky=W)
 		self.button = Button(top, text='Ok', command=lambda: close(self))
-		self.button.grid(row=16, column=0, columnspan=2)
+		self.button.grid(row=17, column=0, columnspan=2)
 		top.lift()
 
 	def openFile(self):
@@ -2032,7 +2038,7 @@ class App():
 		with open(outFile, 'w') as fw:
 			name = str(self.inputFile).split("/")[-1]
 			fw.write(name+"\n")
-			fw.write("Composition\tMass\tWindow\tPercentage of Distribution\tTotal\tMaximum SN\tPPM Error of Main Isotope\t")
+			fw.write("Composition\tMass\tWindow\tPercentage of Distribution\tTotal\tMaximum SN\tNoise\tPPM Error of Main Isotope\t")
 			for i in range(-1, maxIsotope):
 				fw.write("Iso_"+str(i)+"\tS/N Ratio\tQC Value\t")
 			fw.write("\n")
@@ -2043,7 +2049,7 @@ class App():
 					totalArea += j.expArea
 					if j.sn > maxSN:
 						maxSN = j.sn
-				fw.write(str(i.composition)+"\t"+str(i.mass)+"\t"+str(i.window)+"\t"+str(totalArea)+"\t"+str(sum(float(j.obsArea) for j in i.isotopes[1:]))+"\t"+str(maxSN)+"\t"+str(i.ppm)+"\t")
+				fw.write(str(i.composition)+"\t"+str(i.mass)+"\t"+str(i.window)+"\t"+str(totalArea)+"\t"+str(sum(float(j.obsArea) for j in i.isotopes[1:]))+"\t"+str(maxSN)+"\t"+str(i.noise)+"\t"+str(i.ppm)+"\t")
 				for j in i.isotopes:
 					fw.write(str(j.obsArea)+"\t"+str(j.sn)+"\t"+str(j.qc)+"\t")
 				fw.write("\n")
@@ -2111,17 +2117,17 @@ class App():
 					total += float(i[4])
 					# Sum all isotope - background values
 					# Get all values for isotope 0 and up
-					isotopes = i[10::3]
-					sections = [i[x:x+3] for x in xrange(10, len(i), 3)]
+					isotopes = i[11::3]
+					sections = [i[x:x+3] for x in xrange(11, len(i), 3)]
 					for j in sections:
 						try:
 							float(j[0])
 							isotopeResults.append(isotopeResult(float(j[0]), float(j[1]), float(j[2])))
-							if float(j[0]) > float(i[7]):
-								totalBck += float(j[0]) - float(i[7])
+							if float(j[0]) > float(i[8]):
+								totalBck += float(j[0]) - float(i[8])
 						except ValueError:
 							pass
-					analyteResults.append(analyteResult(str(i[0]), float(i[1]), float(i[3]), float(i[7]), str(i[6]), isotopeResults))
+					analyteResults.append(analyteResult(str(i[0]), float(i[1]), float(i[3]), float(i[8]), float(i[6]), str(i[7]), isotopeResults))
 					# Get the value for the maximum number of isotopes to be listed in the output
 					if len(isotopes) > numIsotopes:
 						numIsotopes = len(isotopes)
@@ -2140,7 +2146,6 @@ class App():
 				name = name.split("uncalibrated_")[1]
 				name = name.split(".")[0]
 				data.append(Results(name, calibrated, total, total, total, values))
-
 
 		################################################################
 		# Sort the data list on the filename (alphabetical)			   #
@@ -2179,7 +2184,9 @@ class App():
 				fw.write("Minimum fraction of total isotopic distribution used for extraction\t"+str(MIN_TOTAL_CONTRIBUTION)+"\n")
 			fw.write("\n")
 
-			# Absolute Intensity block (non background subtracted)
+			########################################################
+			# Absolute Intensity block (non background subtracted) #
+			########################################################
 			if self.absoluteIntensity.get() == 1:
 				# Compositions
 				for i in data:
@@ -2206,7 +2213,9 @@ class App():
 					fw.write("\n")
 				fw.write("\n")
 
-			# Absolute Intensity block (background subtracted)
+			####################################################
+			# Absolute Intensity block (background subtracted) #
+			####################################################
 			if self.absoluteIntensityBackground.get() == 1:
 				# Compositions
 				for i in data:
@@ -2234,7 +2243,9 @@ class App():
 					fw.write("\n")
 				fw.write("\n")
 
-			# Analyte Background block
+			############################
+			# Analyte Background block #
+			############################
 			if self.analyteBackground.get() == 1:
 				# Compositions
 				for i in data:
@@ -2258,7 +2269,35 @@ class App():
 					fw.write("\n")
 				fw.write("\n")
 
-			# Relative Intensity block
+			#######################
+			# Analyte Noise block #
+			#######################
+			if self.analNoise.get() == 1:
+				# Compositions
+				for i in data:
+					fw.write("Analyte Noise\tCalibrated")
+					for j in i.analytes:
+						fw.write("\t"+str(j.composition))
+					fw.write("\tTotal Intensity\n")
+					break
+				# Calculated Mass
+				for i in data:
+					fw.write("\t"+str(header))
+					for j in i.analytes:
+						fw.write("\t"+str(j.mass))
+					fw.write("\n")
+					break
+				# Actual Noise values
+				for i in new:
+					fw.write(str(i.name)+"\t"+str(i.calibrated))
+					for j in i.analytes:
+						fw.write("\t"+str(j.noise))
+					fw.write("\n")
+				fw.write("\n")
+
+			############################
+			# Relative Intensity block #
+			############################
 			if self.relativeIntensity.get() == 1:
 				# Compositions
 				for i in data:
@@ -2288,7 +2327,9 @@ class App():
 						fw.write("\n")
 				fw.write("\n")
 
-			# Relative Intensity block (background subtracted)
+			####################################################
+			# Relative Intensity block (background subtracted) #
+			####################################################
 			if self.relativeIntensityBackground.get() == 1:
 				# Compositions
 				for i in data:
@@ -2319,7 +2360,9 @@ class App():
 						fw.write("\n")
 				fw.write("\n")
 
-			# Corrected (for distribution) Relative Intensity block (background subtracted)
+			#################################################################################
+			# Corrected (for distribution) Relative Intensity block (background subtracted) #
+			#################################################################################
 			if self.correctedRelativeIntensityBackground.get() == 1:
 				# Compositions
 				for i in data:
@@ -2369,8 +2412,9 @@ class App():
 						fw.write("\n")
 				fw.write("\n")
 
-
-			# Percentage of spectrum in analytes
+			######################################
+			# Percentage of spectrum in analytes #
+			######################################
 			if self.percentageSpectrum.get() == 1:
 				# Compositions
 				fw.write("Fraction of spectrum in analytes\tCalibrated\tFraction\n")
@@ -2382,7 +2426,9 @@ class App():
 						fw.write(str(i.name)+"\t"+str(i.calibrated)+"\n")
 				fw.write("\n")
 
-			# Fraction of analytes above S_N_CUTOFF block
+			###############################################
+			# Fraction of analytes above S_N_CUTOFF block #
+			###############################################
 			if self.percentageAnalytes.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
@@ -2403,7 +2449,9 @@ class App():
 					fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(fraction)+"\n")
 				fw.write("\n")
 
-			# Percentage of signals above S_N_CUTOFF block (non background subtracted)
+			############################################################################
+			# Percentage of signals above S_N_CUTOFF block (non background subtracted) #
+			############################################################################
 			if self.percentage.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte Area above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
@@ -2427,7 +2475,9 @@ class App():
 					fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(percentage)+"\n")
 				fw.write("\n")
 
-			# Percentage of signals above S_N_CUTOFF block (background subtracted)
+			########################################################################
+			# Percentage of signals above S_N_CUTOFF block (background subtracted) #
+			########################################################################
 			if self.percentageBackground.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte Area - Background Area above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
@@ -2451,7 +2501,9 @@ class App():
 					fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(percentage)+"\n")
 				fw.write("\n")
 
-			# Maximum Signal to nose block
+			################################
+			# Maximum Signal to nose block #
+			################################
 			if self.maxSignalNoise.get() == 1:
 				# Compositions
 				for i in data:
@@ -2479,7 +2531,9 @@ class App():
 					fw.write("\n")
 				fw.write("\n")
 
-			# Quality Score block
+			#######################
+			# Quality Score block #
+			#######################
 			if self.qcScore.get() == 1:
 				# Compositions
 				for i in data:
@@ -2506,7 +2560,9 @@ class App():
 					fw.write("\n")
 				fw.write("\n")
 
-			# PPM Error block
+			###################
+			# PPM Error block #
+			###################
 			if self.ppmQC.get() == 1:
 				# Compositions
 				for i in data:
@@ -2530,7 +2586,9 @@ class App():
 					fw.write("\n")
 				fw.write("\n")
 
-			# Isotopic Signal to noise block
+			##################################
+			# Isotopic Signal to noise block #
+			##################################
 			if self.isoSignalNoise.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
 				for i in range(0, numIsotopes):
@@ -2559,7 +2617,9 @@ class App():
 						fw.write("\n")
 					fw.write("\n")
 
-			# Isotopic absolute intensity block (background subtracted)
+			#############################################################
+			# Isotopic absolute intensity block (background subtracted) #
+			#############################################################
 			if self.isoAbsoluteIntensity.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
 				for i in range(0, numIsotopes):

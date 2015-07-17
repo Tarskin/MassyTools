@@ -550,10 +550,11 @@ class App():
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
 		# The MassyTools Logo (created by Rosina Plomp, 2015)
 		if os.path.isfile('./UI.png'):
-			image = plt.imread('./UI.png')
+			image = matplotlib.image.imread('./UI.png')
 			plt.axis('off')
 			plt.tight_layout()
 			im = plt.imshow(image)
+			plt.show()
 		# The Canvas
 		self.canvas = FigureCanvasTkAgg(self.fig, master=master)
 		self.toolbar = NavigationToolbar2TkAgg(self.canvas, root)

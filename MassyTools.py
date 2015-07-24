@@ -548,13 +548,13 @@ class App():
 		self.noiseQC = False
 		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
+		background_image = self.fig.add_subplot(111)
 		# The MassyTools Logo (created by Rosina Plomp, 2015)
 		if os.path.isfile('./UI.png'):
 			image = matplotlib.image.imread('./UI.png')
-			plt.axis('off')
-			plt.tight_layout()
-			im = plt.imshow(image)
-			plt.show()
+			background_image.axis('off')
+			self.fig.set_tight_layout(True)
+			background_image.imshow(image)
 		# The Canvas
 		self.canvas = FigureCanvasTkAgg(self.fig, master=master)
 		self.toolbar = NavigationToolbar2TkAgg(self.canvas, root)

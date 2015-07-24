@@ -719,11 +719,11 @@ class App():
 			values = master.selected.get(0, END)
 			for i in values:
 				for j in UNITS:
-					if str(i) == BLOCKS[j]['human_readable_name']:
+					if str(i) == BLOCKS[j]['human_readable_name'] and BLOCKS[j]['available_for_mass_modifiers']:
 						MASS_MODIFIERS.append(j)
 			CHARGE_CARRIER = []
 			for i in UNITS:
-				if str(i) == master.chargeCarrierVar.get():
+				if str(i) == master.chargeCarrierVar.get() and BLOCKS[i]['available_for_charge_carrier'] == 1:
 					CHARGE_CARRIER.append(i)
 			master.measurementWindow = 0
 			top.destroy()
@@ -1199,14 +1199,9 @@ class App():
 						numNitrogens += int(BLOCKS[k]['nitrogens']) * int(units[index+1])
 						numOxygens += int(BLOCKS[k]['oxygens']) * int(units[index+1])
 						numSulfurs += int(BLOCKS[k]['sulfurs']) * int(units[index+1])
-		"""# Get rid of a proton if a sodium or potassium was used as a mass modifier
-		if 'sodium' in MASS_MODIFIERS:
-			MASS_MODIFIERS.append('protonLoss')
-		if 'potassium' in MASS_MODIFIERS:
-			MASS_MODIFIERS.append('protonLoss')"""
 		# Attach the mass modifier values
-		totalMassModifers = MASS_MODIFIERS + CHARGE_CARRIER
-		for j in totalMassModifers:
+		totalMassModifiers = MASS_MODIFIERS + CHARGE_CARRIER
+		for j in totalMassModifiers:
 			mass += float(BLOCKS[j]['mass'])
 			numCarbons += float(BLOCKS[j]['carbons'])
 			numHydrogens += int(BLOCKS[j]['hydrogens'])
@@ -1759,6 +1754,11 @@ class App():
 			return
 		print "PRE-PROCESSING REFERENCE FILE"
 		print "THIS MAY TAKE A WHILE"
+		# Get rid of a proton if a sodium or potassium was used as a mass modifier
+		if 'sodium' in MASS_MODIFIERS:
+			MASS_MODIFIERS.append('protonLoss')
+		if 'potassium' in MASS_MODIFIERS:
+			MASS_MODIFIERS.append('protonLoss')
 		with open(analyteFile, 'w') as fw:
 			for i in lines:
 				isotopes = []
@@ -2175,6 +2175,9 @@ class App():
 				fw.write("Minimum number of calibrants in upper region of spectrum\t"+str(NUM_HIGH_RANGE)+"\n")
 				fw.write("Minimum number of calibrants throughout entire spectrum\t"+str(NUM_TOTAL)+"\n")
 			if self.compositionFile != "":
+				fw.write("Charge carrier used for all analytes\t")
+				for i in CHARGE_CARRIER:
+					fw.write(str(i)+"\t")
 				fw.write("Mass modifiers applied to all analytes\t")
 				for i in MASS_MODIFIERS:
 					fw.write(str(i)+"\t")

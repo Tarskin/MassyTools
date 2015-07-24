@@ -548,9 +548,9 @@ class App():
 		self.noiseQC = False
 		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
-		background_image = self.fig.add_subplot(111)
 		# The MassyTools Logo (created by Rosina Plomp, 2015)
 		if os.path.isfile('./UI.png'):
+			background_image = self.fig.add_subplot(111)
 			image = matplotlib.image.imread('./UI.png')
 			background_image.axis('off')
 			self.fig.set_tight_layout(True)
@@ -563,7 +563,7 @@ class App():
 
 		# FRAME
 		frame = Frame(master)
-		master.title("MassyTools 0.1.7.3")
+		master.title("MassyTools 0.1.8.0")
 		if os.path.isfile('./Icon.ico'):
 			master.iconbitmap(default='./Icon.ico')
 
@@ -601,7 +601,7 @@ class App():
 
 	def infoPopup(self):
 		top = self.top = Toplevel()
-		information = ("MassyTools Version 0.1.7.3\n\n"
+		information = ("MassyTools Version 0.1.8.0\n\n"
 					   "Written by Bas Jansen, bas.c.jansen@gmail.com\n"
 					   "Art by Rosina Plomp, h.r.plomp@lumc.nl\n\n"
 					   "MassyTools is designed to be a complete toolkit for\n"

@@ -2743,7 +2743,7 @@ class App():
 		if min(y_array) < 0.0:
 			if self.log is True:
 				with open('MassyTools.log', 'a') as fw:
-					fw.write(str(file)+" contained negative intensities, entire spectrum uplifted with "+str(min(y_array))+" intensity")
+					fw.write(str(file)+" contained negative intensities, entire spectrum uplifted with "+str(min(y_array))+" intensity\n")
 			offset = abs(math.ceil(min(y_array)))
 			newList = [x + offset for x in y_array]
 			y_array = newList

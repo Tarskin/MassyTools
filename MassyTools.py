@@ -1188,7 +1188,7 @@ class App():
 		numOxygens = 0
 		numSulfurs = 0
 		totalElements = 0
-		units = ["".join(x) for _, x in itertools.groupby(Analyte, key=str.isdigit)]
+		units = ["".join(x) for _, x in itertools.groupby(Analyte, key=str.isalpha)]
 		# Calculate the bass composition values
 		for index, j in enumerate(units):
 			for k in UNITS:

@@ -544,7 +544,7 @@ class App():
 						CHARGE_CARRIER.append(chunks[1])
 		# Nose can be determined in multiple ways
 		# Options are 'RMS' and 'MM'
-		self.noise = "MM"
+		self.noise = "RMS"
 		self.noiseQC = False
 		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))

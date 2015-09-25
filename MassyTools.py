@@ -1635,7 +1635,7 @@ class App():
 				line = line.rstrip('\n')
 				values = line.split()
 				mzList.append(float(values[0]))
-				intList.append(int(values[1]))
+				intList.append(int(float(values[1])))
 			# Transform python list into numpy array
 			mzArray = numpy.array(mzList)
 			newArray = f(mzArray)

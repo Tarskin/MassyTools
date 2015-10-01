@@ -23,7 +23,7 @@ import mzML
 import xy
 
 # File
-EXTENSIONS = ".xy"										# Extension of datafiles to be used during batch process
+EXTENSION = ".xy"										# Extension of datafiles to be used during batch process
 														# NOTE: Accepted formats are: 'xy' and 'mzML'
 OUTPUT_FILE = "Summary.txt"								# Default name for the second half of the output file
 SETTINGS_FILE = "Settings.txt"							# Default name for the measurement settings file

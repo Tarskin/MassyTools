@@ -23,8 +23,8 @@ import mzML
 import xy
 
 # File
-EXTENSION = ".xy"										# Extension of datafiles to be used during batch process
-														# NOTE: Accepted formats are: 'xy' and 'mzML'
+TYPES = ("*.xy","*.mzML")								# File types that will be used by MassyTools
+														# Accepted formats: ".xy" and ".mzML"
 OUTPUT_FILE = "Summary.txt"								# Default name for the second half of the output file
 SETTINGS_FILE = "Settings.txt"							# Default name for the measurement settings file
 
@@ -1025,13 +1025,14 @@ class App():
 		# Initialize the composition file (to only calculate isotopic patterns once
 		if self.compositionFile != "":
 			self.initCompositionMasses(self.compositionFile)
-		for file in glob.glob(str(self.batchFolder)+"/*" + EXTENSION):
-			name = os.path.split(file)
-			omittedFiles = ('calibrated', 'uncalibrated')
-			if any(x in name[-1] for x in omittedFiles):
-				pass
-			else:
-				filesGrabbed.append(file)
+		for files in TYPES:
+			for file in glob.glob(str(os.path.join(self.batchFolder,files))):
+				name = os.path.split(file)
+				omittedFiles = ('calibrated', 'uncalibrated')
+				if any(x in name[-1] for x in omittedFiles):
+					pass
+				else:
+					filesGrabbed.append(file)
 		for index, file in enumerate(filesGrabbed):
 			self.inputFile = file
 			if self.calibrationFile != "":  # and self.exclusionFile != "":
@@ -1048,12 +1049,14 @@ class App():
 		self.calPerc.set("100%")
 		progressbar["value"] = 100
 		del filesGrabbed[:]
-		for file in glob.glob(str(self.batchFolder)+"/calibrated_*" + EXTENSION):
-			omittedFiles = ('_calibrated', '_uncalibrated')
-			if any(x in name[-1] for x in omittedFiles):
-				pass
-			else:
-				filesGrabbed.append(file)
+		for files in TYPES:
+			for file in glob.glob(str(os.path.join(self.batchFolder,"calibrated_"+files))):
+				name = os.path.split(file)
+				omittedFiles = ('_calibrated', '_uncalibrated')
+				if any(x in name[-1] for x in omittedFiles):
+					pass
+				else:
+					filesGrabbed.append(file)
 		for index, file in enumerate(filesGrabbed):
 			self.inputFile = file
 			if self.compositionFile != "":
@@ -2064,14 +2067,11 @@ class App():
 					name = name.split("calibrated_")[1]
 					#name = name.split("calibrated_")[1:]
 					#name = ''.join(name)
-				name = name.split(".")[0]
 				for line in fr:
 					parts = line.split("\t")
 					values.append(parts)
-				# Custom addition for albert
-				inputfile = name.split(".")[0]
-				inputfile = "calibrated_"+inputfile + EXTENSION
-				# Maybe change batchFolder to outputFolder?
+
+				inputfile = "calibrated_"+name
 				inputfile = os.path.join(self.batchFolder,inputfile)
 				totalInt = self.getTotalArea(inputfile)
 				analyteResults = []

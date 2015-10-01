@@ -17,8 +17,14 @@ import tkFileDialog
 import tkMessageBox
 import ttk
 
+# Custom libraries
+sys.path.append('libs')
+import mzML
+import xy
+
 # File
-EXTENSION = ".xy"										# Extension of datafiles to be used during batch process
+EXTENSIONS = ".xy"										# Extension of datafiles to be used during batch process
+														# NOTE: Accepted formats are: 'xy' and 'mzML'
 OUTPUT_FILE = "Summary.txt"								# Default name for the second half of the output file
 SETTINGS_FILE = "Settings.txt"							# Default name for the measurement settings file
 
@@ -420,19 +426,6 @@ BLOCKS = {	#######################
 						'sulfurs':2}}
 UNITS = BLOCKS.keys()
 
-
-################################################
-# Custom navigation toolbar class (unfinished) #
-################################################
-class NavToolBar(NavigationToolbar2TkAgg):
-
-	def __init__(self, canvas, root, parent):
-		self.canvas = canvas
-		self.root = root
-		self.parent = parent
-		NavigationToolbar2TkAgg.__init__(self, canvas, root)
-
-
 #############################################
 # Class definitions (used for storing data) #
 #############################################
@@ -499,6 +492,7 @@ class App():
 
 	def __init__(self, master):
 		# VARIABLES
+		self.version = "0.1.8.1"
 		self.master = master
 		self.absoluteIntensity = IntVar()
 		self.absoluteIntensityBackground = IntVar()
@@ -549,9 +543,9 @@ class App():
 		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
 		# The MassyTools Logo (created by Rosina Plomp, 2015)
-		if os.path.isfile('./UI.png'):
+		if os.path.isfile('./ui/UI.png'):
 			background_image = self.fig.add_subplot(111)
-			image = matplotlib.image.imread('./UI.png')
+			image = matplotlib.image.imread('./ui/UI.png')
 			background_image.axis('off')
 			self.fig.set_tight_layout(True)
 			background_image.imshow(image)
@@ -563,9 +557,9 @@ class App():
 
 		# FRAME
 		frame = Frame(master)
-		master.title("MassyTools 0.1.8.0")
-		if os.path.isfile('./Icon.ico'):
-			master.iconbitmap(default='./Icon.ico')
+		master.title("MassyTools "+str(self.version))
+		if os.path.isfile('./ui/Icon.ico'):
+			master.iconbitmap(default='./ui/Icon.ico')
 
 		# VARIABLE ENTRIES
 
@@ -601,7 +595,7 @@ class App():
 
 	def infoPopup(self):
 		top = self.top = Toplevel()
-		information = ("MassyTools Version 0.1.8.0\n\n"
+		information = ("MassyTools Version "+str(self.version)+"\n\n"
 					   "Written by Bas Jansen, bas.c.jansen@gmail.com\n"
 					   "Art by Rosina Plomp, h.r.plomp@lumc.nl\n\n"
 					   "MassyTools is designed to be a complete toolkit for\n"
@@ -1611,44 +1605,12 @@ class App():
 		INPUT: a numpy polynomial (poly1d) function
 		OUTPUT: a calibrated data file
 		"""
-		with open(self.inputFile, 'r') as fr:
-			if self.batch is False:
-				output = tkFileDialog.asksaveasfilename()
-				if output:
-					pass
-				else:
-					tkMessageBox.showinfo("File Error", "No output file selected")
-					return
-			else:
-				parts = os.path.split(str(self.inputFile))
-				output = "calibrated_"+str(parts[-1])
-				# Maybe replace batchFolder without outputFolder?
-				output = os.path.join(self.batchFolder, output)
-			if self.log is True:
-				with open('MassyTools.log', 'a') as fw:
-					fw.write(str(datetime.now())+"\tWriting output file: "+output+"\n")
-			# Prepare variables required for transformation
-			outputBatch = []
-			mzList = []
-			intList = []
-			for line in fr:
-				line = line.rstrip('\n')
-				values = line.split()
-				mzList.append(float(values[0]))
-				intList.append(int(float(values[1])))
-			# Transform python list into numpy array
-			mzArray = numpy.array(mzList)
-			newArray = f(mzArray)
-			# Prepare the output as a list
-			for index, i in enumerate(newArray):
-				outputBatch.append(str(i)+" "+str(intList[index])+"\n")
-			# Join the output list elements
-			joinedOutput = ''.join(outputBatch)
-			with open(output, 'w') as fw:
-				fw.write(joinedOutput)
-			if self.log is True:
-				with open('MassyTools.log', 'a') as fw:
-					fw.write(str(datetime.now())+"\tFinished writing output file: "+output+"\n")
+		if ".mzML" in self.inputFile:
+			run = mzML.parseMZML(self.inputFile)
+			run.load()
+			mzML.transformBinary(run,self.inputFile,self.batchFolder,f)
+		elif ".xy" in self.inputFile:
+			xy.transformXY(self.inputFile, self.batchFolder, self.batch, self.log, f)
 
 	def singularQualityControl(self):
 		""" This function creates a list of Analyte instances based on
@@ -2713,41 +2675,20 @@ class App():
 			return a
 
 	def readData(self, file):
-		""" This function opens the specified file and parses it line
-		by line. The new line ('\n') character is stripped from each line
-		prior to the line being split (on any whitespace character).
-		The first part of a line is appended to a list (x_array), the
-		second part of a line is appended to a list (y_array). The
-		function returns a list of tuples ( (x1,y1), (x2,y2) ) by using
-		the zip functionality.
+		""" This function checks the file format and then hands the
+		file over to the specific library (e.g. mzML or xy).
 
 		INPUT: A string containing the filepath
 		OUTPUT: A list of (m/z,int) tuples
 		"""
-		x_array = []
-		y_array = []
-		with open(file, 'r') as fr:
-			for line in fr:
-				if line[0] == '#':
-					pass
-				else:
-					line = line.rstrip('\n')
-					values = line.split()
-					values = filter(None, values)
-					#if float(values[1]) < 0.0:
-						#print "ERROR: Negative intensity value: "+str(values[1])+" encountered in file: "+str(file)+"\n"
-						#raw_input("Press enter to exit")
-						#sys.exit()
-					x_array.append(float(values[0]))
-					y_array.append(float(values[1]))
-		if min(y_array) < 0.0:
-			if self.log is True:
-				with open('MassyTools.log', 'a') as fw:
-					fw.write(str(file)+" contained negative intensities, entire spectrum uplifted with "+str(min(y_array))+" intensity\n")
-			offset = abs(math.ceil(min(y_array)))
-			newList = [x + offset for x in y_array]
-			y_array = newList
-		return zip(x_array, y_array)
+		if ".mzML" in file:
+			run = mzML.parseMZML(file)
+			run.load()
+			data = run._parsePoints(run._scans[None])
+			return data
+		elif ".xy" in file:
+			data = xy.parseXY(file,self.log)
+			return data
 
 	def plotChange(self, data, f):
 		""" This function takes an array of data. The function also

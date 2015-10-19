@@ -11,7 +11,7 @@ def parseXY(inputFile, log):
         x_array = []
         y_array = []
         for line in fr:
-            if line[0] == '#':
+            if line[0].isdigit() == False:
                 pass
             else:
                 line = line.rstrip('\n')

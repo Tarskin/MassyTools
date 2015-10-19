@@ -895,7 +895,8 @@ class App():
 		else:
 			setattr(self, 'inputFile', file_path)
 			data = self.readData(self.inputFile)
-			self.plotData(data)
+			if data:
+				self.plotData(data)
 
 	def openCalibrationFile(self):
 		""" This function opens a Tkinter filedialog, asking the user
@@ -2689,6 +2690,8 @@ class App():
 		elif ".xy" in file:
 			data = xy.parseXY(file,self.log)
 			return data
+		else:
+			tkMessageBox.showinfo("File Error", "Incorrect file format")
 
 	def plotChange(self, data, f):
 		""" This function takes an array of data. The function also

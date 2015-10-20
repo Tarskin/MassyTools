@@ -3,6 +3,8 @@ from datetime import datetime
 import math
 import numpy
 import os
+import tkFileDialog
+import tkMessageBox
 
 def parseXY(inputFile, log):
     """ Read a given xy file and return the values as a zip.

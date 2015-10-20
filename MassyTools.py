@@ -1330,10 +1330,11 @@ class App():
 		"""
 		errors = []
 		name = os.path.split(str(self.inputFile))[-1]
+		folder =  os.path.split(str(self.inputFile))[0]
 		name = name.split(".")[0]
 		name = "calibrated_"+name+str(".error")
 		# Maybe replace batchFolder with outputFolder?
-		name = os.path.join(self.batchFolder, name)
+		name = os.path.join(folder, name)
 		with open(name, 'w') as fw:
 			fw.write("Expected\tObserved\tPPM Error\n")
 		for index, i in enumerate(observed):

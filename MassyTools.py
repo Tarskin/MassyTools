@@ -1890,7 +1890,7 @@ class App():
 							for k in data[begin:end]:
 								x_points.append(k[0])
 								y_points.append(k[1])
-							newX = numpy.linspace(x_points[0], x_points[-1], 1000)
+							newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
 							f = interp1d(x_points, y_points, kind='cubic')
 							ySpline = f(newX)
 							maximum = 0

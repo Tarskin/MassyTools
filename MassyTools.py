@@ -910,7 +910,7 @@ class App():
 		else:
 			setattr(self, 'inputFile', file_path)
 			data = self.readData(self.inputFile)
-			if data:
+			if data.any():
 				self.plotData(data)
 
 	def openCalibrationFile(self):
@@ -2698,12 +2698,13 @@ class App():
 		INPUT: A string containing the filepath
 		OUTPUT: A list of (m/z,int) tuples
 		"""
-		if ".mzML" in file:
+		if ".mzML".lower() in file.lower():
 			run = mzML.parseMZML(file)
 			run.load()
-			data = run._parsePoints(run._scans[None])
-			return data
-		elif ".xy" in file:
+			for i in run._scans:
+				data = run._parsePoints(run._scans[i])
+				return data
+		elif ".xy".lower() in file.lower():
 			data = xy.parseXY(file,self.log)
 			return data
 		else:

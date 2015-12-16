@@ -910,7 +910,11 @@ class App():
 		else:
 			setattr(self, 'inputFile', file_path)
 			data = self.readData(self.inputFile)
-			if data.any():
+			try:
+				data = data.tolist()
+			except AttributeError:
+				pass
+			if data:
 				self.plotData(data)
 
 	def openCalibrationFile(self):

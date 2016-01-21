@@ -1673,19 +1673,22 @@ class App():
 			if self.batch == 0:
 				print "Analyte: "+str(i.composition)
 			total = 0
+			totalExp = 0
 			for j in i.isotopes[1:]:
-				total += j.maxIntensity
-			if total == 0:
+				total += max(float(j.obsArea) - float(i.backgroundArea),0)
+				totalExp += float(j.expArea)
+			if total <= 0.0:
 				if self.log is True:
 					with open('MassyTools.log', 'a') as fw:
 						fw.write(str(datetime.now())+"\tSkipping QC calculation for "+str(i.composition)+" due to the total area being 0\n")
 				break
 			for j in i.isotopes[1:]:
+				maxAreaBackCorrected = max(float(j.obsArea) - float(i.backgroundArea),0)
 				if self.noiseQC is True:
-					j.qc = float(((((j.maxIntensity - i.backgroundPoint)/total) - j.expArea)**2)/i.noise**2)
+					j.qc = ((float(maxAreaBackCorrected) / float(total)) - (j.expArea/totalExp))**2 / i.noise**2
 				else:
-					j.qc = float((((j.maxIntensity - i.backgroundPoint)/total) - j.expArea)**2)
-				# Temporary display?
+					j.qc = abs((float(maxAreaBackCorrected) / float(total)) - (j.expArea/totalExp))
+				# Temporary display
 				if self.batch == 0:
 					print "Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % f)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc)
 		return compositions

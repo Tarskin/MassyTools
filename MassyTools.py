@@ -971,7 +971,7 @@ class App():
 				fw.write("CALCULATION_WINDOW\t"+str(float(CALCULATION_WINDOW))+"\n")
 				fw.write("OUTER_BCK_BORDER\t"+str(int(OUTER_BCK_BORDER))+"\n")
 				fw.write("S_N_CUTOFF\t"+str(int(S_N_CUTOFF))+"\n")
-				fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(self.extracMinTotal.get()))+"\n")
+				fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(self.MIN_TOTAL_CONTRIBUTION))+"\n")
 
 		if master.measurementWindow == 1:
 			return

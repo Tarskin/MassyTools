@@ -500,6 +500,54 @@ class Isotope():
 		self.maxIntensity = maxIntensity
 		self.qc = qc
 
+################################################################################################
+# Tooltip code - Taken from http://www.voidspace.org.uk/python/weblog/arch_d7_2006_07_01.shtml #
+################################################################################################
+class ToolTip(object):
+
+	def __init__(self, widget):
+		self.widget = widget
+		self.tipwindow = None
+		self.id = None
+		self.x = self.y = 0
+
+	def showtip(self, text):
+		"Display text in tooltip window"
+		self.text = text
+		if self.tipwindow or not self.text:
+			return
+		x, y, cx, cy = self.widget.bbox("insert")
+		x = x + self.widget.winfo_rootx() + 27
+		y = y + cy + self.widget.winfo_rooty() +27
+		self.tipwindow = tw = Toplevel(self.widget)
+		tw.wm_overrideredirect(1)
+		tw.wm_geometry("+%d+%d" % (x, y))
+		try:
+			# For Mac OS
+			tw.tk.call("::tk::unsupported::MacWindowStyle",
+					   "style", tw._w,
+					   "help", "noActivates")
+		except TclError:
+			pass
+		label = Label(tw, text=self.text, justify=LEFT,
+					  background="#ffffe0", relief=SOLID, borderwidth=1,
+					  wraplength=500, font=("tahoma", "8", "normal"))
+		label.pack(ipadx=1)
+
+	def hidetip(self):
+		tw = self.tipwindow
+		self.tipwindow = None
+		if tw:
+			tw.destroy()
+
+def createToolTip(widget, text):
+	toolTip = ToolTip(widget)
+	def enter(event):
+		toolTip.showtip(text)
+	def leave(event):
+		toolTip.hidetip()
+	widget.bind('<Enter>', enter)
+	widget.bind('<Leave>', leave)
 
 ###############################
 # Start of actual application #
@@ -511,21 +559,13 @@ class App():
 		self.version = "0.1.8.1"
 		self.master = master
 		self.absoluteIntensity = IntVar()
-		self.absoluteIntensityBackground = IntVar()
-		self.analyteBackground = IntVar()
-		self.analNoise = IntVar()
 		self.relativeIntensity = IntVar()
-		self.relativeIntensityBackground = IntVar()
-		self.correctedRelativeIntensityBackground = IntVar()
-		self.percentageSpectrum = IntVar()
-		self.percentageAnalytes = IntVar()
-		self.percentage = IntVar()
-		self.percentageBackground = IntVar()
-		self.maxSignalNoise = IntVar()
-		self.isoAbsoluteIntensity = IntVar()
-		self.ppmQC = IntVar()
-		self.qcScore = IntVar()
-		self.isoSignalNoise = IntVar()
+		self.bckSub = IntVar()
+		self.valueIso = IntVar()
+		self.bckNoise = IntVar()
+		self.riCor = IntVar()
+		self.sQC = IntVar()
+		self.aQC = IntVar()
 		self.batchProcessing = 0
 		self.batchWindow = 0
 		self.measurementWindow = 0
@@ -537,27 +577,15 @@ class App():
 		self.batchFolder = ""
 		self.qualityFile = ""
 		self.log = True
-		# Attempt to retrieve previously saved settings from settingsfile
-		if os.path.isfile('./'+str(SETTINGS_FILE)):
-			with open(SETTINGS_FILE,'r') as fr:
-				for line in fr:
-					line = line.rstrip('\n')
-					chunks = line.split()
-					if chunks[0] == "MASS_MODIFIERS":
-						global MASS_MODIFIERS
-						MASS_MODIFIERS = []
-						for i in chunks[1:]:
-							MASS_MODIFIERS.append(i)
-					if chunks[0] == "CHARGE_CARRIER":
-						global CHARGE_CARRIER
-						CHARGE_CARRIER = []
-						CHARGE_CARRIER.append(chunks[1])
 		# Nose can be determined in multiple ways
 		# Options are 'RMS' and 'MM'
 		self.noise = "RMS"
 		self.noiseQC = False
 		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
+		# Attempt to retrieve previously saved settings from settingsfile
+		if os.path.isfile('./'+str(SETTINGS_FILE)):
+			self.getSettings()
 		# The MassyTools Logo (created by Rosina Plomp, 2015)
 		if os.path.isfile('./ui/UI.png'):
 			background_image = self.fig.add_subplot(111)
@@ -609,6 +637,185 @@ class App():
 
 		menu.add_command(label="About MassyTools", command=lambda: self.infoPopup())
 
+		menu.add_command(label="Settings", command = lambda: self.settingsPopup(self))
+
+	# Correctify these for MassyTools
+	def settingsPopup(self,master):
+		""" This function creates a window in which the user can change
+		all the parameters that are for normal use. Certain advanced
+		settings such as the extraction type and noise determination
+		method remain hidden from the user through this window.
+		"""
+
+		def close(self):
+			""" This function closes the settings popup and applies
+			all the entered values to the parameters.
+			"""
+			global CALIBRATION_WINDOW
+			global CALIB_S_N_CUTOFF
+			global NUM_LOW_RANGE
+			global NUM_MID_RANGE
+			global NUM_HIGH_RANGE
+			global NUM_TOTAL
+			global CALCULATION_WINDOW
+			global OUTER_BCK_BORDER
+			global S_N_CUTOFF
+			global MIN_TOTAL_CONTRIBUTION
+			CALIBRATION_WINDOW = float(self.calibWindow.get())
+			CALIB_S_N_CUTOFF = int(self.calibSn.get())
+			NUM_LOW_RANGE = int(self.calibMinLow.get())
+			NUM_MID_RANGE = int(self.calibMinMid.get())
+			NUM_HIGH_RANGE = int(self.calibMinHigh.get())
+			NUM_TOTAL = int(self.calibMinTotal.get())
+			CALCULATION_WINDOW = float(self.extracMassWindow.get())
+			OUTER_BCK_BORDER = int(self.extracBack.get())
+			S_N_CUTOFF = int(self.extracQcSn.get())
+			MIN_TOTAL_CONTRIBUTION = float(self.extracMinTotal.get())
+			master.measurementWindow = 0
+			top.destroy()
+            
+		def save(self):
+			""" This function saves all changed settings to the 
+			settings file.
+			"""
+			with open(SETTINGS_FILE,'w') as fw:
+				fw.write("MASS_MODIFIERS")
+				for i in MASS_MODIFIERS:
+					fw.write("\t"+str(i))
+				fw.write("\nCHARGE_CARRIER\t"+str(CHARGE_CARRIER[0])+"\n")
+				fw.write("CALIBRATION_WINDOW\t"+str(float(self.calibWindow.get()))+"\n")
+				fw.write("CALIB_S_N_CUTOFF\t"+str(int(self.calibSn.get()))+"\n")
+				fw.write("NUM_LOW_RANGE\t"+str(int(self.calibMinLow.get()))+"\n")
+				fw.write("NUM_MID_RANGE\t"+str(int(self.calibMinMid.get()))+"\n")
+				fw.write("NUM_HIGH_RANGE\t"+str(int(self.calibMinHigh.get()))+"\n")
+				fw.write("NUM_TOTAL\t"+str(int(self.calibMinTotal.get()))+"\n")
+				fw.write("CALCULATION_WINDOW\t"+str(float(self.extracMassWindow.get()))+"\n")
+				fw.write("OUTER_BCK_BORDER\t"+str(int(self.extracBack.get()))+"\n")
+				fw.write("S_N_CUTOFF\t"+str(int(self.extracQcSn.get()))+"\n")
+				fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(self.extracMinTotal.get()))+"\n")
+
+		master.measurementWindow = 1
+		top = self.top = Toplevel()
+		top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
+		self.calibrationLabel = Label(top, text="Calibration parameters", font="bold")
+		self.calibrationLabel.grid(row=1, columnspan=2, sticky=W)
+		self.calibWindowLabel = Label(top, text="m/z window for calibration")
+		self.calibWindowLabel.grid(row=2, column=0, sticky=W)
+		self.calibWindow = Entry(top)
+		self.calibWindow.insert(0, CALIBRATION_WINDOW)
+		self.calibWindow.grid(row=2, column=1, sticky=W)
+		self.calibSnLabel = Label(top, text="Minimal S/N for calibration")
+		self.calibSnLabel.grid(row=3, column=0, sticky=W)
+		self.calibSn = Entry(top)
+		self.calibSn.insert(0, CALIB_S_N_CUTOFF)
+		self.calibSn.grid(row=3, column=1, sticky=W)
+		self.calibMinLowLabel = Label(top, text="Minimal number of calibrants in low m/z range")
+		self.calibMinLowLabel.grid(row=4, column=0, sticky=W)
+		self.calibMinLow = Entry(top)
+		self.calibMinLow.insert(0, NUM_LOW_RANGE)
+		self.calibMinLow.grid(row=4, column=1, sticky=W)
+		self.calibMinMidLabel = Label(top, text="Minimal number of calibrants in medium m/z range")
+		self.calibMinMidLabel.grid(row=5, column=0, sticky=W)
+		self.calibMinMid = Entry(top)
+		self.calibMinMid.insert(0, NUM_MID_RANGE)
+		self.calibMinMid.grid(row=5, column=1, sticky=W)
+		self.calibMinHighLabel = Label(top, text="Minimal number of calibrants in high m/z range")
+		self.calibMinHighLabel.grid(row=6, column=0, sticky=W)
+		self.calibMinHigh = Entry(top)
+		self.calibMinHigh.insert(0, NUM_HIGH_RANGE)
+		self.calibMinHigh.grid(row=6, column=1, sticky=W)
+		self.calibMinTotalLabel = Label(top, text="Minimal number of calibrants")
+		self.calibMinTotalLabel.grid(row=7, column=0, sticky=W)
+		self.calibMinTotal = Entry(top)
+		self.calibMinTotal.insert(0, NUM_TOTAL)
+		self.calibMinTotal.grid(row=7, column=1, sticky=W)
+		self.extractionLabel = Label(top, text="Extraction & QC Parameters", font="bold")
+		self.extractionLabel.grid(row=8, columnspan=2, sticky=W)
+		self.extracMassWindowLabel = Label(top, text="m/z window for quantitation")
+		self.extracMassWindowLabel.grid(row=9, column=0, sticky=W)
+		self.extracMassWindow = Entry(top)
+		self.extracMassWindow.insert(0, CALCULATION_WINDOW)
+		self.extracMassWindow.grid(row=9, column=1, sticky=W)
+		self.extracMinTotalLabel = Label(top, text="Minimum isotopic fraction")
+		self.extracMinTotalLabel.grid(row=10, column=0, sticky=W)
+		self.extracMinTotal = Entry(top)
+		self.extracMinTotal.insert(0, MIN_TOTAL_CONTRIBUTION)
+		self.extracMinTotal.grid(row=10, column=1, sticky=W)
+		self.extracBackLabel = Label(top, text="Background detection window")
+		self.extracBackLabel.grid(row=11, column=0, sticky=W)
+		self.extracBack = Entry(top)
+		self.extracBack.insert(0, OUTER_BCK_BORDER)
+		self.extracBack.grid(row=11, column=1, sticky=W)
+		self.extracQcSnLabel = Label(top, text="S/N cutoff for spectral QC")
+		self.extracQcSnLabel.grid(row=12, column=0, sticky=W)
+		self.extracQcSn = Entry(top)
+		self.extracQcSn.insert(0, S_N_CUTOFF)
+		self.extracQcSn.grid(row=12, column=1, sticky=W)
+		self.ok = Button(top,text = 'Ok', command = lambda: close(self))
+		self.ok.grid(row = 13, column = 0, sticky = W)
+		self.save = Button(top, text = 'Save', command = lambda: save(self))
+		self.save.grid(row = 13, column = 1, sticky = E)
+		# Tooltips
+		createToolTip(self.calibWindowLabel,"The mass window in Dalton around the specified exact m/z of a calibrant, that LaCyTools uses to determine the uncalibrated accurate mass.")
+		createToolTip(self.calibSnLabel,"The minimum S/N of a calibrant to be included in the calibration.")
+		createToolTip(self.calibMinLowLabel,"The minimum number of calibrants in the low m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
+		createToolTip(self.calibMinMidLabel,"The minimum number of calibrants in the mid m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
+		createToolTip(self.calibMinHighLabel,"The minimum number of calibrants in the high m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
+		createToolTip(self.calibMinTotalLabel,"The minimum number of calibrants in the whole m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
+		createToolTip(self.extracMassWindowLabel,"The m/z window in Thompson around the specified exact m/z of a feature that LaCyTools will use for quantitation. For example, a value of 0.1 results in LaCyTools quantifying 999.9 to 1000.1 for a feature with an m/z value of 1000.")
+		createToolTip(self.extracMinTotalLabel,"The minimum fraction of the theoretical isotopic pattern that LaCyTools will use for quantitation. For example, a value of 0.95 means that LaCyTools will quantify isotopes until the sum of the quantified isotopes exceeds 0.95 of the total theoretcal isotopic pattern.")
+		createToolTip(self.extracBackLabel,"The mass window in Dalton that LaCyTools is allowed to look for the local background and noise for each analyte. For example, a value of 10 means that LaCyTools will look from 990 m/z to 1010 m/z for an analyte with an m/z of 1000.")
+		createToolTip(self.extracQcSnLabel,"The minimal S/N that an analyte has to have to be included in the analyte QC, e.g. the fraction of analyte intensity above S/N X, where X is the value specified here.")
+
+	def getSettings(self):
+		""" This function reads the settings file as specified in the
+		program, applying them to the program.
+		"""
+		with open(SETTINGS_FILE,'r') as fr:
+			for line in fr:
+				line = line.rstrip('\n')
+				chunks = line.split()
+				if chunks[0] == "MASS_MODIFIERS":
+					global MASS_MODIFIERS
+					MASS_MODIFIERS = []
+					for i in chunks[1:]:
+						MASS_MODIFIERS.append(i)
+				if chunks[0] == "CHARGE_CARRIER":
+					global CHARGE_CARRIER
+					CHARGE_CARRIER = []
+					CHARGE_CARRIER.append(chunks[1])
+				if chunks[0] == "CALIBRATION_WINDOW":
+					global CALIBRATION_WINDOW
+					CALIBRATION_WINDOW = float(chunks[1])
+				if chunks[0] == "CALIB_S_N_CUTOFF":
+					global CALIB_S_N_CUTOFF
+					CALIB_S_N_CUTOFF = int(chunks[1])
+				if chunks[0] == "NUM_LOW_RANGE":
+					global NUM_LOW_RANGE
+					NUM_LOW_RANGE = int(chunks[1])
+				if chunks[0] == "NUM_MID_RANGE":
+					global NUM_MID_RANGE
+					NUM_MID_RANGE = int(chunks[1])
+				if chunks[0] == "NUM_HIGH_RANGE":
+					global NUM_HIGH_RANGE
+					NUM_HIGH_RANGE = int(chunks[1])
+				if chunks[0] == "NUM_TOTAL":
+					global NUM_TOTAL
+					NUM_TOTAL = int(chunks[1])
+				if chunks[0] == "CALCULATION_WINDOW":
+					global CALCULATION_WINDOW
+					CALCULATION_WINDOW = float(chunks[1])
+				if chunks[0] == "OUTER_BCK_BORDER":
+					global OUTER_BCK_BORDER
+					OUTER_BCK_BORDER = int(chunks[1])
+				if chunks[0] == "S_N_CUTOFF":
+					global S_N_CUTOFF
+					S_N_CUTOFF = int(chunks[1])
+				if chunks[0] == "MIN_TOTAL_CONTRIBUTION":
+					global MIN_TOTAL_CONTRIBUTION
+					MIN_TOTAL_CONTRIBUTION = float(chunks[1])
+
+                    
 	def infoPopup(self):
 		top = self.top = Toplevel()
 		information = ("MassyTools Version "+str(self.version)+"\n\n"
@@ -755,6 +962,16 @@ class App():
 				for i in MASS_MODIFIERS:
 					fw.write("\t"+str(i))
 				fw.write("\nCHARGE_CARRIER\t"+str(CHARGE_CARRIER[0])+"\n")
+				fw.write("CALIBRATION_WINDOW\t"+str(float(CALIBRATION_WINDOW))+"\n")
+				fw.write("CALIB_S_N_CUTOFF\t"+str(int(CALIB_S_N_CUTOFF))+"\n")
+				fw.write("NUM_LOW_RANGE\t"+str(int(NUM_LOW_RANGE))+"\n")
+				fw.write("NUM_MID_RANGE\t"+str(int(NUM_MID_RANGE))+"\n")
+				fw.write("NUM_HIGH_RANGE\t"+str(int(NUM_HIGH_RANGE))+"\n")
+				fw.write("NUM_TOTAL\t"+str(int(NUM_TOTAL))+"\n")
+				fw.write("CALCULATION_WINDOW\t"+str(float(CALCULATION_WINDOW))+"\n")
+				fw.write("OUTER_BCK_BORDER\t"+str(int(OUTER_BCK_BORDER))+"\n")
+				fw.write("S_N_CUTOFF\t"+str(int(S_N_CUTOFF))+"\n")
+				fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(self.extracMinTotal.get()))+"\n")
 
 		if master.measurementWindow == 1:
 			return
@@ -815,39 +1032,23 @@ class App():
 
 		def select_all(self):
 			master.absoluteIntensity.set(1)
-			master.absoluteIntensityBackground.set(1)
-			master.analyteBackground.set(1)
-			master.analNoise.set(1)
 			master.relativeIntensity.set(1)
-			master.relativeIntensityBackground.set(1)
-			master.correctedRelativeIntensityBackground.set(1)
-			master.percentageSpectrum.set(1)
-			master.percentageAnalytes.set(1)
-			master.percentage.set(1)
-			master.percentageBackground.set(1)
-			master.maxSignalNoise.set(1)
-			master.qcScore.set(1)
-			master.ppmQC.set(1)
-			master.isoSignalNoise.set(1)
-			master.isoAbsoluteIntensity.set(1)
+			master.bckSub.set(1)
+			master.valueIso.set(1)
+			master.bckNoise.set(1)
+			master.riCor.set(1)
+			master.sQC.set(1)
+			master.aQC.set(1)
 
 		def select_none(self):
 			master.absoluteIntensity.set(0)
-			master.absoluteIntensityBackground.set(0)
-			master.analyteBackground.set(0)
-			master.analNoise.set(0)
 			master.relativeIntensity.set(0)
-			master.relativeIntensityBackground.set(0)
-			master.correctedRelativeIntensityBackground.set(0)
-			master.percentageSpectrum.set(0)
-			master.percentageAnalytes.set(0)
-			master.percentage.set(0)
-			master.percentageBackground.set(0)
-			master.maxSignalNoise.set(0)
-			master.qcScore.set(0)
-			master.ppmQC.set(0)
-			master.isoSignalNoise.set(0)
-			master.isoAbsoluteIntensity.set(0)
+			master.bckSub.set(0)
+			master.valueIso.set(0)
+			master.bckNoise.set(0)
+			master.riCor.set(0)
+			master.sQC.set(0)
+			master.aQC.set(0)
 
 		def close(self):
 			master.outputWindow = 0
@@ -859,40 +1060,26 @@ class App():
 		self.all.grid(row=0, column=0, sticky=W)
 		self.none = Button(top, text="Select None", command=lambda: select_none(self))
 		self.none.grid(row=0, column=1, sticky=E)
-		self.ai = Checkbutton(top, text="Analyte Area", variable=master.absoluteIntensity, onvalue=1, offvalue=0)
-		self.ai.grid(row=1, column=0, sticky=W)
-		self.aiBck = Checkbutton(top, text="Analyte Area - Background Area", variable=master.absoluteIntensityBackground, onvalue=1, offvalue=0)
-		self.aiBck.grid(row=2, column=0, sticky=W)
-		self.Bck = Checkbutton(top, text="Analyte Background Area", variable=master.analyteBackground, onvalue=1, offvalue=0)
-		self.Bck.grid(row=3, column=0, sticky=W)
-		self.anNoise = Checkbutton(top, text="Analyte Noise", variable=master.analNoise, onvalue=1, offvalue=0)
-		self.anNoise.grid(row=4, column=0, sticky=W)
-		self.ri = Checkbutton(top, text="Relative Area", variable=master.relativeIntensity, onvalue=1, offvalue=0)
-		self.ri.grid(row=5, column=0, sticky=W)
-		self.riBck = Checkbutton(top, text="Relative Area - Background Area", variable=master.relativeIntensityBackground, onvalue=1, offvalue=0)
-		self.riBck.grid(row=6, column=0, sticky=W)
-		self.corRiBck = Checkbutton(top, text="Corrected Relative Area - Background Area", variable=master.correctedRelativeIntensityBackground, onvalue=1, offvalue=0)
-		self.corRiBck.grid(row=7, column=0, sticky=W)
-		self.percSpec = Checkbutton(top, text="Fraction of spectrum explained by analytes", variable=master.percentageSpectrum, onvalue=1, offvalue=0)
-		self.percSpec.grid(row=8, column=0, sticky=W)
-		self.percAnal = Checkbutton(top, text="Fraction of analytes above S/N Cutoff", variable=master.percentageAnalytes, onvalue=1, offvalue=0)
-		self.percAnal.grid(row=9, column=0, sticky=W)
-		self.perc = Checkbutton(top, text="Fraction of Analytes Area above S/N Cutoff", variable=master.percentage, onvalue=1, offvalue=0)
-		self.perc.grid(row=10, column=0, sticky=W)
-		self.percBck = Checkbutton(top, text="Fraction of Analytes Area - Background Area above S/N Cutoff", variable=master.percentageBackground, onvalue=1, offvalue=0)
-		self.percBck.grid(row=11, column=0, sticky=W)
-		self.sn = Checkbutton(top, text="Maximum S/N", variable=master.maxSignalNoise, onvalue=1, offvalue=0)
-		self.sn.grid(row=12, column=0, sticky=W)
-		self.qc = Checkbutton(top, text="Quality Score", variable=master.qcScore, onvalue=1, offvalue=0)
-		self.qc.grid(row=13, column=0, sticky=W)
-		self.ppm = Checkbutton(top, text="PPM Error", variable=master.ppmQC, onvalue=1, offvalue=0)
-		self.ppm.grid(row=14, column=0, sticky=W)
-		self.isosn = Checkbutton(top, text="Isotope S/N", variable=master.isoSignalNoise, onvalue=1, offvalue=0)
-		self.isosn.grid(row=15, column=0, sticky=W)
-		self.isoai = Checkbutton(top, text="Isotope Area - Background Area", variable=master.isoAbsoluteIntensity, onvalue=1, offvalue=0)
-		self.isoai.grid(row=16, column=0, sticky=W)
-		self.button = Button(top, text='Ok', command=lambda: close(self))
-		self.button.grid(row=17, column=0, columnspan=2)
+		self.text1 = Label(top, text="Base Outputs", font="bold")
+		self.text1.grid(row=1, column=0, sticky=W)
+		self.text2 = Label(top, text="Output Modifiers", font="bold")
+		self.text2.grid(row=1, column=1, sticky=W)
+		self.ai = Checkbutton(top, text=u"Analyte Intensity\u00B9\u00B7\u00B2", variable=master.absoluteIntensity, onvalue=1, offvalue=0)
+		self.ai.grid(row=2, column=0, sticky=W)
+		self.ri = Checkbutton(top, text=u"Relative Intensity\u00B9\u00B7\u00B3", variable=master.relativeIntensity, onvalue=1, offvalue=0)
+		self.ri.grid(row=3, column=0, sticky=W)
+		self.bck = Checkbutton(top, text=u"\u00B9Background subtracted Intensities", variable=master.bckSub, onvalue=1, offvalue=0)
+		self.bck.grid(row=2, column=1, sticky=W)
+		self.isotope = Checkbutton(top, text=u"\u00B2Values per Isotope", variable=master.valueIso, onvalue=1, offvalue=0)
+		self.isotope.grid(row=3, column=1, sticky=W)
+		self.backNoise = Checkbutton(top, text="Analyte Background & Noise", variable=master.bckNoise, onvalue=1, offvalue=0)
+		self.backNoise.grid(row=4, column=0, sticky=W)
+		self.ri_Cor = Checkbutton(top, text=u"\u00B3Corrected for Isotopic Pattern", variable=master.riCor, onvalue=1, offvalue=0)
+		self.ri_Cor.grid(row=4, column=1, sticky=W)
+		self.s_QC = Checkbutton(top, text=u"Spectral QC\u00B9", variable=master.sQC, onvalue=1, offvalue=0)
+		self.s_QC.grid(row=5, column=0, sticky=W)
+		self.a_QC = Checkbutton(top, text="Analyte QC", variable=master.aQC, onvalue=1, offvalue=0)
+		self.a_QC.grid(row=6, column=0, sticky=W)
 		top.lift()
 
 	def openFile(self):
@@ -2177,7 +2364,7 @@ class App():
 			########################################################
 			# Absolute Intensity block (non background subtracted) #
 			########################################################
-			if self.absoluteIntensity.get() == 1:
+			if self.absoluteIntensity.get() == 1 and self.bckSub.get() == 0:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Area\tCalibrated")
@@ -2206,7 +2393,7 @@ class App():
 			####################################################
 			# Absolute Intensity block (background subtracted) #
 			####################################################
-			if self.absoluteIntensityBackground.get() == 1:
+			if self.absoluteIntensity.get() == 1 and self.bckSub.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Area - Background Area\tCalibrated")
@@ -2236,7 +2423,7 @@ class App():
 			############################
 			# Analyte Background block #
 			############################
-			if self.analyteBackground.get() == 1:
+			if self.bckNoise.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Background Area\tCalibrated")
@@ -2262,7 +2449,7 @@ class App():
 			#######################
 			# Analyte Noise block #
 			#######################
-			if self.analNoise.get() == 1:
+			if self.bckNoise.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Analyte Noise\tCalibrated")
@@ -2288,7 +2475,7 @@ class App():
 			############################
 			# Relative Intensity block #
 			############################
-			if self.relativeIntensity.get() == 1:
+			if self.relativeIntensity.get() == 1 and self.bckSub.get() == 0:
 				# Compositions
 				for i in data:
 					fw.write("Relative Area\tCalibrated")
@@ -2320,7 +2507,7 @@ class App():
 			####################################################
 			# Relative Intensity block (background subtracted) #
 			####################################################
-			if self.relativeIntensityBackground.get() == 1:
+			if self.relativeIntensity.get() == 1 and self.bckSub.get() == 0:
 				# Compositions
 				for i in data:
 					fw.write("Relative Area - Background Area\tCalibrated")
@@ -2353,7 +2540,7 @@ class App():
 			#################################################################################
 			# Corrected (for distribution) Relative Intensity block (background subtracted) #
 			#################################################################################
-			if self.correctedRelativeIntensityBackground.get() == 1:
+			if self.relativeIntensity.get() == 1 and self.riCor.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Corrected Relative Area - Background Area\tCalibrated")
@@ -2405,7 +2592,7 @@ class App():
 			######################################
 			# Percentage of spectrum in analytes #
 			######################################
-			if self.percentageSpectrum.get() == 1:
+			if self.sQC.get() == 1:
 				# Compositions
 				fw.write("Fraction of spectrum in analytes\tCalibrated\tFraction\n")
 				# Actual fractions
@@ -2419,7 +2606,7 @@ class App():
 			###############################################
 			# Fraction of analytes above S_N_CUTOFF block #
 			###############################################
-			if self.percentageAnalytes.get() == 1:
+			if self.sQC.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
 				# Get the fraction
@@ -2442,7 +2629,7 @@ class App():
 			############################################################################
 			# Percentage of signals above S_N_CUTOFF block (non background subtracted) #
 			############################################################################
-			if self.percentage.get() == 1:
+			if self.sQC.get() == 1  and self.bckSub.get() == 0:
 				# Compositions
 				fw.write("Fraction of Analyte Area above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
 				# Absolute Intensity values
@@ -2468,7 +2655,7 @@ class App():
 			########################################################################
 			# Percentage of signals above S_N_CUTOFF block (background subtracted) #
 			########################################################################
-			if self.percentageBackground.get() == 1:
+			if self.sQC.get() == 1 and self.bckSub.get() == 1:
 				# Compositions
 				fw.write("Fraction of Analyte Area - Background Area above S/N cut-off ("+str(S_N_CUTOFF)+")\tCalibrated\tPercentage\n")
 				# Absolute Intensity values
@@ -2494,7 +2681,7 @@ class App():
 			################################
 			# Maximum Signal to nose block #
 			################################
-			if self.maxSignalNoise.get() == 1:
+			if self.aQC.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Maximum Signal-to-Noise\tCalibrated")
@@ -2524,7 +2711,7 @@ class App():
 			#######################
 			# Quality Score block #
 			#######################
-			if self.qcScore.get() == 1:
+			if self.aQC.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("Quality Score\tCalibrated\t")
@@ -2553,7 +2740,7 @@ class App():
 			###################
 			# PPM Error block #
 			###################
-			if self.ppmQC.get() == 1:
+			if self.aQC.get() == 1:
 				# Compositions
 				for i in data:
 					fw.write("PPM Error of main isotope\tCalibrated\t")
@@ -2579,7 +2766,7 @@ class App():
 			##################################
 			# Isotopic Signal to noise block #
 			##################################
-			if self.isoSignalNoise.get() == 1:
+			if self.aQC.get() == 1 and self.valueIso.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
 				for i in range(0, numIsotopes):
 					# Compositions
@@ -2610,7 +2797,7 @@ class App():
 			#############################################################
 			# Isotopic absolute intensity block (background subtracted) #
 			#############################################################
-			if self.isoAbsoluteIntensity.get() == 1:
+			if self.absoluteIntensity.get() == 1 and self.valueIso.get() == 1:
 				# TODO: This outputs 1 more isotope than I expect
 				for i in range(0, numIsotopes):
 					# Compositions

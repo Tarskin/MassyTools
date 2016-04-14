@@ -1278,7 +1278,7 @@ class App():
 				compositions = self.extractData(self.inputFile, compositions)
 				# Disabled to prevent spam, useful for in-depth analysis
 				# self.calcErrorAll(file,compositions)
-				if self.qcScore.get() == 1:
+				if self.aQC.get() == 1:
 					self.qualityFile = self.compositionFile
 					if self.log is True:
 						with open('MassyTools.log', 'a') as fw:
@@ -2065,7 +2065,7 @@ class App():
 		data = self.readData(self.inputFile)
 		for i in compositions:
 			# This is a 'heavy' calculation, only perform it if the user wanted it
-			if self.ppmQC.get() == 1:
+			if self.aQC.get() == 1:
 				# Get accurate mass of main isotope
 				contribution = 0.0
 				accurateMass = 0.0

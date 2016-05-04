@@ -2946,6 +2946,7 @@ class App():
 		self.fig.clear()
 		self.axes = self.fig.add_subplot(111)
 		self.line, = self.axes.plot(x_array, y_array)
+		self.axes.get_xaxis().get_major_formatter().set_useOffset(False)
 		self.canvas.draw()
 
 	#####################

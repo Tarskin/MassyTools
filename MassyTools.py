@@ -2945,7 +2945,9 @@ class App():
 			y_array.append(i[1])
 		self.fig.clear()
 		self.axes = self.fig.add_subplot(111)
-		self.line, = self.axes.plot(x_array, y_array)
+		self.line, = self.axes.plot(x_array, y_array, label=os.path.split(self.inputFile)[-1])
+		handles, labels = self.axes.get_legend_handles_labels()
+		self.fig.legend(handles,labels)
 		self.axes.get_xaxis().get_major_formatter().set_useOffset(False)
 		self.canvas.draw()
 

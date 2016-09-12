@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# Copyright 2014-2015 Bas C. Jansen
+# Copyright 2014-2016 Bas C. Jansen
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 from datetime import datetime
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-from scipy.interpolate import interp1d
+from scipy.interpolate import InterpolatedUnivariateSpline
 from scipy.optimize import fmin
 from Tkinter import *
 import fileinput
@@ -556,7 +556,8 @@ class App():
 
 	def __init__(self, master):
 		# VARIABLES
-		self.version = "0.1.8.1"
+		self.version = "1.0.0"
+		self.build = "1"
 		self.master = master
 		self.absoluteIntensity = IntVar()
 		self.relativeIntensity = IntVar()
@@ -581,7 +582,6 @@ class App():
 		# Options are 'RMS' and 'MM'
 		self.noise = "RMS"
 		self.noiseQC = False
-		self.batch = False
 		self.fig = matplotlib.figure.Figure(figsize=(8, 6))
 		# Attempt to retrieve previously saved settings from settingsfile
 		if os.path.isfile('./'+str(SETTINGS_FILE)):
@@ -874,6 +874,11 @@ class App():
 			master.batchWindow = 0
 			top.destroy()
 
+		def run():
+			master.batchWindow = 0
+			top.destroy()
+			master.batchProcess(master)
+
 		top = self.top = Toplevel()
 		top.protocol("WM_DELETE_WINDOW", lambda: close(self))
 		self.calib = Button(top, text="Calibration File", width=25, command=lambda: calibrationButton())
@@ -896,7 +901,7 @@ class App():
 		self.measurement.grid(row=4, column=0,columnspan=2)
 		self.output = Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
 		self.output.grid(row=5, column=0, columnspan=2)
-		self.run = Button(top, text="Run Batch Process", width=25, command=lambda: master.batchProcess(master))
+		self.run = Button(top, text="Run Batch Process", width=25, command=lambda: run())
 		self.run.grid(row=6, column=0, columnspan=2)
 		# top.lift()
 		# Couple the attributes to button presses
@@ -1080,6 +1085,8 @@ class App():
 		self.s_QC.grid(row=5, column=0, sticky=W)
 		self.a_QC = Checkbutton(top, text="Analyte QC", variable=master.aQC, onvalue=1, offvalue=0)
 		self.a_QC.grid(row=6, column=0, sticky=W)
+		self.button = Button(top,text='Ok',command = lambda: close(self))
+		self.button.grid(row = 7, column = 0, columnspan = 2)
 		top.lift()
 
 	def openFile(self):
@@ -1187,12 +1194,15 @@ class App():
 		OUTPUT: None
 		"""
 		# Safety feature (prevents batchProcess from being started multiple times)
-		if master.batchProcessing == 1:
+		if self.batchProcessing == 1:
 			# Destroy progress bar
-			barWindow.destroy()
+			try:
+				barWindow.destroy()
+			except:
+				pass
 			tkMessageBox.showinfo("Error Message", "Batch Process already running")
 			return
-		master.batchProcessing = 1
+		self.batchProcessing = 1
 		#####################
 		# PROGRESS BAR CODE #
 		#####################
@@ -1223,11 +1233,10 @@ class App():
 		# END OF BAR CODE #
 		###################
 		results, filesGrabbed = ([] for i in range(2))
-		self.batch = True
 		if self.calibrationFile == "" and self.compositionFile == "":
 			tkMessageBox.showinfo("File Error", "No calibration or composition file selected")
 			# Clear the batchProcess lock
-			master.batchProcessing = 0
+			self.batchProcessing = 0
 			return
 		# Initialize the composition file (to only calculate isotopic patterns once
 		if self.compositionFile != "":
@@ -1290,7 +1299,7 @@ class App():
 		progressbar2["value"] = 100
 		self.combineResults()
 		# Clear the batchProcess lock
-		master.batchProcess = 0
+		self.batchProcessing = 0
 		# Destroy progress bar
 		barWindow.destroy()
 		tkMessageBox.showinfo("Status Message", "Batch Process finished on "+str(datetime.now()))
@@ -1516,7 +1525,7 @@ class App():
 		f = numpy.poly1d(z)
 		y = f(maximaMZ)
 		# Display the calibrated plot on the main screen
-		if self.batch is False:
+		if self.batchProcessing == 0:
 			self.plotChange(data, f)
 		self.writeCalibration(y, actualCalibrants)
 		# Call function to write away calibrated file
@@ -1548,7 +1557,7 @@ class App():
 			errors.append((expected, i, ppm))
 			with open(name, 'a') as fw:
 				fw.write(str(expected[index])+"\t"+str(i)+"\t"+str(ppm)+"\n")
-		if self.batch == 0:
+		if self.batchProcessing == 0:
 			self.displayError(errors)
 
 	def displayError(self, errors):
@@ -1680,7 +1689,7 @@ class App():
 			for j in data[begin:end]:
 				x_points.append(j[0])
 				y_points.append(j[1])
-			# Fit a cubic spline through the datapoints
+			# Fit a Interpolated Univariate Spline through the datapoints
 			try:
 				###########################################################
 				# Residual chunk that was used for a guassian fit attempt #
@@ -1694,7 +1703,7 @@ class App():
 				# have major changes in returned maxima with different windows)    #
 				####################################################################
 				newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
-				f = interp1d(x_points, y_points,  kind='cubic')
+				f = InterpolatedUnivariateSpline(x_points, y_points)
 				ySPLINE = f(newX)
 				###############################################
 				# Plot Chunk (internal testing purposes ONLY) #
@@ -1857,7 +1866,7 @@ class App():
 		OUTPUT: A list of Analyte instances
 		"""
 		for i in compositions:
-			if self.batch == 0:
+			if self.batchProcessing == 0:
 				print "Analyte: "+str(i.composition)
 			total = 0
 			totalExp = 0
@@ -1876,7 +1885,7 @@ class App():
 				else:
 					j.qc = abs((float(maxAreaBackCorrected) / float(total)) - (j.expArea/totalExp))
 				# Temporary display
-				if self.batch == 0:
+				if self.batchProcessing == 0:
 					print "Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % f)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc)
 		return compositions
 
@@ -2085,7 +2094,7 @@ class App():
 								x_points.append(k[0])
 								y_points.append(k[1])
 							newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
-							f = interp1d(x_points, y_points, kind='cubic')
+							f = InterpolatedUnivariateSpline(x_points, y_points)
 							ySpline = f(newX)
 							maximum = 0
 							for index, k in enumerate(ySpline):
@@ -2196,7 +2205,7 @@ class App():
 		OUTPUT: A result file -> file_name.raw
 		"""
 		maxIsotope = 0
-		if self.batch == 0:
+		if self.batchProcessing == 0:
 			outFile = tkFileDialog.asksaveasfilename()
 			if outFile:
 				pass
@@ -2340,6 +2349,8 @@ class App():
 		with open(os.path.join(self.batchFolder, summaryFile), 'w') as fw:
 			# Write the parameters used during the processing
 			fw.write("Processing Parameters\n")
+			fw.write("MassyTools Version\t"+str(self.version)+"\n")
+			fw.write("MassyTools Build\t"+str(self.build)+"\n")
 			if self.calibrationFile != "":
 				fw.write("Calibration window (peak detection)\t"+str(CALIBRATION_WINDOW)+"\n")
 				fw.write("Minimum signal-to-noise ratio for calibrants\t"+str(CALIB_S_N_CUTOFF)+"\n")

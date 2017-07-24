@@ -567,6 +567,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.0"
+        self.build = "170724a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()

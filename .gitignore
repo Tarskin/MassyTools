@@ -1,3 +1,6 @@
+tests/
+unittest.py
 *.pyc
 *.log
 Settings.txt
+*.ref

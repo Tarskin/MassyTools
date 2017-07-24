@@ -33,7 +33,7 @@ def parseXY(inputFile, log):
 def transformXY(inputFile, outFolder, batch, log, f):
     """ Read and calibrate a given xy file based on the function 'f'.
     """
-    if batch is False:
+    if batch == 0:
         output = tkFileDialog.asksaveasfilename()
         if output:
             pass

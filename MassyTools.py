@@ -39,6 +39,11 @@ import mzML
 import xy
 import varnames
 
+# Function overwrites
+def dynamic_update(foo):
+    pass
+matplotlib.backends.backend_tkagg.NavigationToolbar2TkAgg.dynamic_update = dynamic_update
+
 # File
 TYPES = ("*.xy","*.mzML")                               # File types that will be used by MassyTools
                                                         # Accepted formats: ".xy" and ".mzML"
@@ -567,7 +572,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.0"
-        self.build = "170724a"
+        self.build = "180208a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -1925,7 +1930,7 @@ class App():
             except RuntimeError:
                 if self.log is True:
                     with open('MassyTools.log', 'a') as fw:
-                        fw.write("Guassian Curve Fit failed for calibrant: "+str(i)+", reverting to non fitted local maximum\n")
+                        fw.write(str(datetime.now())+"\tGuassian Curve Fit failed for calibrant: "+str(i)+", reverting to non fitted local maximum\n")
                 for j in data[begin:end]:
                     if j[1] > maximum[1]:
                         maximum = (j[0], j[1])
@@ -2232,9 +2237,9 @@ class App():
         if self.log is True:
             with open('MassyTools.log', 'a') as fw:
                 if os.path.exists(analyteFile) is True:
-                    fw.write(str(datetime.now())+"\Using existing reference file\n")
+                    fw.write(str(datetime.now())+"\tUsing existing reference file\n")
                 else:
-                    fw.write(str(datetime.now())+"\Pre-processing reference file\n")
+                    fw.write(str(datetime.now())+"\tPre-processing reference file\n")
         # Get rid of a proton if a sodium or potassium was used as a mass modifier
         if 'sodium' in MASS_MODIFIERS:
             MASS_MODIFIERS.append('protonLoss')
@@ -2263,7 +2268,7 @@ class App():
                         break
         if self.log is True:
             with open('MassyTools.log', 'a') as fw:
-                fw.write(str(datetime.now())+"\Pre-processing complete\n")
+                fw.write(str(datetime.now())+"\tPre-processing complete\n")
 
     def calcCompositionMasses(self, file):
         """ This function reads the composition file. Reads the
@@ -2443,13 +2448,14 @@ class App():
         INPUT 2: A list of Analyte instances
         OUTPUT: A tuple of (Background, Background Area, Noise)
         """
-        backgroundPoint = 1000000000000000000000000000000000000000000000000000      # Ridiculous start value
+        backgroundPoint = sys.maxint
         totals = []
         lowEdge = mass - window
         highEdge = mass + window
         for i in range(-OUTER_BCK_BORDER, OUTER_BCK_BORDER):
             windowAreas = []
             windowIntensities = []
+            mzValues = []
             begin = self.search_right(data, lowEdge-i*C[0][2], len(data))
             end = self.search_left(data, highEdge-i*C[0][2], len(data))
             if begin is None or end is None:
@@ -2474,14 +2480,7 @@ class App():
                 if self.noise == "RMS":
                     noise = dev
                 elif self.noise == "MM":
-                    minNoise = 10000000000000000000000
-                    maxNoise = 0
-                    for k in mix:
-                        if k > maxNoise:
-                            maxNoise = k
-                        if k < minNoise:
-                            minNoise = k
-                    noise = maxNoise - minNoise
+                    noise = max(mix) - min(mix)
                 else:
                     tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
                     return

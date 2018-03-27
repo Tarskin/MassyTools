@@ -571,8 +571,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "1.0.0"
-        self.build = "180208a"
+        self.version = "1.0.1"
+        self.build = "180327a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -582,6 +582,7 @@ class App():
         self.riCor = IntVar()
         self.sQC = IntVar()
         self.aQC = IntVar()
+        self.overWrite = IntVar(value=1)
         self.batchProcessing = 0
         self.batchWindow = 0
         self.measurementWindow = 0
@@ -594,6 +595,9 @@ class App():
         self.qualityFile = ""
         self.summaryFile = ""
         self.log = True
+        # Background can be determined in two ways
+        # Options are 'MIN', 'MEDIAN' and 'NOBAN'
+        self.background = "MIN"
         # Nose can be determined in multiple ways
         # Options are 'RMS' and 'MM'
         self.noise = "RMS"
@@ -914,16 +918,18 @@ class App():
         self.compos.grid(row=2, column=0, sticky=W)
         self.com = Label(top, textvariable=self.compFile, width=25)
         self.com.grid(row=2, column=1)
+        self.overwrite = Checkbutton(top, text = "Overwrite Analyte File", variable = master.overWrite, onvalue = 1, offvalue = 0)
+        self.overwrite.grid(row = 3, column = 0, sticky = W)
         self.batchDir = Button(top, text="Batch Directory", width=25, command=lambda: batchButton())
-        self.batchDir.grid(row=3, column=0, sticky=W)
+        self.batchDir.grid(row=4, column=0, sticky=W)
         self.batch = Label(top, textvariable=self.folder, width=25)
-        self.batch.grid(row=3, column=1)
+        self.batch.grid(row=4, column=1)
         self.measurement = Button(top, text="Measurement Setup", width=25, command=lambda: master.measurementPopup(master))
-        self.measurement.grid(row=4, column=0,columnspan=2)
+        self.measurement.grid(row=5, column=0,columnspan=2)
         self.output = Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
-        self.output.grid(row=5, column=0, columnspan=2)
+        self.output.grid(row=6, column=0, columnspan=2)
         self.run = Button(top, text="Run Batch Process", width=25, command=lambda: run())
-        self.run.grid(row=6, column=0, columnspan=2)
+        self.run.grid(row=7, column=0, columnspan=2)
         # top.lift()
         # Couple the attributes to button presses
         top.attributes("-topmost", True)
@@ -2236,39 +2242,41 @@ class App():
         analyteFile = os.path.join(self.batchFolder, "analytes.ref")
         if self.log is True:
             with open('MassyTools.log', 'a') as fw:
-                if os.path.exists(analyteFile) is True:
+                #if os.path.exists(analyteFile) is True:
+                if self.overWrite.get() == 0:
                     fw.write(str(datetime.now())+"\tUsing existing reference file\n")
-                else:
+                elif self.overWrite.get() == 1:
                     fw.write(str(datetime.now())+"\tPre-processing reference file\n")
         # Get rid of a proton if a sodium or potassium was used as a mass modifier
         if 'sodium' in MASS_MODIFIERS:
             MASS_MODIFIERS.append('protonLoss')
         if 'potassium' in MASS_MODIFIERS:
             MASS_MODIFIERS.append('protonLoss')
-        with open(analyteFile, 'w') as fw:
-            for i in lines:
-                isotopes = []
-                i = i.split("\t")
-                i = filter(None, i)
-                if len(i) == 2:
-                    window = float(i[1])
-                else:
-                    window = CALCULATION_WINDOW
-                values = self.parseAnalyte(i[0])
-                totals = self.getChanceNetwork(values)
-                results = self.mergeChances(totals)
-                results.sort(key=lambda x: x[0])
-                fw.write(str(i[0])+"\t"+str(window))
-                fTotal = 0
-                for index, j in enumerate(results):
-                    fTotal += j[1]
-                    fw.write("\t"+str(j[0])+"\t"+str(j[1]))
-                    if fTotal >= MIN_TOTAL_CONTRIBUTION:
-                        fw.write("\n")
-                        break
-        if self.log is True:
-            with open('MassyTools.log', 'a') as fw:
-                fw.write(str(datetime.now())+"\tPre-processing complete\n")
+        if self.overWrite.get() == 1:
+            with open(analyteFile, 'w') as fw:
+                for i in lines:
+                    isotopes = []
+                    i = i.split("\t")
+                    i = filter(None, i)
+                    if len(i) == 2:
+                        window = float(i[1])
+                    else:
+                        window = CALCULATION_WINDOW
+                    values = self.parseAnalyte(i[0])
+                    totals = self.getChanceNetwork(values)
+                    results = self.mergeChances(totals)
+                    results.sort(key=lambda x: x[0])
+                    fw.write(str(i[0])+"\t"+str(window))
+                    fTotal = 0
+                    for index, j in enumerate(results):
+                        fTotal += j[1]
+                        fw.write("\t"+str(j[0])+"\t"+str(j[1]))
+                        if fTotal >= MIN_TOTAL_CONTRIBUTION:
+                            fw.write("\n")
+                            break
+            if self.log is True:
+                with open('MassyTools.log', 'a') as fw:
+                    fw.write(str(datetime.now())+"\tPre-processing complete\n")
 
     def calcCompositionMasses(self, file):
         """ This function reads the composition file. Reads the
@@ -2469,21 +2477,89 @@ class App():
                 windowIntensities.append(j[1])
             totals.append((windowAreas, windowIntensities))
         # Find the set of 5 consecutive windows with lowest average intensity
-        for i in range(0, (2*OUTER_BCK_BORDER)-4):
-            mix = totals[i][1]+totals[i+1][1]+totals[i+2][1]+totals[i+3][1]+totals[i+4][1]
-            avgBackground = numpy.average([sum(totals[i][0]), sum(totals[i+1][0]), sum(totals[i+2][0]), sum(totals[i+3][0]), sum(totals[i+4][0])])
-            dev = numpy.std(mix)
-            avg = numpy.average(mix)
-            if avg < backgroundPoint:
-                backgroundPoint = avg
-                backgroundArea = avgBackground
+        if self.background == "MIN":
+            for i in range(0, (2*OUTER_BCK_BORDER)-4):
+                mix = totals[i][1]+totals[i+1][1]+totals[i+2][1]+totals[i+3][1]+totals[i+4][1]
+                avgBackground = numpy.average([sum(totals[i][0]), sum(totals[i+1][0]), sum(totals[i+2][0]), sum(totals[i+3][0]), sum(totals[i+4][0])])
+                dev = numpy.std(mix)
+                avg = numpy.average(mix)
+                if avg < backgroundPoint:
+                    backgroundPoint = avg
+                    backgroundArea = avgBackground
+                    if self.noise == "RMS":
+                        noise = dev
+                    elif self.noise == "MM":
+                        noise = max(mix) - min(mix)
+                    else:
+                        tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
+                        return
+        # Find the set of 5 consecutive windows with median average intensity
+        elif self.background == "MEDIAN":
+            values = []
+            for i in range(0, (2*OUTER_BCK_BORDER)-4):
+                mix = totals[i][1]+totals[i+1][1]+totals[i+2][1]+totals[i+3][1]+totals[i+4][1]
+                avgBackground = numpy.average([sum(totals[i][0]), sum(totals[i+1][0]), sum(totals[i+2][0]), sum(totals[i+3][0]), sum(totals[i+4][0])])
+                dev = numpy.std(mix)
+                avg = numpy.average(mix)
                 if self.noise == "RMS":
                     noise = dev
                 elif self.noise == "MM":
                     noise = max(mix) - min(mix)
+                values.append((avg, avgBackground, noise))
+            sortedValues = sorted(values, key=lambda x: x[0])
+            a, b, c = zip(*sortedValues)
+            backgroundPoint = a[len(a)//2]
+            backgroundArea = b[len(b)//2]
+            noise = c[len(c)//2]
+        # NOBAN METHOD
+        elif self.background == "NOBAN":
+            dataPoints = []
+            for i in range(0, (2*OUTER_BCK_BORDER)):
+                dataPoints.extend(totals[i][1])
+            sortedData = sorted(dataPoints)
+            startSize = int(0.25 * float(len(sortedData)))
+            currSize = startSize
+            currAverage = numpy.average(sortedData[0:currSize])
+            if self.noise == "MM":
+                currNoise = max(sortedData[0:currSize]) - min(sortedData[0:currSize])
+            elif self.noise == "RMS":
+                currNoise = numpy.std(sortedData[0:currSize])
+            directionFlag = 0
+            for k in range(0,len(sortedData)-(startSize+1)):
+                if sortedData[currSize+1] < currAverage + 3 * currNoise:
+                    directionFlag == 1
+                    currSize += 1
+                    currAverage =  numpy.average(sortedData[0:currSize])
+                    if self.noise == "MM":
+                        currNoise = max(sortedData[0:currSize]) - min(sortedData[0:currSize])
+                    elif self.noise == "RMS":
+                        currNoise = numpy.std(sortedData[0:currSize])
                 else:
-                    tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
-                    return
+                    if sortedData[currSize-1] > currAverage + 3 * currNoise and directionFlag == 0:
+                        currSize -= 1
+                        currAverage = numpy.average(sortedData[0:currSize])
+                        if self.noise == "MM":
+                            currNoise = max(sortedData[0:currSize]) - min(sortedData[0:currSize])
+                        elif self.noise == "RMS":
+                            currNoise = numpy.std(sortedData[0:currSize])
+                    else:
+                        break
+            # Get Area
+            # Get length of window
+            windowLength = 0
+            for i in range(0, (2*OUTER_BCK_BORDER)):
+                if len(totals[i][1]) > windowLength:
+                    windowLength = len(totals[i][1])
+            # Get spacing in window
+            begin = self.search_right(data, lowEdge, len(data))
+            end = self.search_left(data, highEdge, len(data))
+            for j in data[begin:end]:
+                spacing =  (data[end][0] - data[begin][0]) / (end - begin)
+            currArea = windowLength * (currAverage * spacing)
+            # Assign values to generic names
+            backgroundPoint = currAverage
+            backgroundArea = currArea
+            noise = currNoise
         # Custom stuff to test a window of 1
         """backgroundArea = numpy.average(sum(totals[i][0]))
         noise = numpy.std(totals[i][1])
@@ -2664,6 +2740,7 @@ class App():
                     fw.write(str(i)+"\t")
                 fw.write("\n")
                 fw.write("Extraction width\t"+str(CALCULATION_WINDOW)+"\n")
+                fw.write("Background detection method\t"+str(self.background)+"\n")
                 fw.write("Background detection window\t"+str(OUTER_BCK_BORDER)+"\n")
                 fw.write("Minimum signal-to-noise ratio used in percentage based QC\t"+str(S_N_CUTOFF)+"\n")
                 fw.write("Minimum fraction of total isotopic distribution used for extraction\t"+str(MIN_TOTAL_CONTRIBUTION)+"\n")
@@ -2921,9 +2998,12 @@ class App():
                 for i in new:
                     number = 0
                     for j in i.analytes:
+                        #expArea = 0
                         SN = 0
                         for k in j.isotopes:
                             if k.SN > SN:
+                            #if k.expArea> expArea:
+                                #expArea = k.expArea
                                 SN = k.SN
                         if SN > S_N_CUTOFF:
                             number += 1
@@ -2948,9 +3028,12 @@ class App():
                         intensity = 0
                         for j in i.analytes:
                             # Check if maximum S/N is above the cut-off
+                            #expArea = 0
                             SN = 0
                             for k in j.isotopes:
                                 if k.SN > SN:
+                                #if k.expArea > expArea:
+                                    #expArea = k.expArea
                                     SN = k.SN
                             # Get the intensity if it is above the cut-off
                             if SN > S_N_CUTOFF:
@@ -2974,9 +3057,12 @@ class App():
                         intensity = 0
                         for j in i.analytes:
                             # Check if maximum S/N is above the cut-off
+                            #expArea = 0
                             SN = 0
                             for k in j.isotopes:
                                 if k.SN > SN:
+                                #if k.expArea > expArea:
+                                    #expArea = k.expArea
                                     SN = k.SN
                             # Get the intensity if it is above the cut-off
                             if SN > S_N_CUTOFF:
@@ -2986,9 +3072,9 @@ class App():
                     fw.write(str(i.name)+"\t"+str(i.calibrated)+"\t"+str(percentage)+"\n")
                 fw.write("\n")
 
-            ################################
-            # Maximum Signal to nose block #
-            ################################
+            ########################################
+            # Signal to nose of main isotope block #
+            ########################################
             if self.aQC.get() == 1:
                 # Compositions
                 for i in data:
@@ -3008,9 +3094,12 @@ class App():
                 for i in new:
                     fw.write(str(i.name)+"\t"+str(i.calibrated))
                     for j in i.analytes:
+                        #expArea = 0
                         SN = 0
                         for k in j.isotopes:
                             if k.SN > SN:
+                            #if k.expArea > expArea:
+                                #expArea = k.expArea
                                 SN = k.SN
                         fw.write("\t"+str(SN))
                     fw.write("\n")

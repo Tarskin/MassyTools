@@ -571,8 +571,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "1.0.1"
-        self.build = "180327a"
+        self.version = "1.0.2-alpha"
+        self.build = "180626a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -1566,14 +1566,16 @@ class App():
         """
         fractions = []
         for i in element:
+            lastFraction = 0.
             j = 0
             while j <= number:
                 nCk = math.factorial(number) / (math.factorial(j) * math.factorial(number - j))
                 f = nCk * i[1]**j * (1 - i[1])**(number-j)
                 fractions.append((i[2]*j, f))
                 j += 1
-                if f <= MIN_CONTRIBUTION:
+                if f <= MIN_CONTRIBUTION and f < lastFraction:
                     break
+                lastFraction = f
         return fractions
 
     def parseAnalyte(self, Analyte):
@@ -2265,6 +2267,7 @@ class App():
                     values = self.parseAnalyte(i[0])
                     totals = self.getChanceNetwork(values)
                     results = self.mergeChances(totals)
+                    results = self.selectIsotopes(results)
                     results.sort(key=lambda x: x[0])
                     fw.write(str(i[0])+"\t"+str(window))
                     fTotal = 0
@@ -3300,6 +3303,35 @@ class App():
             return data
         else:
             tkMessageBox.showinfo("File Error", "Incorrect file format")
+
+    def selectIsotopes(self, results):
+        """ TODO
+        """
+        # Sort by increasing m/z (x[0])
+        results.sort(key=lambda x: x[0])
+        print results[1:5]
+        # Add index of the isotope
+        foo = []
+        for index,i in enumerate(results):
+            foo.append((i[0],i[1],index))
+        # Sort by decreasing fraction (x[1])
+        results = foo
+        results.sort(key=lambda x: x[1], reverse=True)
+        print results[1:5]
+        contribution = 0.0
+        foo = []
+        # Take only the highest fraction isotopes until the contribution
+        # exceeds the MIN_TOTAL
+        for i in results:
+            contribution += float(i[1])
+            foo.append(i)
+            if contribution > MIN_TOTAL_CONTRIBUTION:
+                break
+        results = foo
+        # Sort by increasing m/z (x[0])
+        results.sort(key=lambda x: x[0])
+        print results[1:5]
+        return results
 
     def plotChange(self, data, f):
         """ This function takes an array of data. The function also

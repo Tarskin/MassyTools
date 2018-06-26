@@ -82,379 +82,58 @@ S33 = [('33S', 0.0076, 0.99939)]
 S34 = [('34S', 0.0429, 1.9958)]
 S36 = [('36S', 0.0002, 3.99501)]
 
-# Building block properties
-BLOCKS = {  #######################
-            # Structural Features #
-            #######################
-                ###################
-                # Monosaccharides #
-                ###################
-                    'F':{'mass':146.05790879894,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Fucose',
-                        'carbons':6,
-                        'hydrogens':10,
-                        'nitrogens':0,
-                        'oxygens':4,
-                        'sulfurs':0},
-                    'H':{'mass':162.0528234185,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Hexose',
-                        'carbons':6,
-                        'hydrogens':10,
-                        'nitrogens':0,
-                        'oxygens':5,
-                        'sulfurs':0},
-                    'N':{'mass':203.07937251951,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'N-Acetyl Hexosamine',
-                        'carbons':8,
-                        'hydrogens':13,
-                        'nitrogens':1,
-                        'oxygens':5,
-                        'sulfurs':0},
-                    'S':{'mass':291.09541650647,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'N-Acetyl Neuraminic Acid',
-                        'carbons':11,
-                        'hydrogens':17,
-                        'nitrogens':1,
-                        'oxygens':8,
-                        'sulfurs':0},
-                    'L':{'mass':273.08485182277,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Lactonized N-Acetyl Neuraminic Acid',
-                        'carbons':11,
-                        'hydrogens':15,
-                        'nitrogens':1,
-                        'oxygens':7,
-                        'sulfurs':0},
-                    'M':{'mass':305.11106657061,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Methylated N-Acetyl Neuraminic Acid',
-                        'carbons':12,
-                        'hydrogens':19,
-                        'nitrogens':1,
-                        'oxygens':8,
-                        'sulfurs':0},
-                    'E':{'mass':319.12671663475,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Ethylated N-Acetyl Neuraminic Acid',
-                        'carbons':13,
-                        'hydrogens':21,
-                        'nitrogens':1,
-                        'oxygens':8,
-                        'sulfurs':0},
-                #########################
-                # Mouse Monosaccharides #
-                #########################
-                    'G':{'mass':307.0903311261,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'N-glycolyl Neuraminic Acid',
-                        'carbons':11,
-                        'hydrogens':17,
-                        'nitrogens':1,
-                        'oxygens':9,
-                        'sulfurs':0},
-                    'Gl':{'mass':289.0797664424,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Lactonized N-glycolyl Neuraminic Acid',
-                        'carbons':11,
-                        'hydrogens':15,
-                        'nitrogens':1,
-                        'oxygens':8,
-                        'sulfurs':0},
-                    'Ge':{'mass':335.1216312544,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Ethylated N-glycolyl Neuraminic Acid',
-                        'carbons':13,
-                        'hydrogens':21,
-                        'nitrogens':1,
-                        'oxygens':9,
-                        'sulfurs':0},
-                #######################
-                # Sugar Modifications #
-                #######################
-                    'P':{'mass':79.96633088875,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Phosphate',
-                        'carbons':0,
-                        'hydrogens':1,
-                        'nitrogens':0,
-                        'oxygens':3,
-                        'sulfurs':0},
-                    'Su':{'mass':79.95681485868,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Sulfate',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':3,
-                        'sulfurs':1},
-                    'Ac':{'mass':42.0105646837,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Acetyl',
-                        'carbons':2,
-                        'hydrogens':2,
-                        'nitrogens':0,
-                        'oxygens':1,
-                        'sulfurs':0},
-                    'Per':{'mass':14.01565006,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Permethyl',
-                        'carbons':1,
-                        'hydrogens':2,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                ##############################
-                # Reducing End Modifications #
-                ##############################
-                    'aa':{'mass':139.06332853255,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'2-aminobenzoic acid label',
-                        'carbons':7,
-                        'hydrogens':9,
-                        'nitrogens':1,
-                        'oxygens':2,
-                        'sulfurs':0},
-                    'ab':{'mass':138.07931294986,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'2-aminobenzamide label',
-                        'carbons':7,
-                        'hydrogens':10,
-                        'nitrogens':2,
-                        'oxygens':1,
-                        'sulfurs':0},
-                    'free':{'mass':18.0105646837,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Water',
-                        'carbons':0,
-                        'hydrogens':2,
-                        'nitrogens':0,
-                        'oxygens':1,
-                        'sulfurs':0},
-            ###################
-            # Charge Carriers #
-            ###################
-                    #################
-                    # Positive Mode #
-                    #################
-                    'sodium':{'mass':22.98922070,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Sodium',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    'potassium':{'mass':38.9631581,
-                        'available_for_mass_modifiers':1,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Potassium',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    'proton':{'mass':1.007276466812,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Proton',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    #################
-                    # Negative Mode #
-                    #################
-                    'protonLoss':{'mass':-1.007276466812,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Proton Loss',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    'chloride':{'mass':34.969402,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Chloride',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    'acetate':{'mass':59.013851,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Acetate',
-                        'carbons':2,
-                        'hydrogens':3,
-                        'nitrogens':0,
-                        'oxygens':2,
-                        'sulfurs':0},
-                    'formate':{'mass':44.998201,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Formate',
-                        'carbons':1,
-                        'hydrogens':1,
-                        'nitrogens':0,
-                        'oxygens':2,
-                        'sulfurs':0},
-                    'electron':{'mass':0.00054857990946,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':1,
-                        'human_readable_name':'Electron',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-            ############
-            # Elements #
-            ############
-                    '_H':{'mass':1.007825,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Hydrogen',
-                        'carbons':0,
-                        'hydrogens':1,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    '_C':{'mass':12.000000,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Carbon',
-                        'carbons':1,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    '_N':{'mass':14.003074,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Nitrogen',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':1,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    '_O':{'mass':15.994915,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Oxygen',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':1,
-                        'sulfurs':0},
-                    '_S':{'mass':31.972071,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Sulfur',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':1},
-                    '_P':{'mass':30.973761,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Potassium',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    '_F':{'mass':18.998403,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Fluor',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    '_Na':{'mass':22.989770,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Sodium',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-                    '_K':{'mass':38.963708,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Kalium',
-                        'carbons':0,
-                        'hydrogens':0,
-                        'nitrogens':0,
-                        'oxygens':0,
-                        'sulfurs':0},
-            #################
-            # Custom Blocks #
-            #################
-                    'Q':{'mass':4135.882086,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Custom',
-                        'carbons':177,
-                        'hydrogens':270,
-                        'nitrogens':50,
-                        'oxygens':59,
-                        'sulfurs':3},
-                    'R':{'mass':2962.590442,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Custom',
-                        'carbons':128,
-                        'hydrogens':219,
-                        'nitrogens':37,
-                        'oxygens':41,
-                        'sulfurs':1},
-                    'T':{'mass':2346.1348023,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Custom',
-                        'carbons':101,
-                        'hydrogens':163,
-                        'nitrogens':27,
-                        'oxygens':33,
-                        'sulfurs':2},
-                    'U':{'mass':2183.0709257,
-                        'available_for_mass_modifiers':0,
-                        'available_for_charge_carrier':0,
-                        'human_readable_name':'Custom',
-                        'carbons':92,
-                        'hydrogens':154,
-                        'nitrogens':26,
-                        'oxygens':33,
-                        'sulfurs':2}}
+# Read the building blocks
+# TODO: Move this inside the app
+BLOCKS = {}
+for file in glob.glob("./blocks/*.block"):
+    block = os.path.splitext(os.path.basename(file))[0]
+    keys = []
+    values = []
+    with open(file,'r') as fr:
+        for line in fr:
+            foo = line.rstrip().split()
+            key = foo[0]
+            value = " ".join(foo[1:])
+            keys.append(key)
+            try:
+                float(value)
+                try:
+                    value = int(value)
+                except ValueError:
+                    value = float(value)
+            except ValueError:
+                value = str(value)
+            values.append(value)    
+    BLOCKS[block] = dict(zip(keys,values))
+# Verify the blocks
+for k,v in BLOCKS.items():
+    try:
+        if type(v['mass']) != float:
+            raise TypeError('Mass is not a float.')
+        if type(v['carbons']) != int:
+            raise TypeError('Carbons is not an integer.')
+        if type(v['hydrogens']) != int:
+            raise TypeError('Hydrogens is not an integer.')
+        if type(v['nitrogens']) != int:
+            raise TypeError('Nitrogens is not an integer.')
+        if type(v['oxygens']) != int:
+            raise TypeError('Oxygens is not an integer.')
+        if type(v['sulfurs']) != int:
+            raise TypeError('Sulfurs is not an integer.')
+        if type(v['available_for_charge_carrier']) != int:
+            raise TypeError('Charge carrier is not an integer.')
+        if v['available_for_charge_carrier'] not in [0,1]:
+            raise TypeError('Charge carrier is not 0 or 1.')
+        if type(v['available_for_mass_modifiers']) != int:
+            raise TypeError('Mass modifier is not an integer.')
+        if v['available_for_mass_modifiers'] not in [0,1]:
+            raise TypeError('Mass modifier is not 0 or 1.')
+    except:
+        root = Tk()
+        root.withdraw()
+        tkMessageBox.showinfo("Block Error","An error was observed in block "+str(k)+
+            ". Please correct this block before running LaCyTools again.")
+        sys.exit()
 UNITS = BLOCKS.keys()
 
 #############################################
@@ -572,7 +251,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.2-alpha"
-        self.build = "180626a"
+        self.build = "180626b"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -3309,7 +2988,6 @@ class App():
         """
         # Sort by increasing m/z (x[0])
         results.sort(key=lambda x: x[0])
-        print results[1:5]
         # Add index of the isotope
         foo = []
         for index,i in enumerate(results):
@@ -3317,7 +2995,6 @@ class App():
         # Sort by decreasing fraction (x[1])
         results = foo
         results.sort(key=lambda x: x[1], reverse=True)
-        print results[1:5]
         contribution = 0.0
         foo = []
         # Take only the highest fraction isotopes until the contribution
@@ -3330,7 +3007,6 @@ class App():
         results = foo
         # Sort by increasing m/z (x[0])
         results.sort(key=lambda x: x[0])
-        print results[1:5]
         return results
 
     def plotChange(self, data, f):

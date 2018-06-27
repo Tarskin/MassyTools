@@ -83,7 +83,6 @@ S34 = [('34S', 0.0429, 1.9958)]
 S36 = [('36S', 0.0002, 3.99501)]
 
 # Read the building blocks
-# TODO: Move this inside the app
 BLOCKS = {}
 for file in glob.glob("./blocks/*.block"):
     block = os.path.splitext(os.path.basename(file))[0]
@@ -152,13 +151,14 @@ class Results():
 
 class analyteResult():
 
-    def __init__(self, composition, mass, distribution, background, noise, ppm, isotopes):
+    def __init__(self, composition, mass, distribution, background, noise, ppm, sn, isotopes):
         self.composition = composition
         self.mass = mass
         self.distribution = distribution
         self.background = background
         self.noise = noise
         self.ppm = ppm
+        self.sn = sn
         self.isotopes = isotopes
 
 
@@ -181,6 +181,7 @@ class Analyte():
         self.backgroundArea = backgroundArea
         self.noise = noise
         self.ppm = None
+        self.sn = None
 
 
 class Isotope():
@@ -251,7 +252,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.2-alpha"
-        self.build = "180626b"
+        self.build = "180627a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -2067,7 +2068,7 @@ class App():
         for i in compositions:
             # This is a 'heavy' calculation, only perform it if the user wanted it
             if self.aQC.get() == 1:
-                # Get accurate mass of main isotope
+                # Get accurate mass and S/N of main isotope
                 contribution = 0.0
                 accurateMass = 0.0
                 for j in i.isotopes[1:]:
@@ -2095,8 +2096,8 @@ class App():
                                     accurateMass = newX[index]
                             # Calculate ppm error and attach it to analyte
                             i.ppm = ((accurateMass - j.mass) / j.mass) * 1000000
-            else:
-                i.ppm = "NA"
+                            # Calculate S/N
+                            i.sn = (max(y_points) - i.backgroundPoint) / i.noise
             # Start with second isotope to omit the 'background' isotope
             for j in i.isotopes[1:]:
                 total = 0
@@ -2278,7 +2279,7 @@ class App():
         with open(outFile, 'w') as fw:
             name = str(self.inputFile).split("/")[-1]
             fw.write(name+"\n")
-            fw.write("Composition\tMass\tWindow\tPercentage of Distribution\tTotal\tMaximum SN\tNoise\tPPM Error of Main Isotope\t")
+            fw.write("Composition\tMass\tWindow\tPercentage of Distribution\tTotal\tSN of Main Isotope\tNoise\tPPM Error of Main Isotope\t")
             for i in range(-1, maxIsotope):
                 fw.write("Iso_"+str(i)+"\tS/N Ratio\tQC Value\t")
             fw.write("\n")
@@ -2289,7 +2290,7 @@ class App():
                     totalArea += j.expArea
                     if j.sn > maxSN:
                         maxSN = j.sn
-                fw.write(str(i.composition)+"\t"+str(i.mass)+"\t"+str(i.window)+"\t"+str(totalArea)+"\t"+str(sum(float(j.obsArea) for j in i.isotopes[1:]))+"\t"+str(maxSN)+"\t"+str(i.noise)+"\t"+str(i.ppm)+"\t")
+                fw.write(str(i.composition)+"\t"+str(i.mass)+"\t"+str(i.window)+"\t"+str(totalArea)+"\t"+str(sum(float(j.obsArea) for j in i.isotopes[1:]))+"\t"+str(i.sn)+"\t"+str(i.noise)+"\t"+str(i.ppm)+"\t")
                 for j in i.isotopes:
                     fw.write(str(j.obsArea)+"\t"+str(j.sn)+"\t"+str(j.qc)+"\t")
                 fw.write("\n")
@@ -2364,7 +2365,7 @@ class App():
                                 totalBck += float(j[0]) - float(i[8])
                         except ValueError:
                             pass
-                    analyteResults.append(analyteResult(str(i[0]), float(i[1]), float(i[3]), float(i[8]), float(i[6]), str(i[7]), isotopeResults))
+                    analyteResults.append(analyteResult(str(i[0]), float(i[1]), float(i[3]), float(i[8]), float(i[6]), str(i[7]), str(i[5]), isotopeResults))
                     # Get the value for the maximum number of isotopes to be listed in the output
                     if len(isotopes) > numIsotopes:
                         numIsotopes = len(isotopes)
@@ -2522,7 +2523,7 @@ class App():
                     fw.write(str(varnames.ANAL_NOISE_TAG)+"\tCalibrated")
                     for j in i.analytes:
                         fw.write("\t"+str(j.composition))
-                    fw.write("\t"+str(varnames.TOTAL_INT_TAG)+"\n")
+                    fw.write("\n")
                     break
                 # Calculated Mass
                 for i in data:
@@ -2680,12 +2681,9 @@ class App():
                 for i in new:
                     number = 0
                     for j in i.analytes:
-                        #expArea = 0
                         SN = 0
                         for k in j.isotopes:
                             if k.SN > SN:
-                            #if k.expArea> expArea:
-                                #expArea = k.expArea
                                 SN = k.SN
                         if SN > S_N_CUTOFF:
                             number += 1
@@ -2710,12 +2708,9 @@ class App():
                         intensity = 0
                         for j in i.analytes:
                             # Check if maximum S/N is above the cut-off
-                            #expArea = 0
                             SN = 0
                             for k in j.isotopes:
                                 if k.SN > SN:
-                                #if k.expArea > expArea:
-                                    #expArea = k.expArea
                                     SN = k.SN
                             # Get the intensity if it is above the cut-off
                             if SN > S_N_CUTOFF:
@@ -2739,12 +2734,9 @@ class App():
                         intensity = 0
                         for j in i.analytes:
                             # Check if maximum S/N is above the cut-off
-                            #expArea = 0
                             SN = 0
                             for k in j.isotopes:
                                 if k.SN > SN:
-                                #if k.expArea > expArea:
-                                    #expArea = k.expArea
                                     SN = k.SN
                             # Get the intensity if it is above the cut-off
                             if SN > S_N_CUTOFF:
@@ -2776,14 +2768,7 @@ class App():
                 for i in new:
                     fw.write(str(i.name)+"\t"+str(i.calibrated))
                     for j in i.analytes:
-                        #expArea = 0
-                        SN = 0
-                        for k in j.isotopes:
-                            if k.SN > SN:
-                            #if k.expArea > expArea:
-                                #expArea = k.expArea
-                                SN = k.SN
-                        fw.write("\t"+str(SN))
+                        fw.write("\t"+str(j.sn))
                     fw.write("\n")
                 fw.write("\n")
 

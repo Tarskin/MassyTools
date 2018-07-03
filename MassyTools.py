@@ -252,7 +252,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.2-alpha"
-        self.build = "180627a"
+        self.build = "180703a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -1127,7 +1127,7 @@ class App():
                     filesGrabbed.append(file)
         for index, file in enumerate(filesGrabbed):
             self.inputFile = file
-            if self.calibrationFile != "":  # and self.exclusionFile != "":
+            if self.calibrationFile != "":
                 # Update the calibration progress bar
                 self.calPerc.set(str(int( (float(index) / float(len(filesGrabbed) ) ) *100))+"%")
                 # print "CalPerc is now set to: "+str(self.calPerc.get())
@@ -1707,6 +1707,19 @@ class App():
                     line = filter(None, line)
                     if len(line) >= 2:
                         potentialCalibrants.append(float(line[1]))
+                    elif len(line) == 1:
+                        maxFraction = 0.
+                        values = self.parseAnalyte(str(line[0]))
+                        totals = self.getChanceNetwork(values)
+                        results = self.mergeChances(totals)
+                        results = self.selectIsotopes(results)
+                        results.sort(key=lambda x: x[0])
+                        for peak in results:
+                            if peak[1] > maxFraction:
+                                maxFraction = float(peak[1])
+                                calMass = float(peak[0])
+                        potentialCalibrants.append(calMass)
+        print potentialCalibrants
         return potentialCalibrants
 
     def transformFile(self, f):

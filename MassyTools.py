@@ -252,7 +252,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.2-alpha"
-        self.build = "180703a"
+        self.build = "180703b"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -1719,7 +1719,6 @@ class App():
                                 maxFraction = float(peak[1])
                                 calMass = float(peak[0])
                         potentialCalibrants.append(calMass)
-        print potentialCalibrants
         return potentialCalibrants
 
     def transformFile(self, f):

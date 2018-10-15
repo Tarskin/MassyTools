@@ -31,6 +31,7 @@ import tkinter as tk
 # Application Specific Imports
 import MassyTools.gui.version as version
 import MassyTools.util.requirement_checker as req_check
+from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 
 class MassyToolsGui(object):
     @classmethod
@@ -53,7 +54,7 @@ class MassyToolsGui(object):
             image = matplotlib.image.imread('./ui/UI.png')
             background_image.axis('off')
             fig.set_tight_layout(True)
-            background_image.imshow(image)
+            background_image.imshow(image, aspect='auto')
         canvas = FigureCanvasTkAgg(fig, master=master)
         toolbar = NavigationToolbar2Tk(canvas, master)
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
@@ -69,7 +70,8 @@ class MassyToolsGui(object):
 
         file_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='File', menu=file_menu)
-        file_menu.add_command(label='Open Input File', command=self.foo)
+        file_menu.add_command(label='Open Input File', command=
+                              self.open_mass_spectrum)
 
         calib_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Calibration', menu=calib_menu)
@@ -106,8 +108,27 @@ class MassyToolsGui(object):
         menu.add_cascade(label='About', menu=about_menu)
         about_menu.add_command(label='About MassyTools', command=self.foo)
 
+        self.fig = fig
+        self.axes = background_image
+        self.canvas = canvas
+
     def foo(self):
         raise NotImplementedError
+
+    def open_mass_spectrum(self):
+        data_buffer = []
+        files = tk.filedialog.askopenfilenames(title=
+                                               'Select Mass Spectrum File(s)')
+        for file in files:
+            self.filename = file
+            data_buffer.append(MassSpectrum(self))
+        self.mass_spectra = data_buffer
+
+        if self.mass_spectra:
+            self.axes.clear()
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.plot_mass_spectrum()
+            finalize_plot(self)
 
 if __name__ == "__main__":
     MassyToolsGui.run()

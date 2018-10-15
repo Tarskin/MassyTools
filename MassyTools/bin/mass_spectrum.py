@@ -1,5 +1,6 @@
 from pathlib import Path, PurePath
 import logging
+import numpy as np
 import tkinter.filedialog as filedialog
 
 
@@ -9,6 +10,21 @@ class MassSpectrum(object):
         self.axes = master.axes
         self.filename = master.filename
         self.open_mass_spectrum()
+
+    def baseline_correct(self):
+        x_values, y_values = zip(*self.data)
+        y_average = np.average(y_values)
+        y_std = np.std(y_values)
+
+        subset = [(x, y) for (x, y) in self.data if y >= y_average-y_std and
+                  y <= y_average+y_std]
+        x_subset, y_subset = zip(*subset)
+
+        p = np.polynomial.polynomial.polyfit(x_subset, y_subset, 3)
+        f = np.poly1d(p)
+        x_values, y_values = zip(*self.data)
+        y_valyes = [x-f(x) for x in y_values]
+        self.data = list(zip(x_values,y_values))
 
     def open_mass_spectrum(self):
         file_type = None
@@ -24,6 +40,7 @@ class MassSpectrum(object):
             except Exception as e:
                 self.logger.error(e)
 
+    # Potentially move this to a dedicated IO module ?
     def open_xy_spectrum(self):
         data_buffer = []
         with Path(self.filename).open() as fr:

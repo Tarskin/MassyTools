@@ -72,6 +72,8 @@ class MassyToolsGui(object):
         menu.add_cascade(label='File', menu=file_menu)
         file_menu.add_command(label='Open Input File', command=
                               self.open_mass_spectrum)
+        file_menu.add_command(label='Baseline Correct', command=
+                              self.baseline_correct)
 
         calib_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Calibration', menu=calib_menu)
@@ -112,8 +114,21 @@ class MassyToolsGui(object):
         self.axes = background_image
         self.canvas = canvas
 
+    # Placeholder
     def foo(self):
         raise NotImplementedError
+
+    # Actual Functions
+
+    def baseline_correct(self):
+        if self.mass_spectra:
+            self.axes.clear()
+            for mass_spectrum in self.mass_spectra:
+                print (mass_spectrum.data[200])
+                mass_spectrum.baseline_correct()
+                print (mass_spectrum.data[200])
+                mass_spectrum.plot_mass_spectrum()
+            finalize_plot(self)
 
     def open_mass_spectrum(self):
         data_buffer = []

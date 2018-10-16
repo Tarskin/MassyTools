@@ -1,7 +1,6 @@
 from pathlib import Path, PurePath
 import logging
 import numpy as np
-import tkinter.filedialog as filedialog
 
 
 class MassSpectrum(object):
@@ -22,9 +21,8 @@ class MassSpectrum(object):
 
         p = np.polynomial.polynomial.polyfit(x_subset, y_subset, 3)
         f = np.poly1d(p)
-        x_values, y_values = zip(*self.data)
-        y_valyes = [x-f(x) for x in y_values]
-        self.data = list(zip(x_values,y_values))
+
+        self.data = [(x, y-f(x)) for x, y in self.data]
 
     def open_mass_spectrum(self):
         file_type = None

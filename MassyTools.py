@@ -27,6 +27,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk
 )
 import tkinter as tk
+from tkinter import filedialog
 
 # Application Specific Imports
 import MassyTools.gui.version as version
@@ -132,7 +133,7 @@ class MassyToolsGui(object):
 
     def open_mass_spectrum(self):
         data_buffer = []
-        files = tk.filedialog.askopenfilenames(title=
+        files = filedialog.askopenfilenames(title=
                                                'Select Mass Spectrum File(s)')
         for file in files:
             self.filename = file

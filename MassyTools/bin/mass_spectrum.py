@@ -20,7 +20,7 @@ class MassSpectrum(object):
         x_subset, y_subset = zip(*subset)
 
         p = np.polynomial.polynomial.polyfit(x_subset, y_subset, 3)
-        f = np.poly1d(p)
+        f = np.polynomial.polynomial.Polynomial(p)
 
         self.data = [(x, y-f(x)) for x, y in self.data]
 

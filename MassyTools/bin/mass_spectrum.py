@@ -1,6 +1,7 @@
 from pathlib import Path, PurePath
 import logging
 import numpy as np
+import MassyTools.util.file_parser as file_parser
 
 
 class MassSpectrum(object):
@@ -34,18 +35,9 @@ class MassSpectrum(object):
 
         if file_type == None:
             try:
-                self.open_xy_spectrum()
+                file_parser.open_xy_spectrum(self)
             except Exception as e:
                 self.logger.error(e)
-
-    # Potentially move this to a dedicated IO module ?
-    def open_xy_spectrum(self):
-        data_buffer = []
-        with Path(self.filename).open() as fr:
-            for line in fr:
-                line = line.rstrip().split()
-                data_buffer.append((float(line[0]), float(line[-1])))
-        self.data = data_buffer
 
     def plot_mass_spectrum(self):
         label = PurePath(self.filename).stem

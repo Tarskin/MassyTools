@@ -25,6 +25,9 @@ class MassSpectrum(object):
 
         self.data = [(x, y-f(x)) for x, y in self.data]
 
+    def calibrate(self):
+        pass
+
     def open_mass_spectrum(self):
         file_type = None
         with Path(self.filename).open() as fr:

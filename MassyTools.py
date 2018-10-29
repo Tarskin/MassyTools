@@ -34,8 +34,11 @@ from tkinter import messagebox
 import MassyTools.gui.version as version
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
+from MassyTools.gui.settings_window import SettingsWindow
+from MassyTools.bin.analyte import Analyte
 from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 from MassyTools.bin.parameters import Parameters
+from MassyTools.bin.settings import Settings
 
 class MassyToolsGui(object):
     @classmethod
@@ -110,13 +113,15 @@ class MassyToolsGui(object):
 
         settings_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Settings', menu=settings_menu)
-        settings_menu.add_command(label='Settings', command=self.foo)
+        settings_menu.add_command(label='Settings', command=
+                                  self.settings_window)
 
         about_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='About', menu=about_menu)
         about_menu.add_command(label='About MassyTools', command=self.foo)
 
         self.logger = logging.getLogger(__name__)
+        self.settings = Settings(self)
         self.parameters = Parameters(self)
         self.axes = background_image
         self.canvas = canvas
@@ -138,19 +143,31 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
-        try:
+        #try:
             if self.mass_spectra and self.parameters.calibration_file:
-                peaks_buffer = functions.get_peak_list(
-                               self.parameters.calibration_file)
-                # Instance Peak class with exact m/z and store in MT class
+                self.peaks = []
+                for cal_peak in functions.get_peak_list(
+                            self.parameters.calibration_file):
+                    analyte_buffer = Analyte(self)
+                    analyte_buffer.name = cal_peak['name']
+                    analyte_buffer.exact_mass = cal_peak['exact mass']
+                    self.peaks.append(analyte_buffer)
                 for mass_spectrum in self.mass_spectra:
-                    # Detect Peaks
-                    # Calibration
-                    pass
+                    self.mass_spectrum = mass_spectrum
+                    for peak in self.peaks:
+                        peak.get_accurate_mass()
+                        print (peak.accurate_mass, peak.exact_mass)
+                    #mass_spectrum.calibrate(self)
+                    
+
+                #self.axes.clear()
+                #for mass_spectrum in self.mass_spectra:
+                    #mass_spectrum.plot_mass_spectrum()
+                #finalize_plot(self)
             if not self.parameters.calibration_file:
                 messagebox.showinfo('Warning','No Calibration File Selected')
-        except Exception as e:
-            self.logger.error(e)
+        #except Exception as e:
+            #self.logger.error(e)
 
     def open_calibration_file(self):
         try:
@@ -183,6 +200,12 @@ class MassyToolsGui(object):
             quant_file = filedialog.askopenfilename(title=
                                                     'Select Quantitation File')
             self.parameters.quantitation_file = quant_file
+        except Exception as e:
+            self.logger.error(e)
+
+    def settings_window(self):
+        try:
+            SettingsWindow(self)
         except Exception as e:
             self.logger.error(e)
 

@@ -158,7 +158,6 @@ class MassyToolsGui(object):
                         peak.get_accurate_mass()
                         print (peak.accurate_mass, peak.exact_mass)
                     #mass_spectrum.calibrate(self)
-                    
 
                 #self.axes.clear()
                 #for mass_spectrum in self.mass_spectra:

@@ -12,7 +12,7 @@ class MassSpectrum(object):
         self.open_mass_spectrum()
 
     def baseline_correct(self):
-        x_values, y_values = zip(*self.data)
+        _, y_values = zip(*self.data)
         y_average = np.average(y_values)
         y_std = np.std(y_values)
 

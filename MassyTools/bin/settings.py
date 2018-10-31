@@ -21,9 +21,9 @@ class Settings(object):
         self.min_total_contribution = 0.95
         self.min_contribution = 0.0001
         self.epsilon = 0.1
-        self.read()
+        self.read_from_disk()
 
-    def save(self):
+    def save_to_disk(self):
         try:
             self.config.add_section('General')
         except configparser.DuplicateSectionError as e:
@@ -51,7 +51,7 @@ class Settings(object):
         with Path(Path.cwd() / 'HappyTools.ini').open('w') as config_file:
             self.config.write(config_file)
 
-    def read(self):
+    def read_from_disk(self):
         if Path(Path.cwd() / 'MassyTools.ini').is_file():
             self.config.read('MassyTools.ini')
             self.mass_modifiers = self.config.get('General', 'Mass modifiers')
@@ -66,5 +66,3 @@ class Settings(object):
             self.mass_window = self.config.getfloat('Quantitation', 'Mass window')
             self.sn_cutoff = self.config.getfloat('Quantitation', 'SN cutoff')
             self.min_total_contribution = self.config.getfloat('Quantitation', 'Min isotopic contribution')
-
-        

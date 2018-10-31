@@ -11,7 +11,7 @@ class SettingsWindow(object):
 
     def save(self):
         self.store_settings()
-        self.settings.save()
+        self.settings.save_to_disk()
 
     def store_settings(self):
         self.settings.calibration_window = float(

@@ -9,7 +9,8 @@ class MassSpectrum(object):
         self.logger = logging.getLogger(__name__)
         self.axes = master.axes
         self.filename = master.filename
-        self.open_mass_spectrum()
+        self.peaks = []
+        self.data = None
 
     def baseline_correct(self):
         _, y_values = zip(*self.data)
@@ -26,7 +27,16 @@ class MassSpectrum(object):
         self.data = [(x, y-f(x)) for x, y in self.data]
 
     def calibrate(self):
-        pass
+        accurate_masses = []
+        exact_masses = []
+        for peak in self.peaks:
+            accurate_masses.append(peak.accurate_mass)
+            exact_masses.append(peak.exact_mass)
+        calibration_parameters = np.polyfit(accurate_masses, exact_masses, 2)
+        calibration_function = np.poly1d(calibration_parameters)
+        x_values, y_values = zip(*self.data)
+        calibrated_x_values = calibration_function(x_values)
+        self.data = list(zip(calibrated_x_values, y_values))
 
     def open_mass_spectrum(self):
         file_type = None

@@ -133,36 +133,32 @@ class MassyToolsGui(object):
     # Actual Functions
     def baseline_correct(self):
         try:
-            if self.mass_spectra:
-                self.axes.clear()
-                for mass_spectrum in self.mass_spectra:
-                    mass_spectrum.baseline_correct()
-                    mass_spectrum.plot_mass_spectrum()
-                finalize_plot(self)
+            self.axes.clear()
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.baseline_correct()
+                mass_spectrum.plot_mass_spectrum()
+            finalize_plot(self)
         except Exception as e:
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
         #try:
-            if self.mass_spectra and self.parameters.calibration_file:
-                self.peaks = []
-                for cal_peak in functions.get_peak_list(
-                            self.parameters.calibration_file):
+            for mass_spectrum in self.mass_spectra:
+                self.mass_spectrum = mass_spectrum
+                peak_list = functions.get_peak_list(
+                            self.parameters.calibration_file)
+                for peak in peak_list:
+                    self.peak = peak
                     analyte_buffer = Analyte(self)
-                    analyte_buffer.name = cal_peak['name']
-                    analyte_buffer.exact_mass = cal_peak['exact mass']
-                    self.peaks.append(analyte_buffer)
-                for mass_spectrum in self.mass_spectra:
-                    self.mass_spectrum = mass_spectrum
-                    for peak in self.peaks:
-                        peak.get_accurate_mass()
-                        print (peak.accurate_mass, peak.exact_mass)
-                    #mass_spectrum.calibrate(self)
+                    analyte_buffer.get_accurate_mass()
+                    mass_spectrum.peaks.append(analyte_buffer)
+                mass_spectrum.calibrate()
 
-                #self.axes.clear()
-                #for mass_spectrum in self.mass_spectra:
-                    #mass_spectrum.plot_mass_spectrum()
-                #finalize_plot(self)
+            self.axes.clear()
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.plot_mass_spectrum()
+            finalize_plot(self)
+
             if not self.parameters.calibration_file:
                 messagebox.showinfo('Warning','No Calibration File Selected')
         #except Exception as e:
@@ -183,7 +179,9 @@ class MassyToolsGui(object):
                                                 'Select Mass Spectrum File(s)')
             for file in files:
                 self.filename = file
-                data_buffer.append(MassSpectrum(self))
+                mass_spec_buffer = MassSpectrum(self)
+                mass_spec_buffer.open_mass_spectrum()
+                data_buffer.append(mass_spec_buffer)
             self.mass_spectra = data_buffer
 
             if self.mass_spectra:

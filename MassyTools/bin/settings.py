@@ -36,7 +36,9 @@ class Settings(object):
             self.config.add_section('Quantitation')
         except configparser.DuplicateSectionError as e:
             self.logger.error(e)
-        self.config.set('General', 'Mass modifiers', ','.join(self.mass_modifiers))
+        if len(self.mass_modifiers) > 1:
+            mass_modifiers = ','.join(self.mass_modifiers)
+        self.config.set('General', 'Mass modifiers', str(mass_modifiers))
         self.config.set('General', 'Charge carrier', str(self.charge_carrier))
         self.config.set('General', 'Background window', str(self.background_window))
         self.config.set('Calibration', 'Mass window', str(self.calibration_window))

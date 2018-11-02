@@ -67,7 +67,7 @@ class MassyToolsGui(object):
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
         canvas.draw()
 
-        frame = tk.Frame(master)
+        tk.Frame(master)
         master.title("MassyTools "+str(version.version))
         if (Path.cwd() / 'ui' / 'Icon.ico').is_file():
             master.iconbitmap(default='./ui/Icon.ico')

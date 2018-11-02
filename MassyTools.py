@@ -48,7 +48,6 @@ class MassyToolsGui(object):
         root.mainloop()
 
     def __init__(self, master):
-
         logging.basicConfig(filename='MassyTools.log',
             format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
             datefmt='%Y-%m-%d %H:%M', filemode='a',

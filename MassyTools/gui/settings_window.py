@@ -5,11 +5,11 @@ class SettingsWindow(object):
         self.settings = master.settings
         self.create_window()
 
-    def close(self):
+    def close_settings_window(self):
         self.store_settings()
         self.root.destroy()
 
-    def save(self):
+    def save_settings(self):
         self.store_settings()
         self.settings.save_to_disk()
 
@@ -47,7 +47,7 @@ class SettingsWindow(object):
 
     def create_window(self):
         root = tk.Tk()
-        root.protocol( "WM_DELETE_WINDOW", self.close)
+        root.protocol( "WM_DELETE_WINDOW", self.close_settings_window)
 
         calibration_label = tk.Label(root, text="Calibration parameters",
                                      font="bold")
@@ -127,9 +127,10 @@ class SettingsWindow(object):
         extraction_qc_sn.insert(0, self.settings.sn_cutoff)
         extraction_qc_sn.grid(row=12, column=1, sticky=tk.W)
 
-        self.ok = tk.Button(root,text = 'Ok', command=self.close)
+        self.ok = tk.Button(root,text = 'Ok', command=
+                            self.close_settings_window)
         self.ok.grid(row = 13, column = 0, sticky = tk.W)
-        self.save = tk.Button(root, text = 'Save', command=self.save)
+        self.save = tk.Button(root, text = 'Save', command=self.save_settings)
         self.save.grid(row = 13, column = 1, sticky = tk.E)
 
         # Tooltips

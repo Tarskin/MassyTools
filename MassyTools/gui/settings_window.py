@@ -1,3 +1,4 @@
+from MassyTools.gui.tooltip import create_tooltip
 import tkinter as tk
 
 class SettingsWindow(object):
@@ -134,16 +135,45 @@ class SettingsWindow(object):
         self.save.grid(row = 13, column = 1, sticky = tk.E)
 
         # Tooltips
-        #createToolTip(self.calibWindowLabel,"The mass window in Dalton around the specified exact m/z of a calibrant, that LaCyTools uses to determine the uncalibrated accurate mass.")
-        #createToolTip(self.calibSnLabel,"The minimum S/N of a calibrant to be included in the calibration.")
-        #createToolTip(self.calibMinLowLabel,"The minimum number of calibrants in the low m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
-        #createToolTip(self.calibMinMidLabel,"The minimum number of calibrants in the mid m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
-        #createToolTip(self.calibMinHighLabel,"The minimum number of calibrants in the high m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
-        #createToolTip(self.calibMinTotalLabel,"The minimum number of calibrants in the whole m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
-        #createToolTip(self.extracMassWindowLabel,"The m/z window in Thompson around the specified exact m/z of a feature that LaCyTools will use for quantitation. For example, a value of 0.1 results in LaCyTools quantifying 999.9 to 1000.1 for a feature with an m/z value of 1000.")
-        #createToolTip(self.extracMinTotalLabel,"The minimum fraction of the theoretical isotopic pattern that LaCyTools will use for quantitation. For example, a value of 0.95 means that LaCyTools will quantify isotopes until the sum of the quantified isotopes exceeds 0.95 of the total theoretcal isotopic pattern.")
-        #createToolTip(self.extracBackLabel,"The mass window in Dalton that LaCyTools is allowed to look for the local background and noise for each analyte. For example, a value of 10 means that LaCyTools will look from 990 m/z to 1010 m/z for an analyte with an m/z of 1000.")
-        #createToolTip(self.extracQcSnLabel,"The minimal S/N that an analyte has to have to be included in the analyte QC, e.g. the fraction of analyte intensity above S/N X, where X is the value specified here.")
+        create_tooltip(calibration_window_label, "The mass window in Dalton "+
+                       "around the specified exact m/z of a calibrant, that "+
+                       "MassyTools uses to determine the accurate mass.")
+        create_tooltip(calibration_sn_label, "The minimum S/N of a calibrant "+
+                       "to be included in the calibration.")
+        create_tooltip(calibration_min_low_label, "The minimum number of "+
+                       "calibrants in the low m/z range that have a S/N "+
+                       "higher than the minimum S/N for calibration to occur.")
+        create_tooltip(calibration_min_medium_label, "The minimum number of "+
+                       "calibrants in the medium m/z range that have a S/N "+
+                       "higher than the minimum S/N for calibration to occur.")
+        create_tooltip(calibration_min_high_label, "The minimum number of "+
+                       "calibrants in the high m/z range that have a S/N "+
+                       "higher than the minimum S/N for calibration to occur.")
+        create_tooltip(calibration_min_total_label, "The minimum number of "+
+                       "calibrants in the whole m/z range that have a S/N "+
+                       "higher than the minimum S/N for calibration to occur.")
+        create_tooltip(extraction_mass_window_label, "The m/z window in "+
+                       "Thomson around the specified exact m/z of a feature "+
+                       "that MassyTools will use for quantitation. For "+
+                       "example, a value of 0.1 results in MassyTools "+
+                       "quantifying 999.9 to 1000.1 for a feature with a m/z "+
+                       "value of 1000.")
+        create_tooltip(extraction_min_total_label, "The minimum fraction of "+
+                       "the theoretical isotopic pattern that MassyTools "+
+                       "will use for quantitation. For example, a value of "+
+                       "0.95 means that MassyTools will quantify isotopes "+
+                       "until the sum of the quantified isotopes exceeds "+
+                       "0.95 of the total theoretcal isotopic pattern.")
+        create_tooltip(extraction_background_window_label, "The mass window "+
+                       "in Dalton that MassyTools is allowed to use to "+
+                       "determine the local background and noise for each "+
+                       "analyte. For example, a value of 10 means that "+
+                       "MassyTools will use the region betwee 990 and 1010 "+
+                       "m/z for an analyte with an exact m/z of 1000.")
+        create_tooltip(extraction_qc_sn_label, "The minimal S/N that an "+
+                       "analyte has to have to be included in the analyte QC"+
+                       ", e.g. the fraction of analyte intensity above S/N X"+
+                       ", where X is the value specified here.")
 
         # Self assignment
         self.root = root

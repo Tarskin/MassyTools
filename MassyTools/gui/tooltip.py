@@ -3,7 +3,6 @@ import tkinter as tk
 
 
 class ToolTip(object):
-
     def __init__(self, widget):
         self.widget = widget
         self.tipwindow = None
@@ -38,3 +37,12 @@ class ToolTip(object):
         self.tipwindow = None
         if tw:
             tw.destroy()
+
+def create_tooltip(widget, text):
+    tooltip = ToolTip(widget)
+    def enter(event):
+        tooltip.showtip(text)
+    def leave(event):
+        tooltip.hidetip()
+    widget.bind('<Enter>', enter)
+    widget.bind('<Leave>', leave)

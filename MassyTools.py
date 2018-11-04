@@ -62,7 +62,7 @@ class MassyToolsGui(object):
             fig.set_tight_layout(True)
             background_image.imshow(image, aspect='auto')
         canvas = FigureCanvasTkAgg(fig, master=master)
-        toolbar = NavigationToolbar2Tk(canvas, master)
+        NavigationToolbar2Tk(canvas, master)
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
         canvas.draw()
 

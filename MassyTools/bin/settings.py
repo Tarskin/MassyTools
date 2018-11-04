@@ -50,7 +50,7 @@ class Settings(object):
         self.config.set('Quantitation', 'Mass window', str(self.mass_window))
         self.config.set('Quantitation', 'SN cutoff', str(self.sn_cutoff))
         self.config.set('Quantitation', 'Min isotopic contribution', str(self.min_total_contribution))
-        with Path(Path.cwd() / 'HappyTools.ini').open('w') as config_file:
+        with Path(Path.cwd() / 'MassyTools.ini').open('w') as config_file:
             self.config.write(config_file)
 
     def read_from_disk(self):

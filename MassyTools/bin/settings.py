@@ -38,6 +38,8 @@ class Settings(object):
             self.logger.error(e)
         if len(self.mass_modifiers) > 1:
             mass_modifiers = ','.join(self.mass_modifiers)
+        else:
+            mass_modifiers = str(self.mass_modifiers)
         self.config.set('General', 'Mass modifiers', str(mass_modifiers))
         self.config.set('General', 'Charge carrier', str(self.charge_carrier))
         self.config.set('General', 'Background window', str(self.background_window))
@@ -68,3 +70,4 @@ class Settings(object):
             self.mass_window = self.config.getfloat('Quantitation', 'Mass window')
             self.sn_cutoff = self.config.getfloat('Quantitation', 'SN cutoff')
             self.min_total_contribution = self.config.getfloat('Quantitation', 'Min isotopic contribution')
+        self.mass_modifiers = self.mass_modifiers.split(',')

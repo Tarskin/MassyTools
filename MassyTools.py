@@ -32,6 +32,7 @@ from tkinter import messagebox
 
 # Application Specific Imports
 import MassyTools.gui.version as version
+import MassyTools.gui.progress_bar as progressbar
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
 from MassyTools.gui.settings_window import SettingsWindow
@@ -42,6 +43,7 @@ from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 from MassyTools.bin.parameters import Parameters
 from MassyTools.bin.settings import Settings
 
+
 class MassyToolsGui(object):
     @classmethod
     def run(cls):
@@ -50,6 +52,9 @@ class MassyToolsGui(object):
         root.mainloop()
 
     def __init__(self, master):
+        # Inherit Tk() root object
+        self.root = master
+
         logging.basicConfig(filename='MassyTools.log',
             format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
             datefmt='%Y-%m-%d %H:%M', filemode='a',
@@ -70,6 +75,8 @@ class MassyToolsGui(object):
 
         tk.Frame(master)
         master.title("MassyTools "+str(version.version))
+        progress = progressbar.SimpleProgressBar(self)
+        progress.bar.pack()
         if (Path.cwd() / 'ui' / 'Icon.ico').is_file():
             master.iconbitmap(default='./ui/Icon.ico')
 
@@ -82,6 +89,9 @@ class MassyToolsGui(object):
                               self.open_mass_spectrum)
         file_menu.add_command(label='Baseline Correct', command=
                               self.baseline_correct)
+        file_menu.add_command(label='Normalize', command=
+                              self.normalize_mass_spectrum)
+        file_menu.add_command(label='Save', command=self.save_mass_spectrum)
 
         calib_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Calibration', menu=calib_menu)
@@ -130,6 +140,7 @@ class MassyToolsGui(object):
         self.parameters = Parameters(self)
         self.axes = background_image
         self.canvas = canvas
+        self.progress = progress
 
     # Placeholder
     def foo(self):
@@ -153,8 +164,9 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
-        #try:
-            for mass_spectrum in self.mass_spectra:
+        try:
+            self.progress.reset_bar()
+            for index, mass_spectrum in enumerate(self.mass_spectra):
                 self.mass_spectrum = mass_spectrum
                 peak_list = functions.get_peak_list(
                             self.parameters.calibration_file)
@@ -164,6 +176,10 @@ class MassyToolsGui(object):
                     analyte_buffer.get_accurate_mass()
                     mass_spectrum.peaks.append(analyte_buffer)
                 mass_spectrum.calibrate()
+                self.progress.counter.set((float(index) / len(
+                                         self.mass_spectra))*100)
+                self.progress.update_progress_bar()
+            self.progress.fill_bar()
 
             self.axes.clear()
             for mass_spectrum in self.mass_spectra:
@@ -172,14 +188,27 @@ class MassyToolsGui(object):
 
             if not self.parameters.calibration_file:
                 messagebox.showinfo('Warning','No Calibration File Selected')
-        #except Exception as e:
-            #self.logger.error(e)
+        except Exception as e:
+            self.logger.error(e)
 
     def cite_window(self):
         try:
             CiteWindow()
         except Exception as e:
             self.logger.erorr(e)
+
+    def normalize_mass_spectrum(self):
+        try:
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.normalize_mass_spectrum()
+
+            if self.mass_spectra:
+                self.axes.clear()
+                for mass_spectrum in self.mass_spectra:
+                    mass_spectrum.plot_mass_spectrum()
+                finalize_plot(self)
+        except Exception as e:
+            self.logger.error(e)
 
     def open_calibration_file(self):
         try:
@@ -214,6 +243,13 @@ class MassyToolsGui(object):
             quant_file = filedialog.askopenfilename(title=
                                                     'Select Quantitation File')
             self.parameters.quantitation_file = quant_file
+        except Exception as e:
+            self.logger.error(e)
+
+    def save_mass_spectrum(self):
+        try:
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.save_mass_spectrum()
         except Exception as e:
             self.logger.error(e)
 

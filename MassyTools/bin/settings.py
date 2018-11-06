@@ -7,6 +7,8 @@ class Settings(object):
     def __init__(self, master):
         self.config = configparser.ConfigParser()
         self.logger = logging.getLogger(__name__)
+
+        # Changeable via GUI
         self.mass_modifiers = ['free']
         self.charge_carrier = 'sodium'
         self.background_window = 20
@@ -19,8 +21,12 @@ class Settings(object):
         self.mass_window = 0.2
         self.sn_cutoff = 9.0
         self.min_total_contribution = 0.95
+
+        # Changeable via source
         self.min_contribution = 0.0001
         self.epsilon = 0.1
+        self.decimal_numbers = 8
+
         self.read_from_disk()
 
     def save_to_disk(self):

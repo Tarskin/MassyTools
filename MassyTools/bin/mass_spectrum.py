@@ -1,4 +1,5 @@
 from pathlib import Path, PurePath
+from bisect import bisect_left, bisect_right
 import logging
 import numpy as np
 import MassyTools.util.file_parser as file_parser
@@ -6,6 +7,7 @@ import MassyTools.util.file_parser as file_parser
 
 class MassSpectrum(object):
     def __init__(self, master):
+        self.settings = master.settings
         self.logger = logging.getLogger(__name__)
         self.axes = master.axes
         self.filename = master.filename
@@ -38,6 +40,12 @@ class MassSpectrum(object):
         calibrated_x_values = calibration_function(x_values)
         self.data = list(zip(calibrated_x_values, y_values))
 
+    def normalize_mass_spectrum(self):
+        x_array, y_array = zip(*self.data)
+        maximum = max(y_array)
+        normalized_y_array = [x/maximum for x in y_array]
+        self.data = list(zip(x_array, normalized_y_array))
+
     def open_mass_spectrum(self):
         file_type = None
         with Path(self.filename).open() as fr:
@@ -56,6 +64,15 @@ class MassSpectrum(object):
         label = PurePath(self.filename).stem
         x_array, y_array = zip(*self.data)
         self.axes.plot(x_array, y_array, label=str(label))
+
+    def save_mass_spectrum(self):
+        with Path(self.filename).open('w') as fw:
+            for data_point in self.data:
+                fw.write(
+                    str(format(data_point[0], '0.' +
+                        str(self.settings.decimal_numbers)+'f'))+'\t' +
+                    str(format(data_point[1], '0.' +
+                        str(self.settings.decimal_numbers)+'f'))+'\n')
 
 def finalize_plot(master):
     master.axes.set_xlabel('m/z [Th]')

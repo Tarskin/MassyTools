@@ -1,5 +1,4 @@
 from pathlib import Path, PurePath
-from bisect import bisect_left, bisect_right
 import logging
 import numpy as np
 import MassyTools.util.file_parser as file_parser

@@ -133,7 +133,6 @@ class MassyToolsGui(object):
                               self.about_window)
         info_menu.add_command(label='Citing MassyTools', command=
                               self.cite_window)
-        
 
         self.logger = logging.getLogger(__name__)
         self.settings = Settings(self)

@@ -4,3 +4,4 @@ unittest.py
 *.log
 Settings.txt
 *.ref
+*.pptx

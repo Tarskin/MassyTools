@@ -35,6 +35,8 @@ import MassyTools.gui.version as version
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
 from MassyTools.gui.settings_window import SettingsWindow
+from MassyTools.gui.about_window import AboutWindow
+from MassyTools.gui.cite_window import CiteWindow
 from MassyTools.bin.analyte import Analyte
 from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 from MassyTools.bin.parameters import Parameters
@@ -115,9 +117,13 @@ class MassyToolsGui(object):
         settings_menu.add_command(label='Settings', command=
                                   self.settings_window)
 
-        about_menu = tk.Menu(menu, tearoff=0)
-        menu.add_cascade(label='About', menu=about_menu)
-        about_menu.add_command(label='About MassyTools', command=self.foo)
+        info_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label='Information', menu=info_menu)
+        info_menu.add_command(label='About MassyTools', command=
+                              self.about_window)
+        info_menu.add_command(label='Citing MassyTools', command=
+                              self.cite_window)
+        
 
         self.logger = logging.getLogger(__name__)
         self.settings = Settings(self)
@@ -130,6 +136,12 @@ class MassyToolsGui(object):
         raise NotImplementedError
 
     # Actual Functions
+    def about_window(self):
+        try:
+            AboutWindow()
+        except Exception as e:
+            self.logger.error(e)
+
     def baseline_correct(self):
         try:
             self.axes.clear()
@@ -162,6 +174,12 @@ class MassyToolsGui(object):
                 messagebox.showinfo('Warning','No Calibration File Selected')
         #except Exception as e:
             #self.logger.error(e)
+
+    def cite_window(self):
+        try:
+            CiteWindow()
+        except Exception as e:
+            self.logger.erorr(e)
 
     def open_calibration_file(self):
         try:

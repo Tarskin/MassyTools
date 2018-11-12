@@ -7,10 +7,11 @@ import MassyTools.util.file_parser as file_parser
 class MassSpectrum(object):
     def __init__(self, master):
         self.settings = master.settings
+        self.building_blocks = master.building_blocks
         self.logger = logging.getLogger(__name__)
         self.axes = master.axes
         self.filename = master.filename
-        self.peaks = []
+        self.analytes = []
         self.data = None
 
     def baseline_correct(self):
@@ -30,9 +31,11 @@ class MassSpectrum(object):
     def calibrate(self):
         accurate_masses = []
         exact_masses = []
-        for peak in self.peaks:
-            accurate_masses.append(peak.accurate_mass)
-            exact_masses.append(peak.exact_mass)
+        for analyte in self.analytes:
+            for isotope in analyte.isotopes:
+                if isotope.accurate_mass:
+                    accurate_masses.append(isotope.accurate_mass)
+                    exact_masses.append(isotope.exact_mass)
         calibration_parameters = np.polyfit(accurate_masses, exact_masses, 2)
         calibration_function = np.poly1d(calibration_parameters)
         x_values, y_values = zip(*self.data)

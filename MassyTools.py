@@ -19,7 +19,8 @@
 
 # Standard Library Imports
 import logging
-from pathlib import Path
+from operator import itemgetter
+from pathlib import Path, PurePath
 
 # Third Party Imports
 import matplotlib
@@ -54,6 +55,7 @@ class MassyToolsGui(object):
     def __init__(self, master):
         # Inherit Tk() root object
         self.root = master
+        self.read_building_blocks()
 
         logging.basicConfig(filename='MassyTools.log',
             format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -163,17 +165,31 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
-        try:
+        #try:
             self.progress.reset_bar()
+
+            peak_list = functions.get_peak_list(
+                self.parameters.calibration_file)
+            analytes = []
+            for peak in peak_list:
+                self.peak = peak
+                analyte_buffer = Analyte(self)
+                analyte_buffer.calculate_isotopes()
+                analytes.append(analyte_buffer)
+
             for index, mass_spectrum in enumerate(self.mass_spectra):
                 self.mass_spectrum = mass_spectrum
-                peak_list = functions.get_peak_list(
-                            self.parameters.calibration_file)
-                for peak in peak_list:
-                    self.peak = peak
-                    analyte_buffer = Analyte(self)
-                    analyte_buffer.get_accurate_mass()
-                    mass_spectrum.peaks.append(analyte_buffer)
+                self.mass_spectrum.analytes = analytes
+                for analyte in self.mass_spectrum.analytes:
+                    analyte.inherit_data_subset()
+                    max_fraction = 0.
+                    object_buffer = None
+                    max_fraction = max(isotope.fraction for isotope in
+                                       analyte.isotopes)
+                    for isotope in analyte.isotopes:
+                        if isotope.fraction == max_fraction:
+                            isotope.get_accurate_mass()
+
                 mass_spectrum.calibrate()
                 self.progress.counter.set((float(index) / len(
                                          self.mass_spectra))*100)
@@ -187,8 +203,8 @@ class MassyToolsGui(object):
 
             if not self.parameters.calibration_file:
                 messagebox.showinfo('Warning','No Calibration File Selected')
-        except Exception as e:
-            self.logger.error(e)
+        #except Exception as e:
+            #self.logger.error(e)
 
     def cite_window(self):
         try:
@@ -245,6 +261,33 @@ class MassyToolsGui(object):
         except Exception as e:
             self.logger.error(e)
 
+    def read_building_blocks(self):
+        building_blocks = {}
+        block_folder = Path.cwd() / 'blocks'
+        for file in block_folder.glob('*.block'):
+            block = PurePath(file).stem
+            keys = []
+            values = []
+            with open(file,'r') as fr:
+                for line in fr:
+                    foo = line.rstrip().split()
+                    key = foo[0]
+                    value = " ".join(foo[1:])
+                    keys.append(key)
+                    try:
+                        float(value)
+                        try:
+                            value = int(value)
+                        except ValueError:
+                            value = float(value)
+                    except ValueError:
+                        value = str(value)
+                    values.append(value)    
+            building_blocks[block] = dict(zip(keys,values))
+        # Maybe need the keys instead?
+        self.building_blocks = building_blocks
+        #UNITS = BLOCKS.keys()
+        
     def save_mass_spectrum(self):
         try:
             for mass_spectrum in self.mass_spectra:

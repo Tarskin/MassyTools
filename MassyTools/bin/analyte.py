@@ -5,6 +5,7 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 from bisect import bisect_left, bisect_right
 from operator import itemgetter
 import MassyTools.util.functions as functions
+import MassyTools.bin.elemental_abundances as elemental_abundances
 from MassyTools.bin.isotope import Isotope
 
 
@@ -102,31 +103,22 @@ class Analyte(object):
                               number_sites)
 
     def calculate_analyte_isotopic_pattern(self):
-        # Find place for this
-        C = [('13C', 0.0107, 1.00335)]
-        H = [('2H', 0.00012, 1.00628)]
-        N = [('15N', 0.00364, 0.99703)]
-        O18 = [('18O', 0.00205, 2.00425)]
-        O17 = [('17O', 0.00038, 1.00422)]
-        S33 = [('33S', 0.0076, 0.99939)]
-        S34 = [('34S', 0.0429, 1.9958)]
-        S36 = [('36S', 0.0002, 3.99501)]
         carbons = functions.calculate_elemental_isotopic_pattern(
-                  C, self.number_carbons)
+                  elemental_abundances.carbon, self.number_carbons)
         hydrogens = functions.calculate_elemental_isotopic_pattern(
-                  H, self.number_hydrogens)
+                  elemental_abundances.hydrogen, self.number_hydrogens)
         nitrogens = functions.calculate_elemental_isotopic_pattern(
-                  N, self.number_nitrogens)
+                  elemental_abundances.nitrogen, self.number_nitrogens)
         oxygens17 = functions.calculate_elemental_isotopic_pattern(
-                  O17, self.number_oxygens)
+                  elemental_abundances.oxygen17, self.number_oxygens)
         oxygens18 = functions.calculate_elemental_isotopic_pattern(
-                  O18, self.number_oxygens)
+                  elemental_abundances.oxygen18, self.number_oxygens)
         sulfurs33 = functions.calculate_elemental_isotopic_pattern(
-                  S33, self.number_sulfurs)
+                  elemental_abundances.sulfur33, self.number_sulfurs)
         sulfurs34 = functions.calculate_elemental_isotopic_pattern(
-                  S34, self.number_sulfurs)
+                  elemental_abundances.sulfur34, self.number_sulfurs)
         sulfurs36 = functions.calculate_elemental_isotopic_pattern(
-                  S36, self.number_sulfurs)
+                  elemental_abundances.sulfur36, self.number_sulfurs)
 
         # Combine distrubtions
         totals = []

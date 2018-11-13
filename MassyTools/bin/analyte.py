@@ -16,6 +16,8 @@ class Analyte(object):
 
         self.name = master.peak['name']
         self.data_subset = None
+        self.distributions = None
+        self.isotopic_pattern = None
         self.isotopes = []
 
     def inherit_data_subset(self):
@@ -101,10 +103,12 @@ class Analyte(object):
                               number_sites)
 
     def calculate_analyte_isotopic_pattern(self):
-        distributions = self.calculate_elemental_distributions(self)
-        isotopic_pattern = combine_distributions(distributions)
-        isotopic_pattern = merge_distributions(isotopic_pattern)
-    
+        self.calculate_elemental_distributions()
+        self.combine_distributions()
+        self.merge_isotopic_pattern()
+        self.sort_isotopic_pattern()
+        self.attach_isotopes()
+
     def calculate_elemental_distributions(self):
         carbons = functions.calculate_elemental_isotopic_pattern(
                   elemental_abundances.carbon, self.number_carbons)
@@ -122,28 +126,49 @@ class Analyte(object):
                   elemental_abundances.sulfur34, self.number_sulfurs)
         sulfurs36 = functions.calculate_elemental_isotopic_pattern(
                   elemental_abundances.sulfur36, self.number_sulfurs)
-        return {'carbons': carbons, 'hydrogens': hydrogens,
-                'nitrogens': nitrogens, 'oxygens17': oxygens17,
-                'oxygens18': oxygens18, 'sulfurs33':sulfurs33,
-                'sulfurs34': sulfurs34, 'sulfurs36': sulfurs36}
+        self.distributions = {'carbons': carbons, 'hydrogens': hydrogens,
+                                'nitrogens': nitrogens, 'oxygens17': oxygens17,
+                                'oxygens18': oxygens18, 'sulfurs33':sulfurs33,
+                                'sulfurs34': sulfurs34, 'sulfurs36': sulfurs36}
 
-        # Merge
-        intermediate_results = []
-        newdata = {d: True for d in totals}
-        for k, v in totals:
+    def combine_distributions(self):
+        totals = []
+        for x in itertools.product(
+            self.distributions['carbons'], self.distributions['hydrogens'],
+            self.distributions['nitrogens'], self.distributions['oxygens17'],
+            self.distributions['oxygens18'], self.distributions['sulfurs33'],
+            self.distributions['sulfurs34'], self.distributions['sulfurs36']
+        ):
+            i, j, k, l, m, n, o, p = x
+            totals.append((self.mass+i[0]+j[0]+k[0]+l[0]+m[0]+n[0]+o[0]+p[0],
+                           i[1]*j[1]*k[1]*l[1]*m[1]*n[1]*o[1]*p[1]))
+        self.distributions = totals
+
+    def attach_isotopes(self):
+        for isotope in self.isotopic_pattern:
+            isotope_buffer = Isotope(self)
+            isotope_buffer.exact_mass = isotope[0]
+            isotope_buffer.fraction = isotope[1]
+            self.isotopes.append(isotope_buffer)
+
+    def merge_isotopic_pattern(self):
+        results = []
+        newdata = {d: True for d in self.distributions}
+        for k, v in self.distributions:
             if not newdata[(k, v)]: continue
             newdata[(k, v)] = False
             # use each piece of data only once
             keys, values = [k*v], [v]
-            for kk, vv in [d for d in totals if newdata[d]]:
+            for kk, vv in [d for d in self.distributions if newdata[d]]:
                 if abs(k-kk) < self.settings.epsilon:
                     keys.append(kk*vv)
                     values.append(vv)
                     newdata[(kk, vv)] = False
-            intermediate_results.append((sum(keys)/sum(values), sum(values)))
-        
-        # Sort
-        intermediate_results = sorted(intermediate_results, key=itemgetter(1),
+            results.append((sum(keys)/sum(values), sum(values)))
+        self.isotopic_pattern = results
+
+    def sort_isotopic_pattern(self):
+        intermediate_results = sorted(self.isotopic_pattern, key=itemgetter(1),
                                       reverse=True)
         results = []
         totals = 0.
@@ -153,41 +178,4 @@ class Analyte(object):
             if totals > self.settings.min_total_contribution:
                 break
         results = sorted(results, key=itemgetter(0))
-
-        # Create isotopes and add them to analyte
-        for result in results:
-            isotope_buffer = Isotope(self)
-            isotope_buffer.exact_mass = result[0]
-            isotope_buffer.fraction = result[1]
-            self.isotopes.append(isotope_buffer)
-
-# Non class functions
-def combine_distributions(distributions):
-    totals = []
-    #for x in itertools.product(carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36):
-    for x in itertools.product(
-        distributions['carbons'], distributions['hydrogens'],
-        distributions['nitrogens'], distributions['oxygens17'],
-        distributions['oxygens18'], distributions['sulfurs33'],
-        distrubtions['sulfurs34'], distributions['sulfurs36']
-    ):
-        i, j, k, l, m, n, o, p = x
-        totals.append((self.mass+i[0]+j[0]+k[0]+l[0]+m[0]+n[0]+o[0]+p[0],
-                       i[1]*j[1]*k[1]*l[1]*m[1]*n[1]*o[1]*p[1]))
-    return totals
-
-def merge_distributions(totals):
-    intermediate_results = []
-    newdata = {d: True for d in totals}
-    for k, v in totals:
-        if not newdata[(k, v)]: continue
-        newdata[(k, v)] = False
-        # use each piece of data only once
-        keys, values = [k*v], [v]
-        for kk, vv in [d for d in totals if newdata[d]]:
-            if abs(k-kk) < self.settings.epsilon:
-                keys.append(kk*vv)
-                values.append(vv)
-                newdata[(kk, vv)] = False
-        intermediate_results.append((sum(keys)/sum(values), sum(values)))
-    return intermediate_results
+        self.isotopic_pattern = results

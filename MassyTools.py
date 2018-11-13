@@ -19,7 +19,6 @@
 
 # Standard Library Imports
 import logging
-from operator import itemgetter
 from pathlib import Path, PurePath
 
 # Third Party Imports
@@ -182,8 +181,6 @@ class MassyToolsGui(object):
                 self.mass_spectrum.analytes = analytes
                 for analyte in self.mass_spectrum.analytes:
                     analyte.inherit_data_subset()
-                    max_fraction = 0.
-                    object_buffer = None
                     max_fraction = max(isotope.fraction for isotope in
                                        analyte.isotopes)
                     for isotope in analyte.isotopes:
@@ -282,12 +279,10 @@ class MassyToolsGui(object):
                             value = float(value)
                     except ValueError:
                         value = str(value)
-                    values.append(value)    
+                    values.append(value)
             building_blocks[block] = dict(zip(keys,values))
-        # Maybe need the keys instead?
         self.building_blocks = building_blocks
-        #UNITS = BLOCKS.keys()
-        
+
     def save_mass_spectrum(self):
         try:
             for mass_spectrum in self.mass_spectra:

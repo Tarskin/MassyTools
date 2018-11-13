@@ -76,4 +76,4 @@ class Settings(object):
             self.mass_window = self.config.getfloat('Quantitation', 'Mass window')
             self.sn_cutoff = self.config.getfloat('Quantitation', 'SN cutoff')
             self.min_total_contribution = self.config.getfloat('Quantitation', 'Min isotopic contribution')
-        self.mass_modifiers = self.mass_modifiers.split(',')
+            self.mass_modifiers = self.mass_modifiers.split(',')

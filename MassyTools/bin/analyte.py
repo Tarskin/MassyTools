@@ -21,6 +21,10 @@ class Analyte(object):
         self.isotopes = []
 
     def inherit_data_subset(self):
+        # This inherits on the basis of quantitation, however calibration
+        # has a different window (self.settings.calibration_window). Design
+        # a way to identify which of the two windows should be used in the
+        # data inheritence.
         x_data, y_data = zip(*self.master.mass_spectrum.data)
         max_fraction = max(isotope.fraction for isotope in self.isotopes)
         for isotope in self.isotopes:

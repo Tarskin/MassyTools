@@ -12,6 +12,7 @@ class Analyte(object):
         self.master = master
         self.logger = logging.getLogger(__name__)
         self.settings = master.settings
+        self.parameters = master.parameters
         self.building_blocks = master.building_blocks
 
         self.name = master.peak['name']
@@ -21,17 +22,18 @@ class Analyte(object):
         self.isotopes = []
 
     def inherit_data_subset(self):
-        # This inherits on the basis of quantitation, however calibration
-        # has a different window (self.settings.calibration_window). Design
-        # a way to identify which of the two windows should be used in the
-        # data inheritence.
+        if self.parameters.calibration == True:
+            mass_window = self.settings.calibration_window
+        if self.parameters.quantitation == True:
+            mass_window = self.settings.mass_window
+
         x_data, y_data = zip(*self.master.mass_spectrum.data)
         max_fraction = max(isotope.fraction for isotope in self.isotopes)
         for isotope in self.isotopes:
             if isotope.fraction == max_fraction:
                 center_mass = isotope.exact_mass
-        left_border = bisect_left(x_data, center_mass-self.settings.mass_window)
-        right_border = bisect_right(x_data, center_mass+self.settings.mass_window)
+        left_border = bisect_left(x_data, center_mass-mass_window)
+        right_border = bisect_right(x_data, center_mass+mass_window)
         self.data_subset = list(zip(x_data[left_border:right_border],
                                 y_data[left_border:right_border]))
 

@@ -6,7 +6,7 @@ def get_peak_list(file_handle):
     with Path(file_handle).open() as fr:
         for line in fr:
             line = line.rstrip().split()
-            peaks.append({'name':str(line[0]), 'exact mass':float(line[-1])})
+            peaks.append({'name':str(line[0])})
     return peaks
 
 def calculate_elemental_isotopic_pattern(element, number):

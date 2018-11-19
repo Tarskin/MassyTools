@@ -106,7 +106,8 @@ class MassyToolsGui(object):
         menu.add_cascade(label='Quantitation', menu=quantitation_menu)
         quantitation_menu.add_command(label='Open Quantitation File',
                                       command=self.open_quantitation_file)
-        quantitation_menu.add_command(label='Quantify', command=self.foo)
+        quantitation_menu.add_command(label='Quantify', command=
+                                      self.quantify_mass_spectrum)
 
         quality_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='QC', menu=quality_menu)
@@ -164,13 +165,46 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
-        #try:
+        try:
             self.progress.reset_bar()
 
             peak_list = functions.get_peak_list(
                 self.parameters.calibration_file)
+            self.peak_list = peak_list
+            self.determine_and_attach_analytes()
+
+            for index, mass_spectrum in enumerate(self.mass_spectra):
+                mass_spectrum.calibrate()
+                self.progress.counter.set((float(index) / len(
+                                         self.mass_spectra))*100)
+                self.progress.update_progress_bar()
+            self.progress.fill_bar()
+
+            self.axes.clear()
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.plot_mass_spectrum()
+            finalize_plot(self)
+
+            if not self.parameters.calibration_file:
+                messagebox.showinfo('Warning','No Calibration File Selected')
+        except Exception as e:
+            self.logger.error(e)
+
+    def quantify_mass_spectrum(self):
+        try:
+            self.progress.reset_bar()
+
+            peak_list = functions.get_peak_list(
+                self.parameters.quantitation_file)
+            self.peak_list = peak_list
+
+        except Exception as e:
+            self.logger.error(e)
+
+    def determine_and_attach_analytes(self):
+        try:
             analytes = []
-            for peak in peak_list:
+            for peak in self.peak_list:
                 self.peak = peak
                 analyte_buffer = Analyte(self)
                 analyte_buffer.calculate_isotopes()
@@ -186,22 +220,8 @@ class MassyToolsGui(object):
                     for isotope in analyte.isotopes:
                         if isotope.fraction == max_fraction:
                             isotope.get_accurate_mass()
-
-                mass_spectrum.calibrate()
-                self.progress.counter.set((float(index) / len(
-                                         self.mass_spectra))*100)
-                self.progress.update_progress_bar()
-            self.progress.fill_bar()
-
-            self.axes.clear()
-            for mass_spectrum in self.mass_spectra:
-                mass_spectrum.plot_mass_spectrum()
-            finalize_plot(self)
-
-            if not self.parameters.calibration_file:
-                messagebox.showinfo('Warning','No Calibration File Selected')
-        #except Exception as e:
-            #self.logger.error(e)
+        except Exception as e:
+            self.logger.error(e)
 
     def cite_window(self):
         try:

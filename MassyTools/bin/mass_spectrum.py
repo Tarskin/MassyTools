@@ -34,6 +34,7 @@ class MassSpectrum(object):
         exact_masses = []
         for analyte in self.analytes:
             for isotope in analyte.isotopes:
+                isotope.inherit_data_subset()
                 if isotope.accurate_mass:
                     accurate_masses.append(isotope.accurate_mass)
                     exact_masses.append(isotope.exact_mass)

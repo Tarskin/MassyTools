@@ -10,11 +10,13 @@ class Isotope(object):
         self.logger = logging.getLogger(__name__)
         self.settings = master.settings
         self.parameters = master.parameters
+        self.data_subset = none
         self.fraction = None
         self.exact_mass = None
         self.accurate_mass = None
+        self.intensity = None
 
-    def get_accurate_mass(self):
+    def inherit_data_subset(self):
         if self.parameters.calibration == True:
             mass_window = self.settings.calibration_window
         if self.parameters.quantitation == True:
@@ -25,6 +27,10 @@ class Isotope(object):
         right_border = bisect_right(x_data, self.exact_mass+mass_window)
         x_subset = x_data[left_border:right_border]
         y_subset = y_data[left_border:right_border]
+        self.data_subset = list(zip(x_subset, y_subset))
+
+    def get_accurate_mass(self):
+        x_subset, y_subset = zip(*self.data_subset)
         x_interpolation = np.linspace(x_subset[0], x_subset[-1],
                                       2500*(x_subset[-1]-x_subset[0]))
         f = InterpolatedUnivariateSpline(x_subset, y_subset)
@@ -32,3 +38,9 @@ class Isotope(object):
         max_value = max(y_interpolation)
         max_index = np.where(y_interpolation == max_value)
         self.accurate_mass = float(x_interpolation[max_index][0])
+
+    def quantify_isotope(self):
+        x_subset, _ = zip(*self.data_subset)
+        average_spacing = (x_subset[-1] - x_subset[0]) / len(x_subset)
+        for datapoint in self.data_subset:
+            self.intensity += datapoint[1] * average_spacing

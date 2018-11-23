@@ -177,7 +177,7 @@ class MassyToolsGui(object):
             for index, mass_spectrum in enumerate(self.mass_spectra):
                 mass_spectrum.calibrate()
                 self.progress.counter.set((float(index) / len(
-                                         self.mass_spectra))*100)
+                                           self.mass_spectra))*100)
                 self.progress.update_progress_bar()
             self.progress.fill_bar()
 
@@ -201,6 +201,16 @@ class MassyToolsGui(object):
             peak_list = functions.get_peak_list(
                 self.parameters.quantitation_file)
             self.peak_list = peak_list
+            self.determine_and_attach_analytes()
+            for index, mass_spectrum in enumerate(self.mass_spectra):
+                self.progress.counter.set((float(index) / len(
+                                           self.mass_spectra))*100)
+                self.progress.update_progress_bar()
+                for analyte in mass_spectrum.analytes:
+                    for isotope in analyte.isotopes:
+                        # Do actual stuff
+                        print (isotope.exact_mass)
+            self.progress.fill_bar()
 
             self.parameters.quantitation = False
 

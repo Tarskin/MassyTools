@@ -241,6 +241,7 @@ class MassyToolsGui(object):
                     max_fraction = max(isotope.fraction for isotope in
                                        analyte.isotopes)
                     for isotope in analyte.isotopes:
+                        isotope.inherit_data_subset()
                         if isotope.fraction == max_fraction:
                             isotope.get_accurate_mass()
         except Exception as e:

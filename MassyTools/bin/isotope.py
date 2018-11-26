@@ -10,7 +10,7 @@ class Isotope(object):
         self.logger = logging.getLogger(__name__)
         self.settings = master.settings
         self.parameters = master.parameters
-        self.data_subset = none
+        self.data_subset = None
         self.fraction = None
         self.exact_mass = None
         self.accurate_mass = None

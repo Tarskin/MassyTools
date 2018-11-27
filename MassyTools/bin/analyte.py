@@ -22,10 +22,7 @@ class Analyte(object):
         self.isotopes = []
 
     def inherit_data_subset(self):
-        if self.parameters.calibration == True:
-            mass_window = self.settings.calibration_window
-        if self.parameters.quantitation == True:
-            mass_window = self.settings.mass_window
+        mass_window = self.settings.background_window
 
         x_data, y_data = zip(*self.master.mass_spectrum.data)
         max_fraction = max(isotope.fraction for isotope in self.isotopes)

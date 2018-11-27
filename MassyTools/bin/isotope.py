@@ -40,6 +40,7 @@ class Isotope(object):
         self.accurate_mass = float(x_interpolation[max_index][0])
 
     def quantify_isotope(self):
+        self.intensity = 0.
         x_subset, _ = zip(*self.data_subset)
         average_spacing = (x_subset[-1] - x_subset[0]) / len(x_subset)
         for datapoint in self.data_subset:

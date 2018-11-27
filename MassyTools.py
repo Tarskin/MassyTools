@@ -233,7 +233,7 @@ class MassyToolsGui(object):
                 analyte_buffer.calculate_isotopes()
                 analytes.append(analyte_buffer)
 
-            for index, mass_spectrum in enumerate(self.mass_spectra):
+            for mass_spectrum in self.mass_spectra:
                 self.mass_spectrum = mass_spectrum
                 self.mass_spectrum.analytes = analytes
                 for analyte in self.mass_spectrum.analytes:

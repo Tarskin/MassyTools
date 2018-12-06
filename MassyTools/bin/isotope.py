@@ -14,6 +14,7 @@ class Isotope(object):
         self.fraction = None
         self.exact_mass = None
         self.accurate_mass = None
+        self.area = None
         self.intensity = None
 
     def inherit_data_subset(self):
@@ -41,7 +42,9 @@ class Isotope(object):
 
     def quantify_isotope(self):
         self.intensity = 0.
+        self.area = 0.
         x_subset, _ = zip(*self.data_subset)
         average_spacing = (x_subset[-1] - x_subset[0]) / len(x_subset)
         for datapoint in self.data_subset:
-            self.intensity += datapoint[1] * average_spacing
+            self.area += datapoint[1] * average_spacing
+            self.intensity = max(self.intensity, datapoint[1])

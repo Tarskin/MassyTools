@@ -33,15 +33,26 @@ class MassSpectrum(object):
         accurate_masses = []
         exact_masses = []
         for analyte in self.analytes:
+            analyte.determine_background()
             for isotope in analyte.isotopes:
-                isotope.inherit_data_subset()
                 if isotope.accurate_mass:
-                    accurate_masses.append(isotope.accurate_mass)
-                    exact_masses.append(isotope.exact_mass)
-        calibration_parameters = np.polyfit(accurate_masses, exact_masses, 2)
-        calibration_function = np.poly1d(calibration_parameters)
+                    isotope.inherit_data_subset()
+                    isotope.quantify_isotope()
+                    sn = ((isotope.intensity - analyte.background_intensity) /
+                        analyte.noise)
+                    if sn >= self.settings.calibration_sn_cutoff:
+                        accurate_masses.append(isotope.accurate_mass)
+                        exact_masses.append(isotope.exact_mass)
+                    else:
+                        self.logger.warning(str(analyte.name)+" to low S/N")
         x_values, y_values = zip(*self.data)
-        calibrated_x_values = calibration_function(x_values)
+        if len(accurate_masses) < self.settings.num_total:
+            calibrated_x_values = x_values
+            self.logger.warning(str(self.filename)+" not calibrated")
+        else:
+            calibration_parameters = np.polyfit(accurate_masses, exact_masses, 2)
+            calibration_function = np.poly1d(calibration_parameters)
+            calibrated_x_values = calibration_function(x_values)
         self.data = list(zip(calibrated_x_values, y_values))
 
     def normalize_mass_spectrum(self):

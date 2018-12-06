@@ -23,6 +23,7 @@ class Analyte(object):
         self.isotopic_pattern = None
         self.background_area = None
         self.background_intensity = None
+        self.noise = None
         self.isotopes = []
 
     def inherit_data_subset(self):
@@ -105,6 +106,7 @@ class Analyte(object):
             if statistics.mean(values) < background_point:
                 self.background_intensity = statistics.mean(values)
                 self.background_area = statistics.mean(averages)
+                self.noise = statistics.stdev(values)
 
     def attach_mass_modifiers(self):
         total_modifiers = list(self.settings.mass_modifiers)

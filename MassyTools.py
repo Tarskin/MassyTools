@@ -207,13 +207,13 @@ class MassyToolsGui(object):
                                            self.mass_spectra))*100)
                 self.progress.update_progress_bar()
                 for analyte in mass_spectrum.analytes:
+                    analyte.determine_background()
                     max_fraction = max(isotope.fraction for isotope in
                                        analyte.isotopes)
                     for isotope in analyte.isotopes:
                         if isotope.fraction == max_fraction:
                             isotope.get_accurate_mass()
                         isotope.quantify_isotope()
-                        print (isotope.intensity)
             self.progress.fill_bar()
 
             self.parameters.quantitation = False

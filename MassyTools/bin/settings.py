@@ -24,6 +24,7 @@ class Settings(object):
 
         # Changeable via source
         self.min_contribution = 0.0001
+        self.background_chunks = 4
         self.epsilon = 0.1
         self.decimal_numbers = 8
 

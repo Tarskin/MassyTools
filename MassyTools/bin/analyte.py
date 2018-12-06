@@ -1,5 +1,7 @@
 import itertools
 import logging
+import sys
+import statistics
 from bisect import bisect_left, bisect_right
 from operator import itemgetter
 import MassyTools.util.functions as functions
@@ -19,10 +21,12 @@ class Analyte(object):
         self.data_subset = None
         self.distributions = None
         self.isotopic_pattern = None
+        self.background_area = None
+        self.background_intensity = None
         self.isotopes = []
 
     def inherit_data_subset(self):
-        mass_window = self.settings.background_window
+        mass_window = self.settings.background_window+self.settings.mass_window
 
         x_data, y_data = zip(*self.master.mass_spectrum.data)
         max_fraction = max(isotope.fraction for isotope in self.isotopes)
@@ -70,6 +74,37 @@ class Analyte(object):
                     self.total_number_units += int(units[index+1])
                     if unit == 'S':
                         self.number_sialic_acids += int(units[index+1])
+
+    def determine_background(self):
+        background_point = sys.maxsize
+        x_data, y_data = zip(*self.data_subset)
+
+        max_fraction = max(isotope.fraction for isotope in self.isotopes)
+        for isotope in self.isotopes:
+            if isotope.fraction == max_fraction:
+                center_mass = isotope.exact_mass
+
+        for windows in range(-self.settings.background_window,
+                             self.settings.background_window, 
+                             self.settings.background_chunks):
+
+            values = []
+            averages = []
+
+            if (len(range(windows, windows+self.settings.background_chunks)) !=
+                self.settings.background_chunks):
+                break
+
+            for j in range(windows, windows+self.settings.background_chunks):
+                curr_mass = center_mass + j * elemental_abundances.carbon[0][2]
+                left_edge = bisect_left(x_data, curr_mass-self.settings.mass_window)
+                right_edge = bisect_right(x_data, curr_mass+self.settings.mass_window)
+                values.extend(y_data[left_edge:right_edge])
+                averages.append(statistics.mean(y_data[left_edge:right_edge]))
+
+            if statistics.mean(values) < background_point:
+                self.background_intensity = statistics.mean(values)
+                self.background_area = statistics.mean(averages)
 
     def attach_mass_modifiers(self):
         total_modifiers = list(self.settings.mass_modifiers)

@@ -1,7 +1,7 @@
 import itertools
 import logging
 import sys
-import statistics
+import numpy as np
 from bisect import bisect_left, bisect_right
 from operator import itemgetter
 import MassyTools.util.functions as functions
@@ -101,12 +101,12 @@ class Analyte(object):
                 left_edge = bisect_left(x_data, curr_mass-self.settings.mass_window)
                 right_edge = bisect_right(x_data, curr_mass+self.settings.mass_window)
                 values.extend(y_data[left_edge:right_edge])
-                averages.append(statistics.mean(y_data[left_edge:right_edge]))
+                averages.append(np.average(y_data[left_edge:right_edge]))
 
-            if statistics.mean(values) < background_point:
-                self.background_intensity = statistics.mean(values)
-                self.background_area = statistics.mean(averages)
-                self.noise = statistics.stdev(values)
+            if np.average(values) < background_point:
+                self.background_intensity = np.average(values)
+                self.background_area = np.average(averages)
+                self.noise = np.std(values)
 
     def attach_mass_modifiers(self):
         total_modifiers = list(self.settings.mass_modifiers)

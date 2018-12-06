@@ -165,7 +165,7 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
-        try:
+        #try:
             self.progress.reset_bar()
             self.parameters.calibration = True
 
@@ -190,8 +190,8 @@ class MassyToolsGui(object):
 
             if not self.parameters.calibration_file:
                 messagebox.showinfo('Warning','No Calibration File Selected')
-        except Exception as e:
-            self.logger.error(e)
+        #except Exception as e:
+            #self.logger.error(e)
 
     def quantify_mass_spectrum(self):
         try:

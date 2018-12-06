@@ -85,7 +85,7 @@ class Analyte(object):
                 center_mass = isotope.exact_mass
 
         for windows in range(-self.settings.background_window,
-                             self.settings.background_window, 
+                             self.settings.background_window,
                              self.settings.background_chunks):
 
             values = []

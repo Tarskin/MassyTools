@@ -7,7 +7,7 @@ import MassyTools.util.file_parser as file_parser
 class MassSpectrum(object):
     def __init__(self, master):
         self.settings = master.settings
-        self.parameters = master.parameters
+        self.process_parameters = master.process_parameters
         self.building_blocks = master.building_blocks
         self.logger = logging.getLogger(__name__)
         self.axes = master.axes

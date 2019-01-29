@@ -9,7 +9,7 @@ class Isotope(object):
         self.master = master
         self.logger = logging.getLogger(__name__)
         self.settings = master.settings
-        self.parameters = master.parameters
+        self.process_parameters = master.process_parameters
         self.data_subset = None
         self.fraction = None
         self.exact_mass = None
@@ -18,9 +18,9 @@ class Isotope(object):
         self.intensity = None
 
     def inherit_data_subset(self):
-        if self.parameters.calibration == True:
+        if self.process_parameters.calibration == True:
             mass_window = self.settings.calibration_window
-        if self.parameters.quantitation == True:
+        if self.process_parameters.quantitation == True:
             mass_window = self.settings.mass_window
 
         x_data, y_data = zip(*self.master.data_subset)

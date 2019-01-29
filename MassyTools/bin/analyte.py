@@ -14,7 +14,7 @@ class Analyte(object):
         self.master = master
         self.logger = logging.getLogger(__name__)
         self.settings = master.settings
-        self.parameters = master.parameters
+        self.process_parameters = master.process_parameters
         self.building_blocks = master.building_blocks
 
         self.name = master.peak['name']

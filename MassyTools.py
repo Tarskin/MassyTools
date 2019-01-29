@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# Copyright 2014-2018 Bas C. Jansen
+# Copyright 2014-2019 Bas C. Jansen
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,9 @@ from MassyTools.gui.about_window import AboutWindow
 from MassyTools.gui.cite_window import CiteWindow
 from MassyTools.bin.analyte import Analyte
 from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
-from MassyTools.bin.parameters import Parameters
+from MassyTools.bin.output import Output
+from MassyTools.bin.process_parameters import ProcessParameters
+from MassyTools.bin.output_parameters import OutputParameters
 from MassyTools.bin.settings import Settings
 
 
@@ -92,13 +94,15 @@ class MassyToolsGui(object):
                               self.baseline_correct)
         file_menu.add_command(label='Normalize', command=
                               self.normalize_mass_spectrum)
-        file_menu.add_command(label='Save', command=self.save_mass_spectrum)
+        file_menu.add_command(label='Save', command=
+                              self.save_mass_spectrum)
 
         calib_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Calibration', menu=calib_menu)
         calib_menu.add_command(label='Open Calibration File', command=
                                self.open_calibration_file)
-        calib_menu.add_command(label='Open Exclusion File', command=self.foo)
+        calib_menu.add_command(label='Open Exclusion File', command=
+                               self.foo)
         calib_menu.add_command(label='Calibrate', command=
                                self.calibrate_mass_spectrum)
 
@@ -121,8 +125,10 @@ class MassyToolsGui(object):
 
         curation_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Data Curation', menu=curation_menu)
-        curation_menu.add_command(label='Spectral Curation', command=self.foo)
-        curation_menu.add_command(label='Analyte Curation', command=self.foo)
+        curation_menu.add_command(label='Spectral Curation', command=
+                                  self.foo)
+        curation_menu.add_command(label='Analyte Curation', command=
+                                  self.foo)
 
         settings_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Settings', menu=settings_menu)
@@ -137,8 +143,10 @@ class MassyToolsGui(object):
                               self.cite_window)
 
         self.logger = logging.getLogger(__name__)
+        self.base_dir = Path.cwd()
         self.settings = Settings(self)
-        self.parameters = Parameters(self)
+        self.process_parameters = ProcessParameters(self)
+        self.output_parameters = OutputParameters(self)
         self.axes = background_image
         self.canvas = canvas
         self.progress = progress
@@ -165,12 +173,12 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
-        #try:
+        try:
             self.progress.reset_bar()
-            self.parameters.calibration = True
+            self.process_parameters.calibration = True
 
             peak_list = functions.get_peak_list(
-                self.parameters.calibration_file)
+                self.process_parameters.calibration_file)
             self.peak_list = peak_list
             self.determine_and_attach_analytes()
 
@@ -186,20 +194,21 @@ class MassyToolsGui(object):
                 mass_spectrum.plot_mass_spectrum()
             finalize_plot(self)
 
-            self.parameters.calibration = False
+            self.process_parameters.calibration = False
 
-            if not self.parameters.calibration_file:
-                messagebox.showinfo('Warning','No Calibration File Selected')
-        #except Exception as e:
-            #self.logger.error(e)
+            if not self.process_parameters.calibration_file:
+                messagebox.showinfo('Warning','No Calibration File '+
+                                    'Selected')
+        except Exception as e:
+            self.logger.error(e)
 
     def quantify_mass_spectrum(self):
         try:
             self.progress.reset_bar()
-            self.parameters.quantitation = True
+            self.process_parameters.quantitation = True
 
             peak_list = functions.get_peak_list(
-                self.parameters.quantitation_file)
+                self.process_parameters.quantitation_file)
             self.peak_list = peak_list
             self.determine_and_attach_analytes()
             for index, mass_spectrum in enumerate(self.mass_spectra):
@@ -216,7 +225,12 @@ class MassyToolsGui(object):
                         isotope.quantify_isotope()
             self.progress.fill_bar()
 
-            self.parameters.quantitation = False
+            self.output = Output(self)
+            self.output.init_output_file()
+            self.output.build_header()
+            self.output.build_output_file()
+
+            self.process_parameters.quantitation = False
 
         except Exception as e:
             self.logger.error(e)
@@ -265,17 +279,17 @@ class MassyToolsGui(object):
 
     def open_calibration_file(self):
         try:
-            cal_file = filedialog.askopenfilename(title=
-                                                  'Select Calibration File')
-            self.parameters.calibration_file = cal_file
+            cal_file = filedialog.askopenfilename(title='Select '+
+                                                  'Calibration File')
+            self.process_parameters.calibration_file = cal_file
         except Exception as e:
             self.logger.error(e)
 
     def open_mass_spectrum(self):
         try:
             data_buffer = []
-            files = filedialog.askopenfilenames(title=
-                                                'Select Mass Spectrum File(s)')
+            files = filedialog.askopenfilenames(title='Select Mass '+
+                                                'Spectrum File(s)')
             for file in files:
                 self.filename = file
                 mass_spec_buffer = MassSpectrum(self)
@@ -289,13 +303,15 @@ class MassyToolsGui(object):
                     mass_spectrum.plot_mass_spectrum()
                 finalize_plot(self)
         except Exception as e:
+            messagebox.showinfo('Warning','The selected files could '+
+                                'not be opened.')
             self.logger.error(e)
 
     def open_quantitation_file(self):
         try:
             quant_file = filedialog.askopenfilename(title=
                                                     'Select Quantitation File')
-            self.parameters.quantitation_file = quant_file
+            self.process_parameters.quantitation_file = quant_file
         except Exception as e:
             self.logger.error(e)
 

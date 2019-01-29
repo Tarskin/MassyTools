@@ -159,7 +159,24 @@ class Output(object):
             fw.write('\n')
 
     def write_mass_accuracy(self):
-        pass
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Mass Accuracy [ppm]')
+            fw.write(self.header)
+            for mass_spectrum in self.master.mass_spectra:
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                for analyte in mass_spectrum.analytes:
+                    for isotope in analyte.isotopes:
+                        if isotope.accurate_mass:
+                            # ((O-E)/E)*1^E6
+                            mass_accuracy = (
+                                ((isotope.accurate_mass -
+                                isotope.exact_mass) /
+                                isotope.exact_mass) * 1000000)
+                            fw.write('\t'+str(mass_accuracy))
+                fw.write('\n')
+            fw.write('\n')
 
     def write_rel_peak_intensity(self):
         with Path(self.master.base_dir / Path(self.filename)).open(

@@ -240,16 +240,16 @@ class MassyToolsGui(object):
 
     def determine_and_attach_analytes(self):
         try:
-            analytes = []
-            for peak in self.peak_list:
-                self.peak = peak
-                analyte_buffer = Analyte(self)
-                analyte_buffer.calculate_isotopes()
-                analytes.append(analyte_buffer)
-
             for mass_spectrum in self.mass_spectra:
+                analytes = []
                 self.mass_spectrum = mass_spectrum
+                for peak in self.peak_list:
+                    self.peak = peak
+                    analyte_buffer = Analyte(self)
+                    analyte_buffer.calculate_isotopes()
+                    analytes.append(analyte_buffer)
                 self.mass_spectrum.analytes = analytes
+
                 for analyte in self.mass_spectrum.analytes:
                     analyte.inherit_data_subset()
                     max_fraction = max(isotope.fraction for isotope in

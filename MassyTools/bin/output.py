@@ -37,22 +37,22 @@ class Output(object):
     def build_output_file(self):
         self.build_header()
 
-        if self.output_parameters.absolute_intensity == True:
-            if self.output_parameters.background_subtraction == True:
+        if self.output_parameters.absolute_intensity.get() == True:
+            if self.output_parameters.background_subtraction.get() == True:
                 self.write_back_sub_abs_peak_intensity()
             else:
-                self.foo()
+                self.write_abs_peak_intensity()
 
-        if self.output_parameters.relative_intensity == True:
-            if self.output_parameters.background_subraction == True:
-                self.foo()
+        if self.output_parameters.relative_intensity.get() == True:
+            if self.output_parameters.background_subtraction.get() == True:
+                self.write_back_sub_rel_peak_intensity()
             else:
-                self.foo()
+                self.write_rel_peak_intensity()
 
-        if self.output_parameters.analyte_quality_criteria == True:
-            self.foo()
+        if self.output_parameters.analyte_quality_criteria.get() == True:
+            self.write_mass_accuracy()
 
-        if self.output_parameters.spectral_quality_criteria == True:
+        if self.output_parameters.spectral_quality_criteria.get() == True:
             self.foo()
 
     def init_output_file(self):
@@ -100,7 +100,23 @@ class Output(object):
             fw.write('\n')
 
     def foo(self):
-        raise NotImplementedError
+        print ("Not Implemented Yet")
+
+    def write_abs_peak_intensity(self):
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Intensities')
+            fw.write(self.header)
+            for mass_spectrum in self.master.mass_spectra:
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                for analyte in mass_spectrum.analytes:
+                    intensity = 0
+                    for isotope in analyte.isotopes:
+                        intensity += isotope.intensity
+                    fw.write('\t'+str(intensity))
+                fw.write('\n')
+            fw.write('\n')
 
     def write_back_sub_abs_peak_intensity(self):
         with Path(self.master.base_dir / Path(self.filename)).open(
@@ -113,8 +129,55 @@ class Output(object):
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
-                        intensity += isotope.intensity - analyte.background_area
+                        intensity += (isotope.intensity -
+                                      analyte.background_area)
                     fw.write('\t'+str(intensity))
                 fw.write('\n')
             fw.write('\n')
-                    
+
+    def write_back_sub_rel_peak_intensity(self):
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Background Subtracted Relative Intensities')
+            fw.write(self.header)
+            for mass_spectrum in self.master.mass_spectra:
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                total_intensity = 0
+                for analyte in mass_spectrum.analytes:
+                    for isotope in analyte.isotopes:
+                        total_intensity += (isotope.intensity -
+                                            analyte.background_area)
+                for analyte in mass_spectrum.analytes:
+                    intensity = 0
+                    for isotope in analyte.isotopes:
+                        intensity += (isotope.intensity -
+                                      analyte.background_area)
+                    intensity = intensity / total_intensity
+                    fw.write('\t'+str(intensity))
+                fw.write('\n')
+            fw.write('\n')
+
+    def write_mass_accuracy(self):
+        pass
+
+    def write_rel_peak_intensity(self):
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Relative Intensities')
+            fw.write(self.header)
+            for mass_spectrum in self.master.mass_spectra:
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                total_intensity = 0
+                for analyte in mass_spectrum.analytes:
+                    for isotope in analyte.isotopes:
+                        total_intensity += isotope.intensity
+                for analyte in mass_spectrum.analytes:
+                    intensity = 0
+                    for isotope in analyte.isotopes:
+                        intensity += isotope.intensity
+                    intensity = intensity / total_intensity
+                    fw.write('\t'+str(intensity))
+                fw.write('\n')
+            fw.write('\n')

@@ -35,6 +35,7 @@ import MassyTools.gui.version as version
 import MassyTools.gui.progress_bar as progressbar
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
+from MassyTools.gui.output_window import OutputWindow
 from MassyTools.gui.settings_window import SettingsWindow
 from MassyTools.gui.about_window import AboutWindow
 from MassyTools.gui.cite_window import CiteWindow
@@ -110,6 +111,8 @@ class MassyToolsGui(object):
         menu.add_cascade(label='Quantitation', menu=quantitation_menu)
         quantitation_menu.add_command(label='Open Quantitation File',
                                       command=self.open_quantitation_file)
+        quantitation_menu.add_command(label='Specify Outputs',
+                                      command=self.open_output_window)
         quantitation_menu.add_command(label='Quantify', command=
                                       self.quantify_mass_spectrum)
 
@@ -306,6 +309,9 @@ class MassyToolsGui(object):
             messagebox.showinfo('Warning','The selected files could '+
                                 'not be opened.')
             self.logger.error(e)
+
+    def open_output_window(self):
+        OutputWindow(self)
 
     def open_quantitation_file(self):
         try:

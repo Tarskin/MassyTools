@@ -8,7 +8,7 @@ class Settings(object):
         self.config = configparser.ConfigParser()
         self.logger = logging.getLogger(__name__)
 
-        # Changeable via GUI
+        # Changeable via GUI (Mostly)
         self.mass_modifiers = ['free']
         self.charge_carrier = 'sodium'
         self.background_window = 20
@@ -46,7 +46,7 @@ class Settings(object):
         if len(self.mass_modifiers) > 1:
             mass_modifiers = ','.join(self.mass_modifiers)
         else:
-            mass_modifiers = str(self.mass_modifiers)
+            mass_modifiers = str(self.mass_modifiers[0])
         self.config.set('General', 'Mass modifiers', str(mass_modifiers))
         self.config.set('General', 'Charge carrier', str(self.charge_carrier))
         self.config.set('General', 'Background window', str(self.background_window))

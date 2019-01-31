@@ -51,9 +51,10 @@ class Output(object):
 
         if self.output_parameters.analyte_quality_criteria.get() == True:
             self.write_mass_accuracy()
+            self.write_signal_to_noise()
 
         if self.output_parameters.spectral_quality_criteria.get() == True:
-            self.foo()
+            self.write_non_quantified_fraction()
 
     def init_output_file(self):
         with Path(self.master.base_dir / Path(self.filename)).open(
@@ -106,14 +107,14 @@ class Output(object):
         with Path(self.master.base_dir / Path(self.filename)).open(
                   'a') as fw:
 
-            fw.write('Intensities')
+            fw.write('Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
                 fw.write(str(PurePath(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
-                        intensity += isotope.intensity
+                        intensity += isotope.area
                     fw.write('\t'+str(intensity))
                 fw.write('\n')
             fw.write('\n')
@@ -122,14 +123,14 @@ class Output(object):
         with Path(self.master.base_dir / Path(self.filename)).open(
                   'a') as fw:
 
-            fw.write('Background Subtracted Intensities')
+            fw.write('Background Subtracted Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
                 fw.write(str(PurePath(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
-                        intensity += (isotope.intensity -
+                        intensity += (isotope.area -
                                       analyte.background_area)
                     fw.write('\t'+str(intensity))
                 fw.write('\n')
@@ -139,19 +140,19 @@ class Output(object):
         with Path(self.master.base_dir / Path(self.filename)).open(
                   'a') as fw:
 
-            fw.write('Background Subtracted Relative Intensities')
+            fw.write('Background Subtracted Relative Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
                 fw.write(str(PurePath(mass_spectrum.filename).stem))
                 total_intensity = 0
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
-                        total_intensity += (isotope.intensity -
+                        total_intensity += (isotope.area -
                                             analyte.background_area)
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
-                        intensity += (isotope.intensity -
+                        intensity += (isotope.area -
                                       analyte.background_area)
                     intensity = intensity / total_intensity
                     fw.write('\t'+str(intensity))
@@ -182,19 +183,53 @@ class Output(object):
         with Path(self.master.base_dir / Path(self.filename)).open(
                   'a') as fw:
 
-            fw.write('Relative Intensities')
+            fw.write('Relative Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
                 fw.write(str(PurePath(mass_spectrum.filename).stem))
                 total_intensity = 0
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
-                        total_intensity += isotope.intensity
+                        total_intensity += isotope.area
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
-                        intensity += isotope.intensity
+                        intensity += isotope.area
                     intensity = intensity / total_intensity
                     fw.write('\t'+str(intensity))
                 fw.write('\n')
+            fw.write('\n')
+
+    def write_signal_to_noise(self):
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Signal-to-Noise')
+            fw.write(self.header)
+            for mass_spectrum in self.master.mass_spectra:
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                for analyte in mass_spectrum.analytes:
+                    for isotope in analyte.isotopes:
+                        if isotope.accurate_mass:
+                            signal_to_noise = (
+                                (isotope.maximum_intensity - 
+                                analyte.background_intensity) /
+                                analyte.noise)
+                            fw.write('\t'+str(signal_to_noise))
+                fw.write('\n')
+            fw.write('\n')
+
+    def write_non_quantified_fraction(self):
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Residual Intensity')
+            for mass_spectrum in self.master.mass_spectra:
+                total_spectrum_intensity = sum([x[1] for x in mass_spectrum.data])
+                total_analyte_intensity = 0
+                for analyte in mass_spectrum.analytes:
+                    for isotope in analyte.isotopes:
+                        total_analyte_intensity += isotope.total_intensity
+                fw.write('\t'+str(total_analyte_intensity /
+                                  total_spectrum_intensity))
             fw.write('\n')

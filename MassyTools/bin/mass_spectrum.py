@@ -38,7 +38,7 @@ class MassSpectrum(object):
                 if isotope.accurate_mass:
                     isotope.inherit_data_subset()
                     isotope.quantify_isotope()
-                    sn = ((isotope.intensity - analyte.background_intensity) /
+                    sn = ((isotope.maximum_intensity - analyte.background_intensity) /
                         analyte.noise)
                     if sn >= self.settings.calibration_sn_cutoff:
                         accurate_masses.append(isotope.accurate_mass)

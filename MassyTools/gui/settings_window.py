@@ -47,20 +47,20 @@ class SettingsWindow(object):
         )
 
     def create_window(self):
-        root = tk.Tk()
+        root = tk.Toplevel()
         root.protocol( "WM_DELETE_WINDOW", self.close_settings_window)
 
         calibration_label = tk.Label(root, text="Calibration parameters",
                                      font="bold")
         calibration_label.grid(row=1, columnspan=2, sticky=tk.W)
+
         calibration_window_label = tk.Label(root, text="m/z window for "+
                                             "calibration")
         calibration_window_label.grid(row=2, column=0, sticky=tk.W)
-
         calibration_window = tk.Entry(root)
         calibration_window.insert(0, self.settings.calibration_window)
         calibration_window.grid(row=2, column=1, sticky=tk.W)
-
+        
         calibration_sn_label = tk.Label(root, text="Minimal S/N for "+
                                         "calibration")
         calibration_sn_label.grid(row=3, column=0, sticky=tk.W)
@@ -128,11 +128,11 @@ class SettingsWindow(object):
         extraction_qc_sn.insert(0, self.settings.sn_cutoff)
         extraction_qc_sn.grid(row=12, column=1, sticky=tk.W)
 
-        self.ok = tk.Button(root,text = 'Ok', command=
+        ok = tk.Button(root,text = 'Ok', command=
                             self.close_settings_window)
-        self.ok.grid(row = 13, column = 0, sticky = tk.W)
-        self.save = tk.Button(root, text = 'Save', command=self.save_settings)
-        self.save.grid(row = 13, column = 1, sticky = tk.E)
+        ok.grid(row = 13, column = 0, sticky = tk.W)
+        save = tk.Button(root, text = 'Save', command=self.save_settings)
+        save.grid(row = 13, column = 1, sticky = tk.E)
 
         # Tooltips
         create_tooltip(calibration_window_label, "The mass window in Dalton "+

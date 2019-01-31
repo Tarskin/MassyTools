@@ -37,6 +37,7 @@ import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
 from MassyTools.gui.output_window import OutputWindow
 from MassyTools.gui.settings_window import SettingsWindow
+from MassyTools.gui.experimental_settings_window import ExperimentalSettingsWindow
 from MassyTools.gui.about_window import AboutWindow
 from MassyTools.gui.cite_window import CiteWindow
 from MassyTools.bin.analyte import Analyte
@@ -78,7 +79,8 @@ class MassyToolsGui(object):
         canvas.draw()
 
         tk.Frame(master)
-        master.title("MassyTools "+str(version.version))
+        master.title('MassyTools '+str(version.version)+
+                     ' (build '+str(version.build)+')')
         progress = progressbar.SimpleProgressBar(self)
         progress.bar.pack()
         if (Path.cwd() / 'ui' / 'Icon.ico').is_file():
@@ -135,8 +137,11 @@ class MassyToolsGui(object):
 
         settings_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Settings', menu=settings_menu)
-        settings_menu.add_command(label='Settings', command=
+        settings_menu.add_command(label='MassyTools Settings', command=
                                   self.settings_window)
+        settings_menu.add_command(
+                label='Experimental Settings', command=
+                self.experimental_settings_window)
 
         info_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Information', menu=info_menu)
@@ -235,6 +240,12 @@ class MassyToolsGui(object):
 
             self.process_parameters.quantitation = False
 
+        except Exception as e:
+            self.logger.error(e)
+
+    def experimental_settings_window(self):
+        try:
+            ExperimentalSettingsWindow(self)
         except Exception as e:
             self.logger.error(e)
 

@@ -301,15 +301,20 @@ class MassyToolsGui(object):
 
     def open_mass_spectrum(self):
         try:
+            self.progress.reset_bar()
             data_buffer = []
             files = filedialog.askopenfilenames(title='Select Mass '+
                                                 'Spectrum File(s)')
-            for file in files:
+            for index, file in enumerate(files):
+                self.progress.counter.set((float(index) /
+                                           len(files))*100)
+                self.progress.update_progress_bar()
                 self.filename = file
                 mass_spec_buffer = MassSpectrum(self)
                 mass_spec_buffer.open_mass_spectrum()
                 data_buffer.append(mass_spec_buffer)
             self.mass_spectra = data_buffer
+            self.progress.fill_bar()
 
             if self.mass_spectra:
                 self.axes.clear()

@@ -225,11 +225,12 @@ class Output(object):
 
             fw.write('Residual Intensity')
             for mass_spectrum in self.master.mass_spectra:
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
                 total_spectrum_intensity = sum([x[1] for x in mass_spectrum.data])
                 total_analyte_intensity = 0
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
                         total_analyte_intensity += isotope.total_intensity
                 fw.write('\t'+str(total_analyte_intensity /
-                                  total_spectrum_intensity))
+                                  total_spectrum_intensity)+'\n')
             fw.write('\n')

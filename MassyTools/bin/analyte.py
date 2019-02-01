@@ -18,6 +18,7 @@ class Analyte(object):
         self.building_blocks = master.building_blocks
 
         self.name = master.peak['name']
+        self.charge = master.charge
         self.data_subset = None
         self.distributions = None
         self.isotopic_pattern = None
@@ -32,7 +33,7 @@ class Analyte(object):
         x_data, y_data = zip(*self.master.mass_spectrum.data)
         max_fraction = max(isotope.fraction for isotope in self.isotopes)
         for isotope in self.isotopes:
-            if isotope.fraction == max_fraction:
+            if isotope.fraction == max_fraction and isotope.charge == self.charge:
                 center_mass = isotope.exact_mass
         left_border = bisect_left(x_data, center_mass-mass_window)
         right_border = bisect_right(x_data, center_mass+mass_window)
@@ -110,7 +111,8 @@ class Analyte(object):
 
     def attach_mass_modifiers(self):
         total_modifiers = list(self.settings.mass_modifiers)
-        total_modifiers.append(self.settings.charge_carrier)
+        for _ in range(self.charge):
+            total_modifiers.append(self.settings.charge_carrier)
 
         # Modifiers that are independent of other modifiers
         for modifier in total_modifiers:
@@ -167,9 +169,9 @@ class Analyte(object):
         sulfurs36 = functions.calculate_elemental_isotopic_pattern(
                   elemental_abundances.sulfur36, self.number_sulfurs)
         self.distributions = {'carbons': carbons, 'hydrogens': hydrogens,
-                                'nitrogens': nitrogens, 'oxygens17': oxygens17,
-                                'oxygens18': oxygens18, 'sulfurs33':sulfurs33,
-                                'sulfurs34': sulfurs34, 'sulfurs36': sulfurs36}
+                              'nitrogens': nitrogens, 'oxygens17': oxygens17,
+                              'oxygens18': oxygens18, 'sulfurs33':sulfurs33,
+                              'sulfurs34': sulfurs34, 'sulfurs36': sulfurs36}
 
     def combine_distributions(self):
         totals = []
@@ -180,8 +182,9 @@ class Analyte(object):
             self.distributions['sulfurs34'], self.distributions['sulfurs36']
         ):
             i, j, k, l, m, n, o, p = x
-            totals.append((self.mass+i[0]+j[0]+k[0]+l[0]+m[0]+n[0]+o[0]+p[0],
-                           i[1]*j[1]*k[1]*l[1]*m[1]*n[1]*o[1]*p[1]))
+            totals.append((
+                (self.mass+i[0]+j[0]+k[0]+l[0]+m[0]+n[0]+o[0]+p[0]) /
+                 self.charge, i[1]*j[1]*k[1]*l[1]*m[1]*n[1]*o[1]*p[1]))
         self.distributions = totals
 
     def attach_isotopes(self):

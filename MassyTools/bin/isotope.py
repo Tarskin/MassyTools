@@ -10,6 +10,7 @@ class Isotope(object):
         self.logger = logging.getLogger(__name__)
         self.settings = master.settings
         self.process_parameters = master.process_parameters
+        self.charge = master.charge
         self.data_subset = None
         self.fraction = None
         self.exact_mass = None
@@ -22,7 +23,7 @@ class Isotope(object):
         if self.process_parameters.calibration == True:
             mass_window = self.settings.calibration_window
         if self.process_parameters.quantitation == True:
-            mass_window = self.settings.mass_window
+            mass_window = self.settings.mass_window / self.charge
 
         x_data, y_data = zip(*self.master.data_subset)
         left_border = bisect_left(x_data, self.exact_mass-mass_window)

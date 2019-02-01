@@ -24,8 +24,8 @@ class ExperimentalSettingsWindow(object):
                 if mass_modifier == self.building_blocks[building_block]['human_readable_name']:
                     mass_modifiers.append(building_block)
         self.settings.mass_modifiers = mass_modifiers
-        self.settings.min_charge_state = self.min_charge.get()
-        self.settings.max_charge_state = self.max_charge.get()
+        self.settings.min_charge_state = int(self.min_charge.get())
+        self.settings.max_charge_state = int(self.max_charge.get())
 
     def create_window(self):
         # This can be prettier

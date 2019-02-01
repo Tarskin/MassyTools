@@ -19,7 +19,8 @@ class Output(object):
         header = ''
         for mass_spectrum in self.master.mass_spectra:
             for analyte in mass_spectrum.analytes:
-                header = header + '\t' + str(analyte.name)
+                header = (header + '\t' + str(analyte.name) + ' [' +
+                         str(analyte.charge) + 'z]')
             header = header + '\n'
             break
 
@@ -220,7 +221,7 @@ class Output(object):
         with Path(self.master.base_dir / Path(self.filename)).open(
                   'a') as fw:
 
-            fw.write('Residual Intensity')
+            fw.write('Residual Intensity\n')
             for mass_spectrum in self.master.mass_spectra:
                 fw.write(str(PurePath(mass_spectrum.filename).stem))
                 total_spectrum_intensity = sum([x[1] for x in mass_spectrum.data])

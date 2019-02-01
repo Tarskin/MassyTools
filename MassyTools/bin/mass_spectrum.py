@@ -35,7 +35,7 @@ class MassSpectrum(object):
         for analyte in self.analytes:
             analyte.determine_background()
             for isotope in analyte.isotopes:
-                if isotope.accurate_mass:
+                if isotope.accurate_mass and isotope.charge == analyte.charge:
                     isotope.inherit_data_subset()
                     isotope.quantify_isotope()
                     sn = ((isotope.maximum_intensity - analyte.background_intensity) /
@@ -44,11 +44,15 @@ class MassSpectrum(object):
                         accurate_masses.append(isotope.accurate_mass)
                         exact_masses.append(isotope.exact_mass)
                     else:
-                        self.logger.warning(str(analyte.name)+" to low S/N")
+                        self.logger.warning(str(analyte.name) +
+                                ' with charge ' + str(analyte.charge) +
+                                ' and an m/z of ' + 
+                                str(isotope.exact_mass) + ' had a S/N' +
+                                ' of '+str(sn) + ' and was ignored')
         x_values, y_values = zip(*self.data)
         if len(accurate_masses) < self.settings.num_total:
             calibrated_x_values = x_values
-            self.logger.warning(str(self.filename)+" not calibrated")
+            self.logger.warning(str(self.filename)+' not calibrated')
         else:
             calibration_parameters = np.polyfit(accurate_masses, exact_masses, 2)
             calibration_function = np.poly1d(calibration_parameters)

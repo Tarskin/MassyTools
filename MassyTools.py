@@ -228,7 +228,8 @@ class MassyToolsGui(object):
                     max_fraction = max(isotope.fraction for isotope in
                                        analyte.isotopes)
                     for isotope in analyte.isotopes:
-                        if isotope.fraction == max_fraction:
+                        if (isotope.fraction == max_fraction and
+                                    isotope.charge == analyte.charge):
                             isotope.get_accurate_mass()
                         isotope.quantify_isotope()
             self.progress.fill_bar()
@@ -255,10 +256,30 @@ class MassyToolsGui(object):
                 analytes = []
                 self.mass_spectrum = mass_spectrum
                 for peak in self.peak_list:
-                    self.peak = peak
-                    analyte_buffer = Analyte(self)
-                    analyte_buffer.calculate_isotopes()
-                    analytes.append(analyte_buffer)
+                    for charge in range(
+                                self.settings.min_charge_state,
+                                self.settings.max_charge_state+1):
+                        self.peak = peak
+                        self.charge = charge
+                        analyte_buffer = Analyte(self)
+                        analyte_buffer.calculate_isotopes()
+                        low_border = (
+                                analyte_buffer.isotopes[0].exact_mass -
+                                self.settings.background_window)
+                        high_border = (
+                                analyte_buffer.isotopes[-1].exact_mass +
+                                self.settings.background_window)
+                        if (low_border > mass_spectrum.data[0][0] and
+                                    high_border < 
+                                    mass_spectrum.data[-1][0]):
+                            analytes.append(analyte_buffer)
+                        else:
+                            self.logger.warning(
+                                    str(analyte_buffer.name)+' with '+
+                                    'charge '+str(self.charge)+' '+
+                                    'being omitted because it falls '+
+                                    'outside of the mass spectrum '+
+                                    'range.')
                 self.mass_spectrum.analytes = analytes
 
                 for analyte in self.mass_spectrum.analytes:
@@ -267,7 +288,8 @@ class MassyToolsGui(object):
                                        analyte.isotopes)
                     for isotope in analyte.isotopes:
                         isotope.inherit_data_subset()
-                        if isotope.fraction == max_fraction:
+                        if (isotope.fraction == max_fraction and 
+                                    isotope.charge == analyte.charge):
                             isotope.get_accurate_mass()
         except Exception as e:
             self.logger.error(e)
@@ -331,8 +353,8 @@ class MassyToolsGui(object):
 
     def open_quantitation_file(self):
         try:
-            quant_file = filedialog.askopenfilename(title=
-                                                    'Select Quantitation File')
+            quant_file = filedialog.askopenfilename(
+                    title='Select Quantitation File')
             self.process_parameters.quantitation_file = quant_file
         except Exception as e:
             self.logger.error(e)

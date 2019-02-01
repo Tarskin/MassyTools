@@ -100,9 +100,6 @@ class Output(object):
                      self.settings.decimal_numbers)+'\n')
             fw.write('\n')
 
-    def foo(self):
-        print ("Not Implemented Yet")
-
     def write_abs_peak_intensity(self):
         with Path(self.master.base_dir / Path(self.filename)).open(
                   'a') as fw:

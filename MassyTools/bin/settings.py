@@ -11,6 +11,8 @@ class Settings(object):
         # Changeable via GUI (Mostly)
         self.mass_modifiers = ['free']
         self.charge_carrier = 'sodium'
+        self.min_charge_state = 1
+        self.max_charge_state = 1
         self.background_window = 20
         self.calibration_window = 0.4
         self.calibration_sn_cutoff = 9.0
@@ -49,6 +51,8 @@ class Settings(object):
             mass_modifiers = str(self.mass_modifiers[0])
         self.config.set('General', 'Mass modifiers', str(mass_modifiers))
         self.config.set('General', 'Charge carrier', str(self.charge_carrier))
+        self.config.set('General', 'Minimum charge state', str(self.min_charge_state))
+        self.config.set('General', 'Maximum charge state', str(self.max_charge_state))
         self.config.set('General', 'Background window', str(self.background_window))
         self.config.set('Calibration', 'Mass window', str(self.calibration_window))
         self.config.set('Calibration', 'SN cutoff', str(self.calibration_sn_cutoff))
@@ -67,6 +71,8 @@ class Settings(object):
             self.config.read('MassyTools.ini')
             self.mass_modifiers = self.config.get('General', 'Mass modifiers')
             self.charge_carrier = self.config.get('General', 'Charge carrier')
+            self.min_charge_state = self.config.get('General', 'Minimum charge state')
+            self.max_charge_state = self.config.get('General', 'Maximum charge state')
             self.background_window = self.config.getint('General', 'Background window')
             self.calibration_window = self.config.getfloat('Calibration', 'Mass window')
             self.calibration_sn_cutoff = self.config.getfloat('Calibration', 'SN cutoff')

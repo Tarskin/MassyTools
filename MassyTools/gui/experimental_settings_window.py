@@ -24,6 +24,8 @@ class ExperimentalSettingsWindow(object):
                 if mass_modifier == self.building_blocks[building_block]['human_readable_name']:
                     mass_modifiers.append(building_block)
         self.settings.mass_modifiers = mass_modifiers
+        self.settings.min_charge_state = self.min_charge.get()
+        self.settings.max_charge_state = self.max_charge.get()
 
     def create_window(self):
         # This can be prettier
@@ -61,19 +63,33 @@ class ExperimentalSettingsWindow(object):
         charge_carrier = tk.OptionMenu(root, charge_carrier_var, *options)
         charge_carrier.grid(row=2, column=1, sticky=tk.W)
 
+        min_charge_label = tk.Label(root, text='Minimum Charge state')
+        min_charge_label.grid(row=3, column=0, sticky=tk.W)
+        min_charge = tk.Spinbox(root, from_=1, to=5, width=3)
+        min_charge.delete(0, 'end')
+        min_charge.insert(0, self.settings.min_charge_state)
+        min_charge.grid(row=3, column=1, sticky=tk.W)
+
+        max_charge_label = tk.Label(root, text='Maximum Charge State')
+        max_charge_label.grid(row=4, column=0, sticky=tk.W)
+        max_charge = tk.Spinbox(root, from_=1, to=5, width=3)
+        max_charge.delete(0, 'end')
+        max_charge.insert(0, self.settings.max_charge_state)
+        max_charge.grid(row=4, column=1, sticky=tk.W)
+
         available_modifier_label = tk.Label(root, text='Available '+
                                             'Mass Modifiers')
-        available_modifier_label.grid(row=3, column=0, sticky=tk.W)
+        available_modifier_label.grid(row=5, column=0, sticky=tk.W)
         selected_modifier_label = tk.Label(root, text='Selected '+
                                            'Mass Modifiers')
-        selected_modifier_label.grid(row=3, column=1, sticky=tk.W)
+        selected_modifier_label.grid(row=5, column=1, sticky=tk.W)
 
         available_modifier = tk.Listbox(root)
-        available_modifier.grid(row=4, column=0, columnspan=2,
+        available_modifier.grid(row=6, column=0, columnspan=2,
                                 sticky=tk.W)
         available_modifier.bind('<<ListboxSelect>>', onselect1)
         selected_modifier = tk.Listbox(root)
-        selected_modifier.grid(row=4, column=1, columnspan=2,
+        selected_modifier.grid(row=6, column=1, columnspan=2,
                                sticky=tk.W)
         selected_modifier.bind('<<ListboxSelect>>', onselect2)
         for building_block in self.building_blocks:
@@ -83,17 +99,13 @@ class ExperimentalSettingsWindow(object):
                 available_modifier.insert(tk.END, self.building_blocks[building_block]['human_readable_name'])
 
         ok = tk.Button(root, text='Ok', command=self.close_settings_window)
-        ok.grid(row=5, column=0, sticky=tk.W)
+        ok.grid(row=7, column=0, sticky=tk.W)
         save = tk.Button(root, text='Save', command=self.save_settings)
-        save.grid(row=5, column=1, sticky=tk.E)
+        save.grid(row=7, column=1, sticky=tk.E)
 
         # Self assignment
         self.root = root
         self.charge_carrier_var = charge_carrier_var
         self.selected_modifier = selected_modifier
-        #self.minCharge = Spinbox(top, from_= 1, to = 3, width = 5)
-        #self.minCharge.grid(row = 0, column = 2, sticky = W)
-        #self.max = Label(top, text = "Max", width = 5)
-        #self.max.grid(row = 0, column = 3, sticky = W)
-        #self.maxCharge = Spinbox(top, from_ = 1, to=3, width=5)
-        #self.maxCharge.grid(row = 0, column = 4, sticky = W)
+        self.min_charge = min_charge
+        self.max_charge = max_charge

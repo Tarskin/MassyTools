@@ -212,7 +212,7 @@ class Output(object):
                     for isotope in analyte.isotopes:
                         if isotope.accurate_mass:
                             signal_to_noise = (
-                                (isotope.maximum_intensity - 
+                                (isotope.maximum_intensity -
                                 analyte.background_intensity) /
                                 analyte.noise)
                             fw.write('\t'+str(signal_to_noise))

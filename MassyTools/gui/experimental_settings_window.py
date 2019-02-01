@@ -103,6 +103,34 @@ class ExperimentalSettingsWindow(object):
         save = tk.Button(root, text='Save', command=self.save_settings)
         save.grid(row=7, column=1, sticky=tk.E)
 
+        # Tooltips
+        create_tooltip(charge_carrier_label, 'The ion that is '+
+                       'attached to the analytes, hereafter referred '+
+                       'to as the charge carrier. New charge carriers '+
+                       'can be added by creating a new file in the '+
+                       'blocks directory and setting the parameter'+
+                       '`available_for_charge_carrier` to 1.')
+        create_tooltip(min_charge_label, 'The lowest charge state '+
+                       'that should be considered for both '+
+                       'calibration and quantitation.')
+        create_tooltip(max_charge_label, 'The highest charge state '+
+                       'that should be considered for both '+
+                       'calibration and quantitation.')
+        create_tooltip(available_modifier_label, 'This lists all '+
+                       'molecules that can be attached to the '+
+                       'analytes, hereafter referred to as adducts. '+
+                       'New mass modifiers can be added by creating '+
+                       'a new file in the `blocks` directory of the '+
+                       'software and setting the parameter '+
+                       '`available_for_mass_modifier` to 1.')
+        create_tooltip(selected_modifier_label, 'This lists all '+
+                       'molecules that are currently attached to the '+
+                       'analytes, hereafter referred to as adducts. '+
+                       'New mass modifiers can be added by creating '+
+                       'a new file in the `blocks` directory of the '+
+                       'software and setting the parameter '+
+                       '`available_for_mass_modifier` to 1.')
+
         # Self assignment
         self.root = root
         self.charge_carrier_var = charge_carrier_var

@@ -44,7 +44,7 @@ class OutputWindow(object):
                 variable=self.output_parameters.analyte_quality_criteria,
                 onvalue=1, offvalue=0)
         analyte_quality_button.grid(row=4, column=0, sticky=tk.W)
-        
+
         spectral_quality_button = tk.Checkbutton(
                 self.top, text="Spectral Quality Criteria",
                 variable=self.output_parameters.spectral_quality_criteria,

@@ -60,7 +60,7 @@ class SettingsWindow(object):
         calibration_window = tk.Entry(root)
         calibration_window.insert(0, self.settings.calibration_window)
         calibration_window.grid(row=2, column=1, sticky=tk.W)
-        
+
         calibration_sn_label = tk.Label(root, text="Minimal S/N for "+
                                         "calibration")
         calibration_sn_label.grid(row=3, column=0, sticky=tk.W)

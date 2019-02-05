@@ -270,7 +270,7 @@ class MassyToolsGui(object):
                                 analyte_buffer.isotopes[-1].exact_mass +
                                 self.settings.background_window)
                         if (low_border > mass_spectrum.data[0][0] and
-                                    high_border < 
+                                    high_border <
                                     mass_spectrum.data[-1][0]):
                             analytes.append(analyte_buffer)
                         else:
@@ -288,7 +288,7 @@ class MassyToolsGui(object):
                                        analyte.isotopes)
                     for isotope in analyte.isotopes:
                         isotope.inherit_data_subset()
-                        if (isotope.fraction == max_fraction and 
+                        if (isotope.fraction == max_fraction and
                                     isotope.charge == analyte.charge):
                             isotope.get_accurate_mass()
         except Exception as e:

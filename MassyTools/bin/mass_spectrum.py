@@ -46,7 +46,7 @@ class MassSpectrum(object):
                     else:
                         self.logger.warning(str(analyte.name) +
                                 ' with charge ' + str(analyte.charge) +
-                                ' and an m/z of ' + 
+                                ' and an m/z of ' +
                                 str(isotope.exact_mass) + ' had a S/N' +
                                 ' of '+str(sn) + ' and was ignored')
         x_values, y_values = zip(*self.data)

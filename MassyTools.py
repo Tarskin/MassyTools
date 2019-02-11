@@ -19,7 +19,7 @@
 
 # Standard Library Imports
 import logging
-from pathlib import Path, PurePath
+from pathlib import Path
 
 # Third Party Imports
 import matplotlib
@@ -43,6 +43,7 @@ from MassyTools.gui.cite_window import CiteWindow
 from MassyTools.bin.analyte import Analyte
 from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 from MassyTools.bin.output import Output
+from MassyTools.bin.pdf import Pdf
 from MassyTools.bin.process_parameters import ProcessParameters
 from MassyTools.bin.output_parameters import OutputParameters
 from MassyTools.bin.settings import Settings
@@ -210,6 +211,20 @@ class MassyToolsGui(object):
         except Exception as e:
             self.logger.error(e)
 
+    def generate_pdf_report(self):
+        try:
+            for mass_spectrum in self.mass_spectra:
+                self.mass_spectrum = mass_spectrum
+                pdf = Pdf(self)
+                pdf.attach_meta_data()
+                pdf.plot_mass_spectrum()
+                for analyte in mass_spectrum.analytes:
+                    self.analyte = analyte
+                    pdf.plot_mass_spectrum_peak()
+                pdf.close_pdf()
+        except Exception as e:
+            self.logger.error(e)
+
     def quantify_mass_spectrum(self):
         try:
             self.progress.reset_bar()
@@ -233,6 +248,8 @@ class MassyToolsGui(object):
                             isotope.get_accurate_mass()
                         isotope.quantify_isotope()
             self.progress.fill_bar()
+
+            self.generate_pdf_report()
 
             self.output = Output(self)
             self.output.init_output_file()
@@ -363,7 +380,7 @@ class MassyToolsGui(object):
         building_blocks = {}
         block_folder = Path.cwd() / 'blocks'
         for file in block_folder.glob('*.block'):
-            block = PurePath(file).stem
+            block = Path(file).stem
             keys = []
             values = []
             with open(file,'r') as fr:

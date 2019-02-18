@@ -258,7 +258,8 @@ class MassyToolsGui(object):
             self.task_label.set('Idle')
             self.progress.fill_bar()
 
-            self.generate_pdf_report()
+            if self.output_parameters.pdf_report.get() == True:
+                self.generate_pdf_report()
 
             self.output = Output(self)
             self.output.init_output_file()

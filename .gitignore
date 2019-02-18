@@ -5,3 +5,4 @@ unittest.py
 Settings.txt
 *.ref
 *.pptx
+*.ini

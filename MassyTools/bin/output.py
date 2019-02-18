@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from pathlib import Path, PurePath
+from pathlib import Path
 import MassyTools.gui.version as version
 
 
@@ -109,7 +109,7 @@ class Output(object):
             fw.write('Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
@@ -125,7 +125,7 @@ class Output(object):
             fw.write('Background Subtracted Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analytes:
                     intensity = 0
                     for isotope in analyte.isotopes:
@@ -142,7 +142,7 @@ class Output(object):
             fw.write('Background Subtracted Relative Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 total_intensity = 0
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
@@ -165,9 +165,8 @@ class Output(object):
             fw.write('Isotopic Pattern Quality')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                # TODO: This can probably be done without PurePath
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
-                for analyte in mass_spectrum.analtes:
+                fw.write(str(Path(mass_spectrum.filename).stem))
+                for analyte in mass_spectrum.analytes:
                     total_intensity = 0.
                     for isotope in analyte.isotopes:
                         total_intensity += (isotope.area -
@@ -188,7 +187,7 @@ class Output(object):
             fw.write('Mass Accuracy [ppm]')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
                         if isotope.accurate_mass:
@@ -208,7 +207,7 @@ class Output(object):
             fw.write('Relative Intensities (Area)')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 total_intensity = 0
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
@@ -229,7 +228,7 @@ class Output(object):
             fw.write('Signal-to-Noise')
             fw.write(self.header)
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analytes:
                     for isotope in analyte.isotopes:
                         if isotope.accurate_mass:
@@ -247,7 +246,7 @@ class Output(object):
 
             fw.write('Residual Intensity\n')
             for mass_spectrum in self.master.mass_spectra:
-                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                fw.write(str(Path(mass_spectrum.filename).stem))
                 total_spectrum_intensity = sum([x[1] for x in mass_spectrum.data])
                 total_analyte_intensity = 0
                 for analyte in mass_spectrum.analytes:

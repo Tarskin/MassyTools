@@ -27,7 +27,7 @@ class OutputParameters(object):
                         str(self.absolute_intensity.get()))
         self.config.set('Output', 'Relative Intensity',
                         str(self.relative_intensity.get()))
-        self.config.set('Output', 'Background Subraction',
+        self.config.set('Output', 'Background Subtraction',
                         str(self.background_subtraction.get()))
         self.config.set('Output', 'Analyte Quality Criteria',
                         str(self.analyte_quality_criteria.get()))
@@ -44,7 +44,7 @@ class OutputParameters(object):
 
             try:
                 self.absolute_intensity.set(int(
-                    self.config.get('Output', 'Abbsolute Intensity')))
+                    self.config.get('Output', 'Absolute Intensity')))
             except (configparser.NoSectionError,
                     configparser.NoOptionError):
                 pass

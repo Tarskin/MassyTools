@@ -35,17 +35,17 @@ class Settings(object):
     def save_to_disk(self):
         try:
             self.config.add_section('General')
-        except configparser.DuplicateSectionError as e:
+        except configparser.DuplicateSectionError:
             pass
 
         try:
             self.config.add_section('Calibration')
-        except configparser.DuplicateSectionError as e:
+        except configparser.DuplicateSectionError:
             pass
 
         try:
             self.config.add_section('Quantitation')
-        except configparser.DuplicateSectionError as e:
+        except configparser.DuplicateSectionError:
             pass
 
         if len(self.mass_modifiers) > 1:

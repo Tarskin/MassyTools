@@ -233,7 +233,7 @@ class MassyToolsGui(object):
                 pdf.plot_mass_spectrum()
                 for analyte in mass_spectrum.analytes:
                     self.analyte = analyte
-                    #pdf.plot_mass_spectrum_peak()
+                    pdf.plot_mass_spectrum_peak()
                 pdf.close_pdf()
             self.task_label.set('Idle')
             

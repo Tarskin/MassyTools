@@ -168,7 +168,7 @@ class Output(object):
                 # TODO: This can probably be done without PurePath
                 fw.write(str(PurePath(mass_spectrum.filename).stem))
                 for analyte in mass_spectrum.analtes:
-                    total_area = 0.
+                    total_intensity = 0.
                     for isotope in analyte.isotopes:
                         total_intensity += (isotope.area -
                                             analyte.background_area)

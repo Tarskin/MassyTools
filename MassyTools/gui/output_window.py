@@ -71,7 +71,7 @@ class OutputWindow(object):
 
     def save_output_settings(self):
         self.output_parameters.save_to_disk()
-    
+
     def select_all_output_settings(self):
         """Set all variables to on (1).
         """

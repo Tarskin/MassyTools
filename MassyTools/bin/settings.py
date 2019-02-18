@@ -36,15 +36,18 @@ class Settings(object):
         try:
             self.config.add_section('General')
         except configparser.DuplicateSectionError as e:
-            self.logger.error(e)
+            pass
+
         try:
             self.config.add_section('Calibration')
         except configparser.DuplicateSectionError as e:
-            self.logger.error(e)
+            pass
+
         try:
             self.config.add_section('Quantitation')
         except configparser.DuplicateSectionError as e:
-            self.logger.error(e)
+            pass
+
         if len(self.mass_modifiers) > 1:
             mass_modifiers = ','.join(self.mass_modifiers)
         else:
@@ -69,18 +72,106 @@ class Settings(object):
     def read_from_disk(self):
         if Path(Path.cwd() / 'MassyTools.ini').is_file():
             self.config.read('MassyTools.ini')
-            self.mass_modifiers = self.config.get('General', 'Mass modifiers')
-            self.charge_carrier = self.config.get('General', 'Charge carrier')
-            self.min_charge_state = int(self.config.get('General', 'Minimum charge state'))
-            self.max_charge_state = int(self.config.get('General', 'Maximum charge state'))
-            self.background_window = int(self.config.getint('General', 'Background window'))
-            self.calibration_window = float(self.config.getfloat('Calibration', 'Mass window'))
-            self.calibration_sn_cutoff = int(self.config.getfloat('Calibration', 'SN cutoff'))
-            self.num_low_mass = int(self.config.getint('Calibration', 'Min low mass'))
-            self.num_medium_mass = int(self.config.getint('Calibration', 'Min medium mass'))
-            self.num_high_mass = int(self.config.getint('Calibration', 'Min high mass'))
-            self.num_total = int(self.config.getint('Calibration', 'Min total'))
-            self.mass_window = float(self.config.getfloat('Quantitation', 'Mass window'))
-            self.sn_cutoff = int(self.config.getfloat('Quantitation', 'SN cutoff'))
-            self.min_total_contribution = float(self.config.getfloat('Quantitation', 'Min isotopic contribution'))
-            self.mass_modifiers = self.mass_modifiers.split(',')
+            try:
+                self.mass_modifiers = self.config.get(
+                        'General', 'Mass modifiers')
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.charge_carrier = self.config.get(
+                        'General', 'Charge carrier')
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.min_charge_state = int(self.config.get(
+                        'General', 'Minimum charge state'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.max_charge_state = int(self.config.get(
+                        'General', 'Maximum charge state'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.background_window = int(self.config.getint(
+                        'General', 'Background window'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.calibration_window = float(self.config.getfloat(
+                        'Calibration', 'Mass window'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.calibration_sn_cutoff = int(self.config.getfloat(
+                        'Calibration', 'SN cutoff'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.num_low_mass = int(self.config.getint(
+                        'Calibration', 'Min low mass'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.num_medium_mass = int(self.config.getint(
+                        'Calibration', 'Min medium mass'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.num_high_mass = int(self.config.getint(
+                        'Calibration', 'Min high mass'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.num_total = int(self.config.getint(
+                        'Calibration', 'Min total'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.mass_window = float(self.config.getfloat(
+                        'Quantitation', 'Mass window'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.sn_cutoff = int(self.config.getfloat(
+                        'Quantitation', 'SN cutoff'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.min_total_contribution = float(self.config.getfloat(
+                        'Quantitation', 'Min isotopic contribution'))
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass
+
+            try:
+                self.mass_modifiers = self.mass_modifiers.split(',')
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError):
+                pass

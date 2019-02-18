@@ -30,7 +30,7 @@ class Analyte(object):
     def inherit_data_subset(self):
         mass_window = self.settings.background_window+self.settings.mass_window
 
-        x_data, y_data = zip(*self.master.mass_spectrum.data)
+        x_data, y_data = zip(*self.master.data)
         max_fraction = max(isotope.fraction for isotope in self.isotopes)
         for isotope in self.isotopes:
             if isotope.fraction == max_fraction and isotope.charge == self.charge:

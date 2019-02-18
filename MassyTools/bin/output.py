@@ -53,6 +53,7 @@ class Output(object):
         if self.output_parameters.analyte_quality_criteria.get() == True:
             self.write_mass_accuracy()
             self.write_signal_to_noise()
+            self.write_isotopic_pattern_quality()
 
         if self.output_parameters.spectral_quality_criteria.get() == True:
             self.write_non_quantified_fraction()
@@ -154,6 +155,29 @@ class Output(object):
                                       analyte.background_area)
                     intensity = intensity / total_intensity
                     fw.write('\t'+str(intensity))
+                fw.write('\n')
+            fw.write('\n')
+
+    def write_isotopic_pattern_quality(self):
+        with Path(self.master.base_dir / Path(self.filename)).open(
+                  'a') as fw:
+
+            fw.write('Isotopic Pattern Quality')
+            fw.write(self.header)
+            for mass_spectrum in self.master.mass_spectra:
+                # TODO: This can probably be done without PurePath
+                fw.write(str(PurePath(mass_spectrum.filename).stem))
+                for analyte in mass_spectrum.analtes:
+                    total_area = 0.
+                    for isotope in analyte.isotopes:
+                        total_intensity += (isotope.area -
+                                            analyte.background_area)
+                    ipq = 0.
+                    for isotope in analyte.isotopes:
+                        ipq += abs(isotope.fraction - ((isotope.area -
+                                   analyte.background_area) /
+                                   total_intensity))
+                    fw.write('\t'+str(ipq))
                 fw.write('\n')
             fw.write('\n')
 

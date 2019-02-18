@@ -128,11 +128,11 @@ class SettingsWindow(object):
         extraction_qc_sn.insert(0, self.settings.sn_cutoff)
         extraction_qc_sn.grid(row=12, column=1, sticky=tk.W)
 
-        ok = tk.Button(root,text = 'Ok', command=
+        ok = tk.Button(root,text='Ok', command=
                             self.close_settings_window)
-        ok.grid(row = 13, column = 0, sticky = tk.W)
-        save = tk.Button(root, text = 'Save', command=self.save_settings)
-        save.grid(row = 13, column = 1, sticky = tk.E)
+        ok.grid(row=13, column=0, sticky=tk.W)
+        save = tk.Button(root, text='Save', command=self.save_settings)
+        save.grid(row=13, column=1, sticky=tk.E)
 
         # Tooltips
         create_tooltip(calibration_window_label, "The mass window in Dalton "+

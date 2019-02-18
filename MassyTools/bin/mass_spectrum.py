@@ -2,10 +2,12 @@ from pathlib import Path, PurePath
 import logging
 import numpy as np
 import MassyTools.util.file_parser as file_parser
+from MassyTools.bin.analyte import Analyte
 
 
 class MassSpectrum(object):
     def __init__(self, master):
+        self.master = master
         self.settings = master.settings
         self.process_parameters = master.process_parameters
         self.building_blocks = master.building_blocks
@@ -59,6 +61,44 @@ class MassSpectrum(object):
             calibrated_x_values = calibration_function(x_values)
         self.data = list(zip(calibrated_x_values, y_values))
 
+    def process_mass_spectrum(self):
+        analytes = []
+        for peak in self.master.peak_list:
+            for charge in range(
+                        self.settings.min_charge_state,
+                        self.settings.max_charge_state+1):
+                self.peak = peak
+                self.charge = charge
+                analyte_buffer = Analyte(self)
+                analyte_buffer.calculate_isotopes()
+                low_border = (
+                        analyte_buffer.isotopes[0].exact_mass -
+                        self.settings.background_window)
+                high_border = (
+                        analyte_buffer.isotopes[-1].exact_mass +
+                        self.settings.background_window)
+                if (low_border > self.data[0][0] and high_border <
+                            self.data[-1][0]):
+                    analytes.append(analyte_buffer)
+                else:
+                    self.logger.warning(
+                            str(analyte_buffer.name)+' with '+
+                            'charge '+str(self.charge)+' '+
+                            'being omitted because it falls '+
+                            'outside of the mass spectrum '+
+                            'range.')
+        self.analytes = analytes
+
+        for analyte in self.analytes:
+            analyte.inherit_data_subset()
+            max_fraction = max(isotope.fraction for isotope in
+                               analyte.isotopes)
+            for isotope in analyte.isotopes:
+                isotope.inherit_data_subset()
+                if (isotope.fraction == max_fraction and
+                            isotope.charge == analyte.charge):
+                    isotope.get_accurate_mass()
+
     def normalize_mass_spectrum(self):
         x_array, y_array = zip(*self.data)
         maximum = max(y_array)
@@ -83,6 +123,17 @@ class MassSpectrum(object):
         label = PurePath(self.filename).stem
         x_array, y_array = zip(*self.data)
         self.axes.plot(x_array, y_array, label=str(label))
+
+    def quantify_mass_spectrum(self):
+        for analyte in self.analytes:
+            analyte.determine_background()
+            max_fraction = max(isotope.fraction for isotope in
+                               analyte.isotopes)
+            for isotope in analyte.isotopes:
+                if (isotope.fraction == max_fraction and
+                            isotope.charge == analyte.charge):
+                    isotope.get_accurate_mass()
+                isotope.quantify_isotope()
 
     def save_mass_spectrum(self):
         with Path(self.filename).open('w') as fw:

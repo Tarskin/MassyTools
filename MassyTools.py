@@ -40,7 +40,6 @@ from MassyTools.gui.settings_window import SettingsWindow
 from MassyTools.gui.experimental_settings_window import ExperimentalSettingsWindow
 from MassyTools.gui.about_window import AboutWindow
 from MassyTools.gui.cite_window import CiteWindow
-from MassyTools.bin.analyte import Analyte
 from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 from MassyTools.bin.output import Output
 from MassyTools.bin.pdf import Pdf
@@ -60,6 +59,10 @@ class MassyToolsGui(object):
         # Inherit Tk() root object
         self.root = master
         self.read_building_blocks()
+
+        # Define task_label for progress bar functionality
+        task_label = tk.StringVar()
+        task_label.set('Idle')
 
         logging.basicConfig(filename='MassyTools.log',
             format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -82,8 +85,11 @@ class MassyToolsGui(object):
         tk.Frame(master)
         master.title('MassyTools '+str(version.version)+
                      ' (build '+str(version.build)+')')
+        task  = tk.Label(master, textvariable=task_label, width=20)
+        # TODO: Change this to be in line with the progress bar
+        task.pack()
         progress = progressbar.SimpleProgressBar(self)
-        progress.bar.pack()
+        progress.bar.pack(fill=tk.BOTH, expand=tk.YES)
         if (Path.cwd() / 'ui' / 'Icon.ico').is_file():
             master.iconbitmap(default='./ui/Icon.ico')
 
@@ -159,6 +165,7 @@ class MassyToolsGui(object):
         self.axes = background_image
         self.canvas = canvas
         self.progress = progress
+        self.task_label = task_label
 
     # Placeholder
     def foo(self):
@@ -189,13 +196,15 @@ class MassyToolsGui(object):
             peak_list = functions.get_peak_list(
                 self.process_parameters.calibration_file)
             self.peak_list = peak_list
-            self.determine_and_attach_analytes()
+            self.process_mass_spectrum()
 
+            self.task_label.set('Calibrating Mass Spectra')
             for index, mass_spectrum in enumerate(self.mass_spectra):
                 mass_spectrum.calibrate()
-                self.progress.counter.set((float(index) / len(
-                                           self.mass_spectra))*100)
+                self.progress.counter.set((float(index) /
+                        len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
+            self.task_label.set('Idle')
             self.progress.fill_bar()
 
             self.axes.clear()
@@ -213,7 +222,11 @@ class MassyToolsGui(object):
 
     def generate_pdf_report(self):
         try:
-            for mass_spectrum in self.mass_spectra:
+            self.task_label.set('Generating PDF reports')
+            for index, mass_spectrum in enumerate(self.mass_spectra):
+                self.progress.counter.set((float(index) /
+                        len(self.mass_spectra))*100)
+                self.progress.update_progress_bar()
                 self.mass_spectrum = mass_spectrum
                 pdf = Pdf(self)
                 pdf.attach_meta_data()
@@ -222,6 +235,7 @@ class MassyToolsGui(object):
                     self.analyte = analyte
                     pdf.plot_mass_spectrum_peak()
                 pdf.close_pdf()
+            self.task_label.set('Idle')
         except Exception as e:
             self.logger.error(e)
 
@@ -233,20 +247,15 @@ class MassyToolsGui(object):
             peak_list = functions.get_peak_list(
                 self.process_parameters.quantitation_file)
             self.peak_list = peak_list
-            self.determine_and_attach_analytes()
+            self.process_mass_spectrum()
+
+            self.task_label.set('Quantifying Analytes')
             for index, mass_spectrum in enumerate(self.mass_spectra):
-                self.progress.counter.set((float(index) / len(
-                                           self.mass_spectra))*100)
+                self.progress.counter.set((float(index) /
+                        len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
-                for analyte in mass_spectrum.analytes:
-                    analyte.determine_background()
-                    max_fraction = max(isotope.fraction for isotope in
-                                       analyte.isotopes)
-                    for isotope in analyte.isotopes:
-                        if (isotope.fraction == max_fraction and
-                                    isotope.charge == analyte.charge):
-                            isotope.get_accurate_mass()
-                        isotope.quantify_isotope()
+                mass_spectrum.quantify_mass_spectrum()
+            self.task_label.set('Idle')
             self.progress.fill_bar()
 
             self.generate_pdf_report()
@@ -267,47 +276,15 @@ class MassyToolsGui(object):
         except Exception as e:
             self.logger.error(e)
 
-    def determine_and_attach_analytes(self):
+    def process_mass_spectrum(self):
         try:
-            for mass_spectrum in self.mass_spectra:
-                analytes = []
-                self.mass_spectrum = mass_spectrum
-                for peak in self.peak_list:
-                    for charge in range(
-                                self.settings.min_charge_state,
-                                self.settings.max_charge_state+1):
-                        self.peak = peak
-                        self.charge = charge
-                        analyte_buffer = Analyte(self)
-                        analyte_buffer.calculate_isotopes()
-                        low_border = (
-                                analyte_buffer.isotopes[0].exact_mass -
-                                self.settings.background_window)
-                        high_border = (
-                                analyte_buffer.isotopes[-1].exact_mass +
-                                self.settings.background_window)
-                        if (low_border > mass_spectrum.data[0][0] and
-                                    high_border <
-                                    mass_spectrum.data[-1][0]):
-                            analytes.append(analyte_buffer)
-                        else:
-                            self.logger.warning(
-                                    str(analyte_buffer.name)+' with '+
-                                    'charge '+str(self.charge)+' '+
-                                    'being omitted because it falls '+
-                                    'outside of the mass spectrum '+
-                                    'range.')
-                self.mass_spectrum.analytes = analytes
-
-                for analyte in self.mass_spectrum.analytes:
-                    analyte.inherit_data_subset()
-                    max_fraction = max(isotope.fraction for isotope in
-                                       analyte.isotopes)
-                    for isotope in analyte.isotopes:
-                        isotope.inherit_data_subset()
-                        if (isotope.fraction == max_fraction and
-                                    isotope.charge == analyte.charge):
-                            isotope.get_accurate_mass()
+            self.task_label.set('Processing Mass Spectra')
+            for index, mass_spectrum in enumerate(self.mass_spectra):
+                self.progress.counter.set((float(index) /
+                        len(self.mass_spectra))*100)
+                self.progress.update_progress_bar()
+                mass_spectrum.process_mass_spectrum()
+            self.task_label.set('Idle')
         except Exception as e:
             self.logger.error(e)
 
@@ -344,22 +321,31 @@ class MassyToolsGui(object):
             data_buffer = []
             files = filedialog.askopenfilenames(title='Select Mass '+
                                                 'Spectrum File(s)')
+
+            self.task_label.set('Opening Mass Spectra')
             for index, file in enumerate(files):
                 self.progress.counter.set((float(index) /
-                                           len(files))*100)
+                        len(files))*100)
                 self.progress.update_progress_bar()
                 self.filename = file
                 mass_spec_buffer = MassSpectrum(self)
                 mass_spec_buffer.open_mass_spectrum()
                 data_buffer.append(mass_spec_buffer)
             self.mass_spectra = data_buffer
+            self.task_label.set('Idle')
             self.progress.fill_bar()
 
+            self.task_label.set('Plotting Mass Spectra')
             if self.mass_spectra:
                 self.axes.clear()
-                for mass_spectrum in self.mass_spectra:
+                for index, mass_spectrum in enumerate(self.mass_spectra):
+                    self.progress.counter.set((float(index) /
+                        len(files))*100)
+                    self.progress.update_progress_bar()
                     mass_spectrum.plot_mass_spectrum()
                 finalize_plot(self)
+            self.task_label.set('Idle')
+            self.progress.fill_bar()
         except Exception as e:
             messagebox.showinfo('Warning','The selected files could '+
                                 'not be opened.')

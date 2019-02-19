@@ -236,7 +236,8 @@ class MassyToolsGui(object):
                     pdf.plot_mass_spectrum_peak()
                 pdf.close_pdf()
             self.task_label.set('Idle')
-            
+            self.progress.fill_bar()
+
         except Exception as e:
             self.logger.error(e)
 

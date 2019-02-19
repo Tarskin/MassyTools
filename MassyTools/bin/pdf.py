@@ -18,7 +18,7 @@ class Pdf(object):
         meta_data = self.pdf.infodict()
         meta_data['Title'] = 'PDF Report for: '+str(
                 Path(self.master.filename).stem)
-        meta_data['Author'] = ('HappyTools version: '+
+        meta_data['Author'] = ('MassyTools version: '+
                                str(version.version)+' build: '+
                                str(version.build))
         meta_data['CreationDate'] = datetime.now()

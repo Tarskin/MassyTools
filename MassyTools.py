@@ -46,6 +46,11 @@ from MassyTools.bin.process_parameters import ProcessParameters
 from MassyTools.bin.output_parameters import OutputParameters
 from MassyTools.bin.settings import Settings
 
+# Platform specific bits
+if os.name == 'posix':
+    import matplotlib
+    matplotlib.use('TkAgg')
+
 
 class MassyToolsGui(object):
     @classmethod

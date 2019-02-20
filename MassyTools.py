@@ -23,6 +23,7 @@ from pathlib import Path
 
 # Third Party Imports
 import matplotlib
+matplotlib.use('Agg')
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk
 )
@@ -64,34 +65,43 @@ class MassyToolsGui(object):
         task_label = tk.StringVar()
         task_label.set('Idle')
 
+        # LOGGING
         logging.basicConfig(filename='MassyTools.log',
             format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
             datefmt='%Y-%m-%d %H:%M', filemode='a',
             level=logging.WARNING)
         req_check.check_requirements()
 
+        # CANVAS
         fig = matplotlib.figure.Figure(figsize=(8, 6))
-        if (Path.cwd() / 'ui' / 'UI.png').is_file():
-            background_image = fig.add_subplot(111)
-            image = matplotlib.image.imread('./ui/UI.png')
-            background_image.axis('off')
-            fig.set_tight_layout(True)
-            background_image.imshow(image, aspect='auto')
+        axes = fig.add_subplot(111)
+        axes.axis('off')
+        background_image = (Path.cwd() / 'MassyTools' / 'gui' /
+                            'assets' / 'UI.png')
+        if background_image.is_file():
+            img = matplotlib.image.imread(str(background_image))
+            axes.imshow(img)
+            axes.set_aspect('auto')
         canvas = FigureCanvasTkAgg(fig, master=master)
         NavigationToolbar2Tk(canvas, master)
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
         canvas.draw()
 
+        # FRAME
         tk.Frame(master)
         master.title('MassyTools '+str(version.version)+
                      ' (build '+str(version.build)+')')
         task  = tk.Label(master, textvariable=task_label, width=20)
-        # TODO: Change this to be in line with the progress bar
         task.pack()
         progress = progressbar.SimpleProgressBar(self)
         progress.bar.pack(fill=tk.BOTH, expand=tk.YES)
-        if (Path.cwd() / 'ui' / 'Icon.ico').is_file():
-            master.iconbitmap(default='./ui/Icon.ico')
+        iconbitmap = (Path.cwd() / 'MassyTools' / 'gui' / 'assets' /
+                      'Icon.ico')
+        if iconbitmap.is_file():
+            try:
+                master.iconbitmap(default=iconbitmap)
+            except tk.TclError as e:
+                self.logger.warn(e)
 
         menu = tk.Menu(master)
         master.config(menu=menu)
@@ -162,7 +172,7 @@ class MassyToolsGui(object):
         self.settings = Settings(self)
         self.process_parameters = ProcessParameters(self)
         self.output_parameters = OutputParameters(self)
-        self.axes = background_image
+        self.axes = axes
         self.canvas = canvas
         self.progress = progress
         self.task_label = task_label

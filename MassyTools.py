@@ -22,8 +22,6 @@ import logging
 from pathlib import Path
 
 # Third Party Imports
-import matplotlib
-matplotlib.use('Agg')
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk
 )

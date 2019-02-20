@@ -101,7 +101,7 @@ class MassyToolsGui(object):
             try:
                 master.iconbitmap(default=iconbitmap)
             except tk.TclError as e:
-                self.logger.warn(e)
+                logging.getLogger(__name__).warn(e)
 
         menu = tk.Menu(master)
         master.config(menu=menu)

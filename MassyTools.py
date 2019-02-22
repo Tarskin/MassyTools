@@ -22,6 +22,7 @@ import logging
 from pathlib import Path
 
 # Third Party Imports
+import matplotlib
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk
 )
@@ -47,6 +48,7 @@ from MassyTools.bin.output_parameters import OutputParameters
 from MassyTools.bin.settings import Settings
 
 # Platform specific bits
+import os
 if os.name == 'posix':
     import matplotlib
     matplotlib.use('TkAgg')
@@ -170,6 +172,7 @@ class MassyToolsGui(object):
         info_menu.add_command(label='Citing MassyTools', command=
                               self.cite_window)
 
+        # INHERITANCE
         self.logger = logging.getLogger(__name__)
         self.base_dir = Path.cwd()
         self.settings = Settings(self)

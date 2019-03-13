@@ -251,8 +251,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "1.0.2-alpha"
-        self.build = "180703b"
+        self.version = "1.0.2"
+        self.build = "190313a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -1650,7 +1650,7 @@ class App():
         """
         actualCalibrants = []
         for i in maxima:
-            diff = 4.0
+            diff = sys.maxint
             closest = 0
             for j in potentialCalibrants:
                 if abs(float(j)-float(i[0])) < diff:

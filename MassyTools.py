@@ -252,7 +252,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.2"
-        self.build = "190313a"
+        self.build = "190321a"
         self.master = master
         self.absoluteIntensity = IntVar()
         self.relativeIntensity = IntVar()
@@ -2093,23 +2093,28 @@ class App():
                         if begin is None or end is None:
                             pass
                         else:
-                            x_points = []
-                            y_points = []
-                            for k in data[begin:end]:
-                                x_points.append(k[0])
-                                y_points.append(k[1])
-                            newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
-                            f = InterpolatedUnivariateSpline(x_points, y_points)
-                            ySpline = f(newX)
-                            maximum = 0
-                            for index, k in enumerate(ySpline):
-                                if k > maximum:
-                                    maximum = k
-                                    accurateMass = newX[index]
-                            # Calculate ppm error and attach it to analyte
-                            i.ppm = ((accurateMass - j.mass) / j.mass) * 1000000
-                            # Calculate S/N
-                            i.sn = (max(y_points) - i.backgroundPoint) / i.noise
+                            try:
+                                x_points = []
+                                y_points = []
+                                for k in data[begin:end]:
+                                    x_points.append(k[0])
+                                    y_points.append(k[1])
+                                newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
+                                f = InterpolatedUnivariateSpline(x_points, y_points)
+                                ySpline = f(newX)
+                                maximum = 0
+                                for index, k in enumerate(ySpline):
+                                    if k > maximum:
+                                        maximum = k
+                                        accurateMass = newX[index]
+                                # Calculate ppm error and attach it to analyte
+                                i.ppm = ((accurateMass - j.mass) / j.mass) * 1000000
+                                # Calculate S/N
+                                i.sn = (max(y_points) - i.backgroundPoint) / i.noise
+                            except Exception as e:
+                                print ("Skipping SN and PPM calculation for "+str(i.composition))
+                                i.ppm = None
+                                i.sn = None
             # Start with second isotope to omit the 'background' isotope
             for j in i.isotopes[1:]:
                 total = 0

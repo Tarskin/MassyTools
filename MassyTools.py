@@ -50,7 +50,6 @@ from MassyTools.bin.settings import Settings
 # Platform specific bits
 import os
 if os.name == 'posix':
-    import matplotlib
     matplotlib.use('TkAgg')
 
 

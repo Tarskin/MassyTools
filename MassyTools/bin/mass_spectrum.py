@@ -53,9 +53,15 @@ class MassSpectrum(object):
                                 ' of '+str(sn) + ' and was ignored')
         x_values, y_values = zip(*self.data)
         if len(accurate_masses) < self.settings.num_total:
+            self.filename = (PurePath(self.filename).parent /
+                             PurePath('uncalibrated_'+str(PurePath(
+                             self.filename).name)))
             calibrated_x_values = x_values
             self.logger.warning(str(self.filename)+' not calibrated')
         else:
+            self.filename = (PurePath(self.filename).parent /
+                             PurePath('calibrated_'+str(PurePath(
+                             self.filename).name)))
             calibration_parameters = np.polyfit(accurate_masses, exact_masses, 2)
             calibration_function = np.poly1d(calibration_parameters)
             calibrated_x_values = calibration_function(x_values)

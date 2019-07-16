@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class OutputParameters(object):
-    def __init__(self, master):
+    def __init__(self):
         self.config = configparser.ConfigParser()
         self.logger = logging.getLogger(__name__)
 

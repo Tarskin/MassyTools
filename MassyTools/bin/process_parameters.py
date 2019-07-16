@@ -1,5 +1,5 @@
 class ProcessParameters(object):
-    def __init__(self, master):
+    def __init__(self):
         self.calibration_file = None
         self.calibration = False
         self.quantitation_file = None

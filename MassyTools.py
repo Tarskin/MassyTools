@@ -35,6 +35,7 @@ import MassyTools.gui.version as version
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
 import MassyTools.util.classification as classification
+from MassyTools.gui.batch_window import BatchWindow
 from MassyTools.gui.output_window import OutputWindow
 from MassyTools.gui.progress_bar import ProgressBar
 from MassyTools.gui.settings_window import SettingsWindow
@@ -71,14 +72,15 @@ class MassyToolsGui(object):
         task_label.set('Idle')
 
         # LOGGING
-        logging.basicConfig(filename='MassyTools.log',
-            format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-            datefmt='%Y-%m-%d %H:%M', filemode='a',
-            level=logging.WARNING)
+        logging.basicConfig(
+                filename='MassyTools.log',
+                format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                datefmt='%Y-%m-%d %H:%M', filemode='a',
+                level=logging.WARNING)
         req_check.check_requirements()
 
         # CANVAS
-        fig = figure.Figure(figsize=(12,6))
+        fig = figure.Figure(figsize=(12, 6))
         axes = fig.add_subplot(111)
         axes.axis('off')
         canvas = FigureCanvasTkAgg(fig, master=master)
@@ -100,7 +102,7 @@ class MassyToolsGui(object):
             img = image.imread(str(backgroundimage))
             axes.imshow(img)
             axes.set_aspect('auto')
-        task  = tk.Label(master, textvariable=task_label, width=20)
+        task = tk.Label(master, textvariable=task_label, width=20)
         task.pack()
         progress = ProgressBar(self.master)
         progress.bar.pack(fill=tk.X)
@@ -114,28 +116,28 @@ class MassyToolsGui(object):
 
         file_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='File', menu=file_menu)
-        file_menu.add_command(label='Open Input File', command=
-                              self.open_mass_spectrum)
-        file_menu.add_command(label='Baseline Correct', command=
-                              self.baseline_correct)
-        file_menu.add_command(label='Normalize', command=
-                              self.normalize_mass_spectrum)
-        file_menu.add_command(label='Save', command=
-                              self.save_mass_spectrum)
+        file_menu.add_command(label='Open Input File',
+                              command=self.open_mass_spectrum)
+        file_menu.add_command(label='Baseline Correct',
+                              command=self.baseline_correct)
+        file_menu.add_command(label='Normalize',
+                              command=self.normalize_mass_spectrum)
+        file_menu.add_command(label='Save',
+                              command=self.save_mass_spectrum)
 
         adv_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Advanced', menu=adv_menu)
-        adv_menu.add_command(label='Classify Mass Spectra', command=
-                             self.classify_mass_spectra)
+        adv_menu.add_command(label='Classify Mass Spectra',
+                             command=self.classify_mass_spectra)
 
         calib_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Calibration', menu=calib_menu)
-        calib_menu.add_command(label='Open Calibration File', command=
-                               self.open_calibration_file)
-        calib_menu.add_command(label='Open Exclusion File', command=
-                               self.foo)
-        calib_menu.add_command(label='Calibrate', command=
-                               self.calibrate_mass_spectrum)
+        calib_menu.add_command(label='Open Calibration File',
+                               command=self.open_calibration_file)
+        calib_menu.add_command(label='Open Exclusion File',
+                               command=self.foo)
+        calib_menu.add_command(label='Calibrate',
+                               command=self.calibrate_mass_spectrum)
 
         quantitation_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Quantitation', menu=quantitation_menu)
@@ -143,47 +145,48 @@ class MassyToolsGui(object):
                                       command=self.open_quantitation_file)
         quantitation_menu.add_command(label='Specify Outputs',
                                       command=self.open_output_window)
-        quantitation_menu.add_command(label='Quantify', command=
-                                      self.quantify_mass_spectrum)
+        quantitation_menu.add_command(label='Quantify',
+                                      command=self.quantify_mass_spectrum)
 
         quality_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='QC', menu=quality_menu)
         quality_menu.add_command(label='Open Quality Control File',
-                                command=self.foo)
+                                 command=self.foo)
         quality_menu.add_command(label='Calculate QC', command=self.foo)
 
         batch_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Batch Process', menu=batch_menu)
-        batch_menu.add_command(label='Batch Process', command=self.foo)
+        batch_menu.add_command(label='Batch Process',
+                               command=self.batch_process)
 
         curation_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Data Curation', menu=curation_menu)
-        curation_menu.add_command(label='Spectral Curation', command=
-                                  self.foo)
-        curation_menu.add_command(label='Analyte Curation', command=
-                                  self.foo)
+        curation_menu.add_command(label='Spectral Curation',
+                                  command=self.foo)
+        curation_menu.add_command(label='Analyte Curation',
+                                  command=self.foo)
 
         settings_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Settings', menu=settings_menu)
-        settings_menu.add_command(label='MassyTools Settings', command=
-                                  self.settings_window)
+        settings_menu.add_command(label='MassyTools Settings',
+                                  command=self.settings_window)
         settings_menu.add_command(
-                label='Experimental Settings', command=
-                self.experimental_settings_window)
+                label='Experimental Settings',
+                command=self.experimental_settings_window)
 
         info_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Information', menu=info_menu)
-        info_menu.add_command(label='About MassyTools', command=
-                              self.about_window)
-        info_menu.add_command(label='Citing MassyTools', command=
-                              self.cite_window)
+        info_menu.add_command(label='About MassyTools',
+                              command=self.about_window)
+        info_menu.add_command(label='Citing MassyTools',
+                              command=self.cite_window)
 
         # INHERITANCE
         self.logger = logging.getLogger(__name__)
         self.base_dir = Path.cwd()
         self.settings = Settings(self)
-        self.process_parameters = ProcessParameters(self)
-        self.output_parameters = OutputParameters(self)
+        self.process_parameters = ProcessParameters()
+        self.output_parameters = OutputParameters()
         self.axes = axes
         self.canvas = canvas
         self.progress = progress
@@ -210,6 +213,12 @@ class MassyToolsGui(object):
         except Exception as e:
             self.logger.error(e)
 
+    def batch_process(self):
+        try:
+            BatchWindow(self)
+        except Exception as e:
+            self.logger.error(e)
+
     def calibrate_mass_spectrum(self):
         try:
             self.progress.reset_bar()
@@ -223,8 +232,8 @@ class MassyToolsGui(object):
             self.task_label.set('Calibrating Mass Spectra')
             for index, mass_spectrum in enumerate(self.mass_spectra):
                 mass_spectrum.calibrate()
-                self.progress.counter.set((float(index) /
-                        len(self.mass_spectra))*100)
+                self.progress.counter.set(
+                    (float(index) / len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
             self.task_label.set('Idle')
             self.progress.fill_bar()
@@ -237,7 +246,7 @@ class MassyToolsGui(object):
             self.process_parameters.calibration = False
 
             if not self.process_parameters.calibration_file:
-                messagebox.showinfo('Warning','No Calibration File '+
+                messagebox.showinfo('Warning', 'No Calibration File ' +
                                     'Selected')
         except Exception as e:
             self.logger.error(e)
@@ -262,8 +271,8 @@ class MassyToolsGui(object):
         try:
             self.task_label.set('Generating PDF reports')
             for index, mass_spectrum in enumerate(self.mass_spectra):
-                self.progress.counter.set((float(index) /
-                        len(self.mass_spectra))*100)
+                self.progress.counter.set(
+                    (float(index) / len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
                 self.mass_spectrum = mass_spectrum
                 pdf = Pdf(self)
@@ -291,14 +300,14 @@ class MassyToolsGui(object):
 
             self.task_label.set('Quantifying Analytes')
             for index, mass_spectrum in enumerate(self.mass_spectra):
-                self.progress.counter.set((float(index) /
-                        len(self.mass_spectra))*100)
+                self.progress.counter.set(
+                    (float(index) / len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
                 mass_spectrum.quantify_mass_spectrum()
             self.task_label.set('Idle')
             self.progress.fill_bar()
 
-            if self.output_parameters.pdf_report.get() == True:
+            if self.output_parameters.pdf_report.get():
                 self.generate_pdf_report()
 
             self.output = Output(self)
@@ -321,8 +330,8 @@ class MassyToolsGui(object):
         try:
             self.task_label.set('Processing Mass Spectra')
             for index, mass_spectrum in enumerate(self.mass_spectra):
-                self.progress.counter.set((float(index) /
-                        len(self.mass_spectra))*100)
+                self.progress.counter.set(
+                    (float(index) / len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
                 mass_spectrum.process_mass_spectrum()
             self.task_label.set('Idle')
@@ -350,7 +359,7 @@ class MassyToolsGui(object):
 
     def open_calibration_file(self):
         try:
-            cal_file = filedialog.askopenfilename(title='Select '+
+            cal_file = filedialog.askopenfilename(title='Select ' +
                                                   'Calibration File')
             self.process_parameters.calibration_file = cal_file
         except Exception as e:
@@ -360,13 +369,13 @@ class MassyToolsGui(object):
         try:
             self.progress.reset_bar()
             data_buffer = []
-            files = filedialog.askopenfilenames(title='Select Mass '+
+            files = filedialog.askopenfilenames(title='Select Mass ' +
                                                 'Spectrum File(s)')
 
             self.task_label.set('Opening Mass Spectra')
             for index, file in enumerate(files):
-                self.progress.counter.set((float(index) /
-                        len(files))*100)
+                self.progress.counter.set(
+                    (float(index) / len(files))*100)
                 self.progress.update_progress_bar()
                 self.filename = file
                 mass_spec_buffer = MassSpectrum(self)
@@ -380,15 +389,15 @@ class MassyToolsGui(object):
             if self.mass_spectra:
                 self.axes.clear()
                 for index, mass_spectrum in enumerate(self.mass_spectra):
-                    self.progress.counter.set((float(index) /
-                        len(files))*100)
+                    self.progress.counter.set(
+                        (float(index) / len(files))*100)
                     self.progress.update_progress_bar()
                     mass_spectrum.plot_mass_spectrum()
                 finalize_plot(self)
             self.task_label.set('Idle')
             self.progress.fill_bar()
         except Exception as e:
-            messagebox.showinfo('Warning','The selected files could '+
+            messagebox.showinfo('Warning', 'The selected files could ' +
                                 'not be opened.')
             self.logger.error(e)
 
@@ -410,7 +419,7 @@ class MassyToolsGui(object):
             block = Path(file).stem
             keys = []
             values = []
-            with open(file,'r') as fr:
+            with open(file, 'r') as fr:
                 for line in fr:
                     foo = line.rstrip().split()
                     key = foo[0]
@@ -425,7 +434,7 @@ class MassyToolsGui(object):
                     except ValueError:
                         value = str(value)
                     values.append(value)
-            building_blocks[block] = dict(zip(keys,values))
+            building_blocks[block] = dict(zip(keys, values))
         self.building_blocks = building_blocks
 
     def save_mass_spectrum(self):
@@ -440,6 +449,7 @@ class MassyToolsGui(object):
             SettingsWindow(self)
         except Exception as e:
             self.logger.error(e)
+
 
 if __name__ == "__main__":
     MassyToolsGui.run()

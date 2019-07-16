@@ -22,21 +22,21 @@ import logging
 from pathlib import Path
 
 # Third Party Imports
-import matplotlib
+from matplotlib import image, figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk
 )
+import os
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import filedialog, messagebox
 
 # Application Specific Imports
 import MassyTools.gui.version as version
-import MassyTools.gui.progress_bar as progressbar
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
 import MassyTools.util.classification as classification
 from MassyTools.gui.output_window import OutputWindow
+from MassyTools.gui.progress_bar import ProgressBar
 from MassyTools.gui.settings_window import SettingsWindow
 from MassyTools.gui.experimental_settings_window import ExperimentalSettingsWindow
 from MassyTools.gui.about_window import AboutWindow
@@ -49,8 +49,8 @@ from MassyTools.bin.output_parameters import OutputParameters
 from MassyTools.bin.settings import Settings
 
 # Platform specific bits
-import os
 if os.name == 'posix':
+    import matplotlib
     matplotlib.use('TkAgg')
 
 
@@ -63,7 +63,7 @@ class MassyToolsGui(object):
 
     def __init__(self, master):
         # Inherit Tk() root object
-        self.root = master
+        self.master = master
         self.read_building_blocks()
 
         # Define task_label for progress bar functionality
@@ -78,15 +78,9 @@ class MassyToolsGui(object):
         req_check.check_requirements()
 
         # CANVAS
-        fig = matplotlib.figure.Figure(figsize=(8, 6))
+        fig = figure.Figure(figsize=(12,6))
         axes = fig.add_subplot(111)
         axes.axis('off')
-        background_image = (Path.cwd() / 'MassyTools' / 'gui' /
-                            'assets' / 'UI.png')
-        if background_image.is_file():
-            img = matplotlib.image.imread(str(background_image))
-            axes.imshow(img)
-            axes.set_aspect('auto')
         canvas = FigureCanvasTkAgg(fig, master=master)
         NavigationToolbar2Tk(canvas, master)
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
@@ -94,20 +88,27 @@ class MassyToolsGui(object):
 
         # FRAME
         tk.Frame(master)
-        master.title('MassyTools '+str(version.version)+
-                     ' (build '+str(version.build)+')')
+        master.title('MassyTools '+str(version.version) +
+                     ' (Build '+str(version.build)+')')
+        iconbitmap = Path.cwd() / 'MassyTools' / 'gui' / 'assets' / 'Icon.ico'
+        backgroundimage = Path.cwd() / 'MassyTools' / 'gui' / 'assets' / 'UI.png'
+        try:
+            master.iconbitmap(default=iconbitmap)
+        except tk.TclError as e:
+            logging.getLogger(__name__).warning(e)
+        if backgroundimage.is_file():
+            img = image.imread(str(backgroundimage))
+            axes.imshow(img)
+            axes.set_aspect('auto')
         task  = tk.Label(master, textvariable=task_label, width=20)
         task.pack()
-        progress = progressbar.SimpleProgressBar(self)
-        progress.bar.pack(fill=tk.BOTH, expand=tk.YES)
-        iconbitmap = (Path.cwd() / 'MassyTools' / 'gui' / 'assets' /
-                      'Icon.ico')
-        if iconbitmap.is_file():
-            try:
-                master.iconbitmap(default=iconbitmap)
-            except tk.TclError as e:
-                logging.getLogger(__name__).warning(e)
+        progress = ProgressBar(self.master)
+        progress.bar.pack(fill=tk.X)
 
+        # QUIT
+        master.protocol('WM_DELETE_WINDOW', self.close)
+
+        # MENU
         menu = tk.Menu(master)
         master.config(menu=menu)
 
@@ -252,6 +253,10 @@ class MassyToolsGui(object):
 
         except Exception as e:
             self.logger.error(e)
+
+    def close(self):
+        self.master.destroy()
+        self.master.quit()
 
     def generate_pdf_report(self):
         try:

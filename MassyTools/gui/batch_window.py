@@ -1,5 +1,9 @@
-import tkinter as tk
 from pathlib import Path
+import tkinter as tk
+
+from MassyTools.gui.output_window import OutputWindow
+from MassyTools.gui.tooltip import create_tooltip
+from MassyTools.util.batch_process import BatchProcess
 
 
 class BatchWindow(object):
@@ -60,21 +64,46 @@ class BatchWindow(object):
         close_button.grid(row=5, column=1, sticky=tk.E)
 
         self.top = top
+        self.top = top
+        self.data_folder_var = data_folder_var
+        self.calibration_file_var = calibration_file_var
+        self.quantitation_file_var = quantitation_file_var
+
+        # Tooltips
+        create_tooltip(
+            calibration_button, 'This button will allow you to select ' +
+            'your calibration file, the program expects a tab separated ' +
+            'text file where each line consists contains at least a '+
+            'composition.')
+
+        create_tooltip(
+            analyte_button, 'This button will allow you to select your ' +
+            'analyte file, the program expects a tab separated text file ' +
+            'where each line contains at least a composition')
+
+        create_tooltip(
+            batch_button, 'This button will allow you to select the ' +
+            'folder where the mass spectra are stored that MassyTools will ' +
+            'process.')
+
+        create_tooltip(
+            output_button, 'This button will open another window in ' +
+            'which you can select which outputs you want MassyTools to show ' +
+            'in the final summary.')
 
     def close(self):
         self.top.destroy()
 
     def open_output_window(self):
-        # OutputWindow(self)
+        OutputWindow(self)
         pass
 
     def run(self):
         """Start the batch process.
         """
         try:
-            pass
-            # batch_process = BatchProcess(self)
-            # batch_process.batch_process()
+            # Placeholder
+            BatchProcess(self)
         except Exception as e:
             self.logger.error(e)
 

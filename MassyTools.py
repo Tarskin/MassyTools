@@ -19,7 +19,7 @@
 
 # Standard Library Imports
 import logging
-from pathlib import Path
+from pathlib import Path, PurePath
 
 # Third Party Imports
 import matplotlib
@@ -35,6 +35,7 @@ import MassyTools.gui.version as version
 import MassyTools.gui.progress_bar as progressbar
 import MassyTools.util.requirement_checker as req_check
 import MassyTools.util.functions as functions
+import MassyTools.util.classification as classification
 from MassyTools.gui.output_window import OutputWindow
 from MassyTools.gui.settings_window import SettingsWindow
 from MassyTools.gui.experimental_settings_window import ExperimentalSettingsWindow
@@ -105,7 +106,7 @@ class MassyToolsGui(object):
             try:
                 master.iconbitmap(default=iconbitmap)
             except tk.TclError as e:
-                logging.getLogger(__name__).warn(e)
+                logging.getLogger(__name__).warning(e)
 
         menu = tk.Menu(master)
         master.config(menu=menu)
@@ -120,6 +121,11 @@ class MassyToolsGui(object):
                               self.normalize_mass_spectrum)
         file_menu.add_command(label='Save', command=
                               self.save_mass_spectrum)
+
+        adv_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label='Advanced', menu=adv_menu)
+        adv_menu.add_command(label='Classify Mass Spectra', command=
+                             self.classify_mass_spectra)
 
         calib_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label='Calibration', menu=calib_menu)
@@ -232,6 +238,18 @@ class MassyToolsGui(object):
             if not self.process_parameters.calibration_file:
                 messagebox.showinfo('Warning','No Calibration File '+
                                     'Selected')
+        except Exception as e:
+            self.logger.error(e)
+
+    def classify_mass_spectra(self):
+        try:
+            classification.classify_mass_spectra(self.mass_spectra)
+
+            self.axes.clear()
+            for mass_spectrum in self.mass_spectra:
+                mass_spectrum.plot_mass_spectrum()
+            finalize_plot(self)
+
         except Exception as e:
             self.logger.error(e)
 

@@ -19,7 +19,7 @@
 
 # Standard Library Imports
 import logging
-from pathlib import Path, PurePath
+from pathlib import Path
 
 # Third Party Imports
 import matplotlib

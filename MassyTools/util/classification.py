@@ -24,7 +24,7 @@ def density_based_spatial_clustering(data):
 def normalize_intensity(mass_spectra):
     data = []
 
-    for index, mass_spectrum in enumerate(mass_spectra):
+    for mass_spectrum in mass_spectra:
         _, _y = zip(*mass_spectrum.data)
         max_y = max(_y)
         norm_y = [x / max_y for x in _y]

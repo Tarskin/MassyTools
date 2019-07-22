@@ -98,7 +98,6 @@ class BatchWindow(object):
 
     def open_output_window(self):
         OutputWindow(self)
-        pass
 
     def run(self):
         """Start the batch process.

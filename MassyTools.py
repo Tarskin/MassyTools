@@ -44,7 +44,6 @@ from MassyTools.gui.about_window import AboutWindow
 from MassyTools.gui.cite_window import CiteWindow
 from MassyTools.bin.mass_spectrum import MassSpectrum, finalize_plot
 from MassyTools.bin.output import Output
-from MassyTools.bin.pdf import Pdf
 from MassyTools.bin.process_parameters import ProcessParameters
 from MassyTools.bin.output_parameters import OutputParameters
 from MassyTools.bin.settings import Settings
@@ -214,10 +213,10 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def batch_process(self):
-        # try:
+        try:
             BatchWindow(self)
-        # except Exception as e:
-        #     self.logger.error(e)
+        except Exception as e:
+            self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
         try:

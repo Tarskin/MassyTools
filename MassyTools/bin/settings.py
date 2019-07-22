@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 class Settings(object):
-    def __init__(self, master):
+    def __init__(self):
         self.config = configparser.ConfigParser()
         self.logger = logging.getLogger(__name__)
 
@@ -75,6 +75,10 @@ class Settings(object):
             try:
                 self.mass_modifiers = self.config.get(
                         'General', 'Mass modifiers')
+                try:
+                    self.mass_modifiers = self.mass_modifiers.split(',')
+                except AttributeError:
+                    pass
             except (configparser.NoSectionError,
                     configparser.NoOptionError):
                 pass
@@ -166,12 +170,6 @@ class Settings(object):
             try:
                 self.min_total_contribution = float(self.config.getfloat(
                         'Quantitation', 'Min isotopic contribution'))
-            except (configparser.NoSectionError,
-                    configparser.NoOptionError):
-                pass
-
-            try:
-                self.mass_modifiers = self.mass_modifiers.split(',')
             except (configparser.NoSectionError,
                     configparser.NoOptionError):
                 pass

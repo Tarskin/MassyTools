@@ -184,7 +184,7 @@ class MassyToolsGui(object):
         # INHERITANCE
         self.logger = logging.getLogger(__name__)
         self.base_dir = Path.cwd()
-        self.settings = Settings(self)
+        self.settings = Settings()
         self.process_parameters = ProcessParameters()
         self.output_parameters = OutputParameters()
         self.axes = axes
@@ -214,10 +214,10 @@ class MassyToolsGui(object):
             self.logger.error(e)
 
     def batch_process(self):
-        try:
+        # try:
             BatchWindow(self)
-        except Exception as e:
-            self.logger.error(e)
+        # except Exception as e:
+        #     self.logger.error(e)
 
     def calibrate_mass_spectrum(self):
         try:
@@ -274,14 +274,7 @@ class MassyToolsGui(object):
                 self.progress.counter.set(
                     (float(index) / len(self.mass_spectra))*100)
                 self.progress.update_progress_bar()
-                self.mass_spectrum = mass_spectrum
-                pdf = Pdf(self)
-                pdf.attach_meta_data()
-                pdf.plot_mass_spectrum()
-                for analyte in mass_spectrum.analytes:
-                    self.analyte = analyte
-                    pdf.plot_mass_spectrum_peak()
-                pdf.close_pdf()
+                mass_spectrum.generate_pdf_report()
             self.task_label.set('Idle')
             self.progress.fill_bar()
 

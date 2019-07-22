@@ -11,7 +11,9 @@ class BatchWindow(object):
         self.master = master
         self.output_parameters = master.output_parameters
         self.process_parameters = master.process_parameters
+        self.building_blocks = master.building_blocks  # Should refactor to not need this
         self.logger = master.logger
+        self.axes = master.axes  # Should refactor to not need this
         self.settings = self.master.settings
 
         data_folder_var = tk.StringVar()
@@ -29,19 +31,19 @@ class BatchWindow(object):
         top.protocol('WM_DELETE_WINDOW', self.close)
 
         calibration_button = tk.Button(top, text='Calibration File',
-                                      width=20,
-                                      command=self.set_calibration_file)
+                                       width=20,
+                                       command=self.set_calibration_file)
         calibration_button.grid(row=1, column=0, sticky=tk.W)
-        calibration_label = tk.Label(top, textvariable=
-                                     calibration_file_var, width=20)
+        calibration_label = tk.Label(top, textvariable=calibration_file_var,
+                                     width=20)
         calibration_label.grid(row=1, column=1)
 
         analyte_button = tk.Button(top, text='Analyte File',
-                                  width=20,
-                                  command=self.set_analyte_file)
+                                   width=20,
+                                   command=self.set_analyte_file)
         analyte_button.grid(row=2, column=0, sticky=tk.W)
-        analyte_label = tk.Label(top, textvariable=
-                                 quantitation_file_var, width=20)
+        analyte_label = tk.Label(top, textvariable=quantitation_file_var,
+                                 width=20)
         analyte_label.grid(row=2, column=1)
 
         batch_button = tk.Button(top, text='Batch Directory',
@@ -73,7 +75,7 @@ class BatchWindow(object):
         create_tooltip(
             calibration_button, 'This button will allow you to select ' +
             'your calibration file, the program expects a tab separated ' +
-            'text file where each line consists contains at least a '+
+            'text file where each line consists contains at least a ' +
             'composition.')
 
         create_tooltip(
@@ -102,8 +104,8 @@ class BatchWindow(object):
         """Start the batch process.
         """
         try:
-            # Placeholder
-            BatchProcess(self)
+            batch_process = BatchProcess(self)
+            batch_process.batch_process()
         except Exception as e:
             self.logger.error(e)
 

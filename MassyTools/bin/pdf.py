@@ -8,8 +8,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 class Pdf(object):
     def __init__(self, master):
         self.master = master
-        parent_dir = Path(master.mass_spectrum.filename).parent
-        pdf_file = str(Path(master.mass_spectrum.filename).stem)+'.pdf'
+        parent_dir = Path(master.filename).parent
+        pdf_file = str(Path(master.filename).stem)+'.pdf'
         pdf = PdfPages(parent_dir / Path(pdf_file))
 
         fig = Figure(figsize=(8,6))
@@ -31,11 +31,11 @@ class Pdf(object):
         meta_data['CreationDate'] = datetime.now()
 
     def plot_mass_spectrum(self):
-        x_data, y_data = zip(*self.master.mass_spectrum.data)
+        x_data, y_data = zip(*self.master.data)
 
         self.axes.clear()
         self.axes.plot(x_data, y_data)
-        self.axes.set_title(str(self.master.mass_spectrum.filename))
+        self.axes.set_title(str(self.master.filename))
         self.pdf.savefig(self.fig)
 
     def plot_mass_spectrum_peak(self):

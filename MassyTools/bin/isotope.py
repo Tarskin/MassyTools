@@ -35,7 +35,7 @@ class Isotope(object):
     def get_accurate_mass(self):
         x_subset, y_subset = zip(*self.data_subset)
         x_interpolation = np.linspace(x_subset[0], x_subset[-1],
-                                      2500*(x_subset[-1]-x_subset[0]))
+                                      int(2500*(x_subset[-1]-x_subset[0])))
         f = InterpolatedUnivariateSpline(x_subset, y_subset)
         y_interpolation = f(x_interpolation)
         max_value = max(y_interpolation)

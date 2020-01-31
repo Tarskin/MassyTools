@@ -226,10 +226,10 @@ class MassyToolsGui(object):
             peak_list = functions.get_peak_list(
                 self.process_parameters.calibration_file)
             self.peak_list = peak_list
-            self.process_mass_spectrum()
 
             self.task_label.set('Calibrating Mass Spectra')
             for index, mass_spectrum in enumerate(self.mass_spectra):
+                mass_spectrum.process_mass_spectrum()
                 mass_spectrum.calibrate()
                 self.progress.counter.set(
                     (float(index) / len(self.mass_spectra))*100)

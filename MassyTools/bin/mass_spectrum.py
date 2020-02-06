@@ -163,6 +163,6 @@ def finalize_plot(master):
     master.axes.set_xlabel('m/z [Th]')
     master.axes.set_ylabel('Intensity [au]')
     handles, labels = master.axes.get_legend_handles_labels()
-    master.axes.legend(handles, labels)
+    master.axes.legend(handles, labels, loc='upper right')
     master.axes.get_xaxis().get_major_formatter().set_useOffset(False)
     master.canvas.draw_idle()

@@ -101,7 +101,7 @@ class MassyToolsGui(object):
             img = image.imread(str(backgroundimage))
             axes.imshow(img)
             axes.set_aspect('auto')
-        task = tk.Label(master, textvariable=task_label, width=20)
+        task = tk.Label(master, textvariable=task_label, width=30)
         task.pack()
         progress = ProgressBar(self.master)
         progress.bar.pack(fill=tk.X)
@@ -205,9 +205,20 @@ class MassyToolsGui(object):
     def baseline_correct(self):
         try:
             self.axes.clear()
-            for mass_spectrum in self.mass_spectra:
+
+            self.progress.reset_bar()
+            self.task_label.set('Baseline Correcting Mass Spectra')
+
+            for index, mass_spectrum in enumerate(self.mass_spectra):
                 mass_spectrum.baseline_correct()
                 mass_spectrum.plot_mass_spectrum()
+                self.progress.counter.set(
+                    (float(index) / len(self.mass_spectra))*100)
+                self.progress.update_progress_bar()
+
+            self.task_label.set('Idle')
+            self.progress.fill_bar()
+
             finalize_plot(self)
         except Exception as e:
             self.logger.error(e)

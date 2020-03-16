@@ -2,6 +2,7 @@ import logging
 import numpy as np
 from bisect import bisect_left, bisect_right
 from scipy.interpolate import InterpolatedUnivariateSpline
+from sys import maxsize
 
 
 class Isotope(object):
@@ -43,8 +44,8 @@ class Isotope(object):
         self.accurate_mass = float(x_interpolation[max_index][0])
 
     def quantify_isotope(self):
-        self.maximum_intensity = 0.
-        self.total_intensity = 0.
+        self.maximum_intensity = -maxsize
+        self.total_intensity = 0
         self.area = 0.
         x_subset, _ = zip(*self.data_subset)
         average_spacing = (x_subset[-1] - x_subset[0]) / len(x_subset)

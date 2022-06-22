@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: massytools
+Version: 22.6.11
+Summary: Mass Spectrum Quantitiation Tool.
+Home-page: https://github.com/Tarskin/MassyTools
+Author: Bas Cornelis Jansen
+Author-email: bas.c.jansen@gmail.com
+Keywords: ms,mass spectrometry,quantitation,proteomics,glycomics,python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.9.10
+License-File: LICENSE
+
+Apache 2.0

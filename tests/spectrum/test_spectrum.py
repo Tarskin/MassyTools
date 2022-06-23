@@ -1,4 +1,4 @@
-from bin.mass_spectrum import MassSpectrum
+from massytools.bin.mass_spectrum import MassSpectrum
 
 A = MassSpectrum()
 

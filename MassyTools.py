@@ -84,7 +84,7 @@ S36 = [('36S', 0.0002, 3.99501)]
 
 # Read the building blocks
 BLOCKS = {}
-for file in glob.glob("./blocks/*.block"):
+for file in glob.glob("./blocks/**/*.block", recursive=True):
     block = os.path.splitext(os.path.basename(file))[0]
     keys = []
     values = []
@@ -251,8 +251,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "2.1.5"
-        self.build = "20240201"
+        self.version = "2.1.6"
+        self.build = "20240315"
         self.master = master
         self.absoluteIntensity = tk.DoubleVar() #tk.IntVar()
         self.relativeIntensity = tk.DoubleVar() #tk.IntVar()
